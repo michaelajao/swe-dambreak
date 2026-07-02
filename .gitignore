@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.pytest_cache/
+build/
+dist/
+
+# Data — raw coauthor outputs are large and external; keep out of git
+data/raw/
+data/cache/
+
+# Experiment outputs
+runs/
+checkpoints/
+*.npy
+*.npz
+
+# OS
+Thumbs.db
+.DS_Store
