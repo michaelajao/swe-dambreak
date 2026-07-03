@@ -144,9 +144,9 @@ def main() -> None:
         "3. **Grid staggering**: cell-centered FV (ours) vs node FD-style "
         "(theirs); comparison interpolation contributes O(dx^2) near smooth "
         "regions and O(dx) at the shock.\n"
-        "4. **Numerical diffusion at the shock** dominates L_inf: both are "
-        "first-order at the front, but wave-speed estimates differ (ours "
-        "two-rarefaction with q_K correction; theirs Davies-type min/max).\n"
+        "4. **Numerical diffusion at the shock** dominates L_inf: both schemes "
+        "use Davies-type wave-speed bounds, so the remaining front differences "
+        "come from time integration (RK2 vs RK3), dt, and grid staggering.\n"
     )
     (REPORTS / "reconciliation.md").write_text("\n".join(L), encoding="utf-8")
     print("wrote reports/reconciliation.md")
