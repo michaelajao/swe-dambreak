@@ -1,0 +1,479 @@
+% ============================================================
+% references.bib — Comparative Analysis of Numerical Schemes for
+% 2D Dam-Break Problems with Source Terms
+% All entries verified against publisher pages / arXiv / Crossref
+% (2026-07-03). Entries flagged "preprint" have no journal version yet.
+% ============================================================
+
+% ---------- Classical numerical methods ----------
+
+@book{toro2001shockcapturing,
+  author    = {Toro, Eleuterio F.},
+  title     = {Shock-Capturing Methods for Free-Surface Shallow Flows},
+  publisher = {John Wiley \& Sons},
+  address   = {Chichester},
+  year      = {2001},
+  isbn      = {978-0-471-98766-6}
+}
+
+@book{toro2009riemann,
+  author    = {Toro, Eleuterio F.},
+  title     = {Riemann Solvers and Numerical Methods for Fluid Dynamics: A Practical Introduction},
+  edition   = {3rd},
+  publisher = {Springer},
+  address   = {Berlin, Heidelberg},
+  year      = {2009},
+  doi       = {10.1007/b79761},
+  isbn      = {978-3-540-25202-3}
+}
+
+@article{godunov1959difference,
+  author  = {Godunov, Sergei K.},
+  title   = {A Difference Method for Numerical Calculation of Discontinuous Solutions of the Equations of Hydrodynamics},
+  journal = {Matematicheskii Sbornik},
+  volume  = {47(89)},
+  number  = {3},
+  pages   = {271--306},
+  year    = {1959},
+  note    = {In Russian}
+}
+
+@article{harten1983upstream,
+  author  = {Harten, Amiram and Lax, Peter D. and van Leer, Bram},
+  title   = {On Upstream Differencing and {Godunov}-Type Schemes for Hyperbolic Conservation Laws},
+  journal = {SIAM Review},
+  volume  = {25},
+  number  = {1},
+  pages   = {35--61},
+  year    = {1983},
+  doi     = {10.1137/1025002}
+}
+
+@article{toro1994hllc,
+  author  = {Toro, Eleuterio F. and Spruce, M. and Speares, W.},
+  title   = {Restoration of the Contact Surface in the {HLL}-{Riemann} Solver},
+  journal = {Shock Waves},
+  volume  = {4},
+  number  = {1},
+  pages   = {25--34},
+  year    = {1994},
+  doi     = {10.1007/BF01414629}
+}
+
+@article{roe1981approximate,
+  author  = {Roe, Philip L.},
+  title   = {Approximate {Riemann} Solvers, Parameter Vectors, and Difference Schemes},
+  journal = {Journal of Computational Physics},
+  volume  = {43},
+  number  = {2},
+  pages   = {357--372},
+  year    = {1981},
+  doi     = {10.1016/0021-9991(81)90128-5}
+}
+
+@article{rusanov1961calculation,
+  author  = {Rusanov, Viktor V.},
+  title   = {The Calculation of the Interaction of Non-Stationary Shock Waves and Obstacles},
+  journal = {Zhurnal Vychislitel'noi Matematiki i Matematicheskoi Fiziki},
+  volume  = {1},
+  number  = {2},
+  pages   = {267--279},
+  year    = {1961},
+  note    = {English translation: USSR Computational Mathematics and Mathematical Physics, 1(2):304--320, 1962}
+}
+
+@article{vanleer1979towards,
+  author  = {van Leer, Bram},
+  title   = {Towards the Ultimate Conservative Difference Scheme. {V}. {A} Second-Order Sequel to {Godunov's} Method},
+  journal = {Journal of Computational Physics},
+  volume  = {32},
+  number  = {1},
+  pages   = {101--136},
+  year    = {1979}
+}
+
+@article{lax1960systems,
+  author  = {Lax, Peter D. and Wendroff, Burton},
+  title   = {Systems of Conservation Laws},
+  journal = {Communications on Pure and Applied Mathematics},
+  volume  = {13},
+  number  = {2},
+  pages   = {217--237},
+  year    = {1960}
+}
+
+@article{gottlieb2001strong,
+  author  = {Gottlieb, Sigal and Shu, Chi-Wang and Tadmor, Eitan},
+  title   = {Strong Stability-Preserving High-Order Time Discretization Methods},
+  journal = {SIAM Review},
+  volume  = {43},
+  number  = {1},
+  pages   = {89--112},
+  year    = {2001},
+  doi     = {10.1137/S003614450036757X}
+}
+
+@article{borges2008improved,
+  author  = {Borges, Rafael and Carmona, Monique and Costa, Bruno and Don, Wai Sun},
+  title   = {An Improved Weighted Essentially Non-Oscillatory Scheme for Hyperbolic Conservation Laws},
+  journal = {Journal of Computational Physics},
+  volume  = {227},
+  number  = {6},
+  pages   = {3191--3211},
+  year    = {2008}
+}
+
+@article{kurganov2018finite,
+  author  = {Kurganov, Alexander},
+  title   = {Finite-Volume Schemes for Shallow-Water Equations},
+  journal = {Acta Numerica},
+  volume  = {27},
+  pages   = {289--351},
+  year    = {2018}
+}
+
+% ---------- Well-balancing, source terms, wet/dry ----------
+
+@article{audusse2004fast,
+  author  = {Audusse, Emmanuel and Bouchut, Fran{\c{c}}ois and Bristeau, Marie-Odile and Klein, Rupert and Perthame, Beno{\^i}t},
+  title   = {A Fast and Stable Well-Balanced Scheme with Hydrostatic Reconstruction for Shallow Water Flows},
+  journal = {SIAM Journal on Scientific Computing},
+  volume  = {25},
+  number  = {6},
+  pages   = {2050--2065},
+  year    = {2004},
+  doi     = {10.1137/S1064827503431090}
+}
+
+@article{bermudez1994upwind,
+  author  = {Berm{\'u}dez, Alfredo and V{\'a}zquez, Mar{\'i}a Elena},
+  title   = {Upwind Methods for Hyperbolic Conservation Laws with Source Terms},
+  journal = {Computers \& Fluids},
+  volume  = {23},
+  number  = {8},
+  pages   = {1049--1071},
+  year    = {1994}
+}
+
+@article{xing2010positivity,
+  author  = {Xing, Yulong and Zhang, Xiangxiong and Shu, Chi-Wang},
+  title   = {Positivity-Preserving High Order Well-Balanced Discontinuous {Galerkin} Methods for the Shallow Water Equations},
+  journal = {Advances in Water Resources},
+  volume  = {33},
+  number  = {12},
+  pages   = {1476--1493},
+  year    = {2010}
+}
+
+% ---------- Benchmarks and analytic solutions ----------
+
+@book{stoker1957water,
+  author    = {Stoker, James J.},
+  title     = {Water Waves: The Mathematical Theory with Applications},
+  publisher = {Interscience Publishers},
+  address   = {New York},
+  year      = {1957}
+}
+
+@article{delestre2013swashes,
+  author  = {Delestre, Olivier and Lucas, Carine and Ksinant, Pierre-Antoine and Darboux, Fr{\'e}d{\'e}ric and Laguerre, Christian and Vo, Thi-Ngoc-Tuoi and James, Fran{\c{c}}ois and Cordier, St{\'e}phane},
+  title   = {{SWASHES}: A Compilation of Shallow Water Analytic Solutions for Hydraulic and Environmental Studies},
+  journal = {International Journal for Numerical Methods in Fluids},
+  volume  = {72},
+  number  = {3},
+  pages   = {269--300},
+  year    = {2013},
+  doi     = {10.1002/fld.3741}
+}
+
+@article{fennema1990explicit,
+  author  = {Fennema, Robert J. and Chaudhry, M. Hanif},
+  title   = {Explicit Methods for 2-{D} Transient Free-Surface Flows},
+  journal = {Journal of Hydraulic Engineering},
+  volume  = {116},
+  number  = {8},
+  pages   = {1013--1034},
+  year    = {1990},
+  doi     = {10.1061/(ASCE)0733-9429(1990)116:8(1013)}
+}
+
+@article{kawahara1986finite,
+  author  = {Kawahara, Mutsuto and Umetsu, Tomoyoshi},
+  title   = {Finite Element Method for Moving Boundary Problems in River Flow},
+  journal = {International Journal for Numerical Methods in Fluids},
+  volume  = {6},
+  number  = {6},
+  pages   = {365--386},
+  year    = {1986}
+}
+
+@article{soaresfrazao2007experimental,
+  author  = {Soares-Fraz{\~a}o, Sandra and Zech, Yves},
+  title   = {Experimental Study of Dam-Break Flow Against an Isolated Obstacle},
+  journal = {Journal of Hydraulic Research},
+  volume  = {45},
+  number  = {sup1},
+  pages   = {27--36},
+  year    = {2007},
+  doi     = {10.1080/00221686.2007.9521830}
+}
+
+% ---------- PINNs: foundations and pathologies ----------
+
+@article{raissi2019physics,
+  author  = {Raissi, Maziar and Perdikaris, Paris and Karniadakis, George E.},
+  title   = {Physics-informed neural networks: A deep learning framework for solving forward and inverse problems involving nonlinear partial differential equations},
+  journal = {Journal of Computational Physics},
+  volume  = {378},
+  pages   = {686--707},
+  year    = {2019},
+  doi     = {10.1016/j.jcp.2018.10.045}
+}
+
+@article{mao2020highspeed,
+  author  = {Mao, Zhiping and Jagtap, Ameya D. and Karniadakis, George Em},
+  title   = {Physics-informed neural networks for high-speed flows},
+  journal = {Computer Methods in Applied Mechanics and Engineering},
+  volume  = {360},
+  pages   = {112789},
+  year    = {2020},
+  doi     = {10.1016/j.cma.2019.112789}
+}
+
+@inproceedings{rahaman2019spectral,
+  author    = {Rahaman, Nasim and Baratin, Aristide and Arpit, Devansh and Draxler, Felix and Lin, Min and Hamprecht, Fred A. and Bengio, Yoshua and Courville, Aaron},
+  title     = {On the Spectral Bias of Neural Networks},
+  booktitle = {Proceedings of the 36th International Conference on Machine Learning (ICML)},
+  series    = {Proceedings of Machine Learning Research},
+  volume    = {97},
+  pages     = {5301--5310},
+  year      = {2019},
+  publisher = {PMLR}
+}
+
+% ---------- PINNs for shallow water equations ----------
+
+@article{mumtaz2025dambreak,
+  author  = {Mumtaz, Kinza and Nadeem, Muhammad Waasif and Khan, Adnan and Lakdawala, Zahra},
+  title   = {Investigating the use of physics informed neural networks for dam-break scenarios},
+  journal = {PLOS ONE},
+  year    = {2025},
+  volume  = {20},
+  number  = {9},
+  pages   = {e0332694},
+  doi     = {10.1371/journal.pone.0332694}
+}
+
+@article{tian2025pinnswe,
+  author  = {Tian, Yongfu and Ding, Shan and Huang, Lida and Su, Guofeng and Chen, Jianguo},
+  title   = {Physics-Informed Neural Networks for Solving the Two-Dimensional Shallow Water Equations With Terrain Topography and Rainfall Source Terms},
+  journal = {Water Resources Research},
+  year    = {2025},
+  volume  = {61},
+  pages   = {e2025WR040052},
+  doi     = {10.1029/2025WR040052},
+  note    = {Preprint: arXiv:2501.11372}
+}
+
+@article{qi2024pinnswe,
+  author  = {Qi, Xin and de Almeida, Gustavo A. M. and Maldonado, Sergio},
+  title   = {Physics-informed neural networks for solving flow problems modeled by the {2D} Shallow Water Equations without labeled data},
+  journal = {Journal of Hydrology},
+  year    = {2024},
+  volume  = {636},
+  pages   = {131263},
+  doi     = {10.1016/j.jhydrol.2024.131263}
+}
+
+@article{dazzi2024augmented,
+  author  = {Dazzi, Susanna},
+  title   = {Physics-Informed Neural Networks for the Augmented System of Shallow Water Equations With Topography},
+  journal = {Water Resources Research},
+  year    = {2024},
+  volume  = {60},
+  pages   = {e2023WR036589},
+  doi     = {10.1029/2023WR036589}
+}
+
+@article{qi2025ndawl,
+  author  = {Qi, Xin and Zhang, Dawei and Wang, Fan and Bi, Wuxia and Lu, Mingda},
+  title   = {{NDAWL-PINN}: a new non-dimensionalization and multi-task learning approach for efficient training of physics-informed neural networks to solve the shallow water equations},
+  journal = {Engineering Applications of Computational Fluid Mechanics},
+  year    = {2025},
+  volume  = {19},
+  number  = {1},
+  pages   = {2535015},
+  doi     = {10.1080/19942060.2025.2535015}
+}
+
+% ---------- Finite-volume-informed and hybrid neural solvers ----------
+
+@misc{liu2026fvmpinn,
+  author        = {Liu, Xiaofeng},
+  title         = {Finite Volume-Informed Neural Network Framework for {2D} Shallow Water Equations: Rugged Loss Landscapes and the Importance of Data Guidance},
+  year          = {2026},
+  eprint        = {2605.11001},
+  archivePrefix = {arXiv},
+  howpublished  = {arXiv preprint arXiv:2605.11001}
+}
+
+@misc{oubarka2026wepinn,
+  author        = {Oubarka, Ismail and Kissami, Imad and Boubekeur, Mohamed and Benkhaldoun, Fayssal and Madrane, Aziz and Saadi, Zakaria},
+  title         = {Weak and entropy physics-informed neural networks for conservation laws},
+  year          = {2026},
+  eprint        = {2603.24819},
+  archivePrefix = {arXiv},
+  howpublished  = {arXiv preprint arXiv:2603.24819}
+}
+
+@misc{wu2025rimnet,
+  author       = {Wu, Jingxiao and Liang, Qiuhua and Chen, Huili and Duan, Haoran},
+  title        = {{RimNet}: A Hybrid Neural Network--Finite Volume Framework for {Riemann} Flux Approximation in Shallow Water Equations},
+  year         = {2025},
+  howpublished = {SSRN preprint, abstract no. 5433524},
+  url          = {https://papers.ssrn.com/sol3/papers.cfm?abstract_id=5433524},
+  note         = {Preprint posted September 2025}
+}
+
+@article{patsatzis2025gorinns,
+  author  = {Patsatzis, Dimitrios G. and di Bernardo, Mario and Russo, Lucia and Siettos, Constantinos},
+  title   = {{GoRINNs}: {Godunov}-{Riemann} informed neural networks for learning hyperbolic conservation laws},
+  journal = {Journal of Computational Physics},
+  year    = {2025},
+  volume  = {534},
+  pages   = {114002},
+  doi     = {10.1016/j.jcp.2025.114002}
+}
+
+@article{wei2025ffvpinn,
+  author  = {Wei, Chang and Fan, Yuchen and Wong, Jian Cheng and Ooi, Chin Chun and Wang, Heyang and Chiu, Pao-Hsiung},
+  title   = {{FFV-PINN}: A fast physics-informed neural network with simplified finite volume discretization and residual correction},
+  journal = {Computer Methods in Applied Mechanics and Engineering},
+  year    = {2025},
+  volume  = {444},
+  pages   = {118139},
+  doi     = {10.1016/j.cma.2025.118139},
+  note    = {Preprint: arXiv:2603.24114}
+}
+
+@misc{lichtle2025unfv,
+  author        = {Lichtl{\'e}, Nathan and Canesse, Alexi and Fu, Zhe and Matin, Hossein Nick Zinat and Delle Monache, Maria Laura and Bayen, Alexandre M.},
+  title         = {{(U)NFV}: Supervised and Unsupervised Neural Finite Volume Methods for Solving Hyperbolic {PDEs}},
+  year          = {2025},
+  eprint        = {2505.23702},
+  archivePrefix = {arXiv},
+  howpublished  = {arXiv preprint arXiv:2505.23702},
+  note          = {Also on OpenReview, id AhtDnPyfOE}
+}
+
+% ---------- Neural operators ----------
+
+@inproceedings{li2021fourier,
+  author    = {Zongyi Li and Nikola Kovachki and Kamyar Azizzadenesheli and Burigede Liu and Kaushik Bhattacharya and Andrew Stuart and Anima Anandkumar},
+  title     = {Fourier Neural Operator for Parametric Partial Differential Equations},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2021},
+  note      = {arXiv:2010.08895}
+}
+
+@article{lu2021deeponet,
+  author  = {Lu Lu and Pengzhan Jin and Guofei Pang and Zhongqiang Zhang and George Em Karniadakis},
+  title   = {Learning nonlinear operators via {DeepONet} based on the universal approximation theorem of operators},
+  journal = {Nature Machine Intelligence},
+  volume  = {3},
+  number  = {3},
+  pages   = {218--229},
+  year    = {2021},
+  doi     = {10.1038/s42256-021-00302-5}
+}
+
+@article{wang2021pideeponet,
+  author  = {Sifan Wang and Hanwen Wang and Paris Perdikaris},
+  title   = {Learning the solution operator of parametric partial differential equations with physics-informed {DeepONets}},
+  journal = {Science Advances},
+  volume  = {7},
+  number  = {40},
+  pages   = {eabi8605},
+  year    = {2021},
+  doi     = {10.1126/sciadv.abi8605}
+}
+
+@article{li2024pino,
+  author  = {Zongyi Li and Hongkai Zheng and Nikola Kovachki and David Jin and Haoxuan Chen and Burigede Liu and Kamyar Azizzadenesheli and Anima Anandkumar},
+  title   = {Physics-Informed Neural Operator for Learning Partial Differential Equations},
+  journal = {ACM/IMS Journal of Data Science},
+  volume  = {1},
+  number  = {3},
+  pages   = {1--27},
+  year    = {2024},
+  doi     = {10.1145/3648506}
+}
+
+@article{kovachki2023neuraloperator,
+  author  = {Nikola Kovachki and Zongyi Li and Burigede Liu and Kamyar Azizzadenesheli and Kaushik Bhattacharya and Andrew Stuart and Anima Anandkumar},
+  title   = {Neural Operator: Learning Maps Between Function Spaces With Applications to {PDEs}},
+  journal = {Journal of Machine Learning Research},
+  volume  = {24},
+  number  = {89},
+  pages   = {1--97},
+  year    = {2023}
+}
+
+@misc{wang2026lgno,
+  author        = {Hao Wang and Chi-Wang Shu and Qi Tang},
+  title         = {{LGNO}: A Local-Global Neural Operator for Hyperbolic Conservation Laws},
+  year          = {2026},
+  eprint        = {2606.18221},
+  archivePrefix = {arXiv},
+  note          = {arXiv:2606.18221}
+}
+
+@article{lu2026dcmawno,
+  author  = {Yu Lu and Ling Hong and Jun Jiang},
+  title   = {Capturing steep transitions in high-{Reynolds} fluid flows and rogue wave systems via a dual-channel wavelet neural operator},
+  journal = {International Journal of Numerical Methods for Heat \& Fluid Flow},
+  volume  = {36},
+  number  = {5},
+  pages   = {2027--2062},
+  year    = {2026},
+  doi     = {10.1108/HFF-12-2025-0997}
+}
+
+@article{kontolati2024latent,
+  author  = {Katiana Kontolati and Somdatta Goswami and George Em Karniadakis and Michael D. Shields},
+  title   = {Learning nonlinear operators in latent spaces for real-time predictions of complex dynamics in physical systems},
+  journal = {Nature Communications},
+  volume  = {15},
+  pages   = {5101},
+  year    = {2024},
+  doi     = {10.1038/s41467-024-49411-w}
+}
+
+@misc{liu2026hydraulics,
+  author        = {Xiaofeng Liu and Yong G. Lai},
+  title         = {Physics-Informed Deep Operator Learning for Computational Hydraulics Modeling},
+  year          = {2026},
+  eprint        = {2601.08086},
+  archivePrefix = {arXiv},
+  note          = {arXiv:2601.08086}
+}
+
+@misc{keppler2025pinoswe,
+  author       = {Robert Keppler and Julian Koch and Rasmus Fensholt},
+  title        = {Learning {2D} Shallow Water Equations with Physics-Informed Neural Operator Networks},
+  howpublished = {ESS Open Archive preprint},
+  year         = {2025},
+  doi          = {10.22541/essoar.176131914.46883575},
+  note         = {Preprint, posted 24 October 2025}
+}
+
+@article{secchi2026debrisflow,
+  author  = {Mauricio Secchi and Antonio Pasculli and Nicola Sciarra},
+  title   = {Artificial Intelligence for Learning {2D} Debris-Flow Dynamics: Application of {Fourier} Neural Operators and Synthetic Data to a Case Study in Central Italy},
+  journal = {Land},
+  volume  = {15},
+  number  = {5},
+  pages   = {759},
+  year    = {2026},
+  doi     = {10.3390/land15050759}
+}

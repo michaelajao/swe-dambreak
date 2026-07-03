@@ -1,5 +1,5 @@
 # Fdb version 4
-["pdflatex"] 1783116548.58546 "c:/Users/ajaoo/Desktop/swe-dambreak/paper/main.tex" "main.pdf" "main" 1783116553.22507 2
+["pdflatex"] 1783117692.97415 "c:/Users/ajaoo/Desktop/swe-dambreak/paper/main.tex" "main.pdf" "main" 1783117697.941 2
   "C:/Users/ajaoo/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map" 1782303496 806075 f1f8d8f49b3419398f262f07ea1b66bd ""
   "C:/Users/ajaoo/AppData/Local/MiKTeX/miktex/data/le/pdftex/pdflatex.fmt" 1773785255 13257295 ff303e7ade3bc1ed3747b21eda7361d2 ""
   "C:/Users/ajaoo/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/cm-super/cm-super-ts1.enc" 1001775420 2900 1537cc8184ad1792082cd229ecc269f4 ""
@@ -36,6 +36,7 @@
   "C:/Users/ajaoo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb" 1247596667 32569 5e5ddc8df908dea60932f3c484a54c0d ""
   "C:/Users/ajaoo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy8.pfb" 1247596667 32626 5abc8bb2f28aa647d4c70f8ea38cc0d3 ""
   "C:/Users/ajaoo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmti12.pfb" 1247596667 36118 fad905eba93cff5bce1e185fe980a177 ""
+  "C:/Users/ajaoo/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/symbols/msbm10.pfb" 1247596673 34694 870c211f62cb72718a00e353f14f254d ""
   "C:/Users/ajaoo/AppData/Local/Programs/MiKTeX/fonts/type1/public/cm-super/sfrm1200.pfb" 1215618300 136101 b18d10b3436f8cb0cd04046deb340fe7 ""
   "C:/Users/ajaoo/AppData/Local/Programs/MiKTeX/tex/context/base/mkii/supp-pdf.mkii" 1580390158 71627 94eb9990bed73c364d7f53f960cc8c5b ""
   "C:/Users/ajaoo/AppData/Local/Programs/MiKTeX/tex/generic/babel/babel.sty" 1754220793 146665 9149bce97203d4030d7cbe4f4e85dfc4 ""
@@ -199,10 +200,10 @@
   "Rectangular_Comparison_All_Times.png" 1782954839 1681993 8fede7483124c0c95863e5aeaaf8c802 ""
   "Step_Comparison_All_Times.png" 1782954839 2940971 41adb38d7674cf1fbef69dbee38926de ""
   "Triangular_Comparison_All_Times.png" 1782954839 1787504 96de53d63a4db7d8359923a4656b775d ""
-  "c:/Users/ajaoo/Desktop/swe-dambreak/paper/main.tex" 1783116547 34058 145528c066d10a5f0a8222338833d193 ""
-  "main.aux" 1783116553 9980 bb4785c9204d77bf6d9301c6b074ce98 "pdflatex"
-  "main.out" 1783116553 4566 37c007dcd418a1fbbee5f8f454564f6f "pdflatex"
-  "main.tex" 1783116547 34058 145528c066d10a5f0a8222338833d193 ""
+  "c:/Users/ajaoo/Desktop/swe-dambreak/paper/main.tex" 1783117686 50886 d62d04be6c01422de7da37aa2b412a13 ""
+  "main.aux" 1783117697 13709 cf1d3e7e276e656b4e9704cb03aa148d "pdflatex"
+  "main.out" 1783117697 6717 9b1d2c5aead34cfe924c6301b8694feb "pdflatex"
+  "main.tex" 1783117686 50886 d62d04be6c01422de7da37aa2b412a13 ""
   (generated)
   "main.aux"
   "main.log"

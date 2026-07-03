@@ -133,13 +133,13 @@ def setup_fvm(entry, eval_bi, device, tr):
     x0, x1 = grid.x0, grid.x0 + grid.nx * grid.dx
     y0, y1 = grid.y0, grid.y0 + grid.ny * grid.dy
     h_s = eval_bi.U0[0].to(torch.float32).to(device)     # background = IC depth
-    # bound momentum so early unphysical predictions can't overflow the FV step:
-    # 3x the characteristic momentum h_max * sqrt(g h_max)
+    # predict bounded velocity (momentum = h*u): 4x the gravity-wave speed is
+    # ample headroom for dam-break flows and keeps the FV step finite on dry beds
     h_max = float(eval_bi.U0[0].max())
-    mom_scale = 3.0 * h_max * (eval_bi.g * h_max) ** 0.5
+    vel_scale = 4.0 * (eval_bi.g * h_max) ** 0.5
     mcfg = FVMPINNConfig(hidden=128, layers=5, fourier_features=32,
                          x_range=(x0, x1), y_range=(y0, y1),
-                         t_range=(0.0, eval_bi.t_end), mom_scale=mom_scale)
+                         t_range=(0.0, eval_bi.t_end), vel_scale=vel_scale)
     model = FVMPINN(mcfg, h_s).to(device)
     scfg = Config(grid=grid, bc=eval_bi.bc, scheme="hllc", order=2,
                   limiter="van_leer", g=eval_bi.g, manning_n=eval_bi.manning_n)

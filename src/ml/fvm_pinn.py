@@ -38,8 +38,10 @@ class FVMPINNConfig:
     x_range: tuple[float, float] = (0.0, 1.0)
     y_range: tuple[float, float] = (0.0, 1.0)
     t_range: tuple[float, float] = (0.0, 1.0)
-    mom_scale: float = 0.0   # if >0, momentum = mom_scale * tanh(raw): bounds the
-                             # FV step so unphysical early predictions can't overflow
+    vel_scale: float = 0.0   # if >0, the net predicts velocity = vel_scale*tanh(raw)
+                             # and momentum = h*velocity, so momentum vanishes with
+                             # depth (bounded velocity -> the FV step cannot blow up
+                             # on near-dry cells, the dry-bed NaN failure mode)
 
 
 class FVMPINN(nn.Module):
@@ -88,10 +90,13 @@ class FVMPINN(nn.Module):
         out = self._forward_points(xyt).reshape(grid.ny, grid.nx, 3)
         xi = out[..., 0]
         h = torch.nn.functional.softplus(xi + self.h_s)
-        hu, hv = out[..., 1], out[..., 2]
-        if self.cfg.mom_scale > 0:
-            hu = self.cfg.mom_scale * torch.tanh(hu)
-            hv = self.cfg.mom_scale * torch.tanh(hv)
+        if self.cfg.vel_scale > 0:
+            # predict bounded velocity; momentum = h*u vanishes in dry cells
+            u = self.cfg.vel_scale * torch.tanh(out[..., 1])
+            v = self.cfg.vel_scale * torch.tanh(out[..., 2])
+            hu, hv = h * u, h * v
+        else:
+            hu, hv = out[..., 1], out[..., 2]
         U = torch.stack([h, hu, hv], dim=0)
         return U.to(torch.float64)
 

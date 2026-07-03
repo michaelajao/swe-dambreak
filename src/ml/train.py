@@ -59,8 +59,13 @@ def train(
             return {"iter": i, "loss": float("inf"), **{k: float("nan") for k in comps
                                                         if isinstance(comps[k], (int, float))}}
         total.backward()
-        if cfg.grad_clip > 0:
-            torch.nn.utils.clip_grad_norm_(model.parameters(), cfg.grad_clip)
+        # clip_grad_norm_ returns the pre-clip total norm; skip the step if the
+        # gradients are non-finite (a finite loss can still backprop NaN grads)
+        gnorm = torch.nn.utils.clip_grad_norm_(
+            model.parameters(), cfg.grad_clip if cfg.grad_clip > 0 else float("inf"))
+        if not torch.isfinite(gnorm):
+            opt.zero_grad(set_to_none=True)
+            return {"iter": i, "loss": float(total.detach())}
         opt.step()
         rec = {"iter": i, "loss": float(total.detach())}
         rec.update({k: (float(v) if not isinstance(v, (list, tuple)) else json.dumps(v))
