@@ -98,6 +98,20 @@ class FVMResidualSpec:
     times: list[float]                # collocation times (increasing)
     n_sub: int = 1                    # CFL-safe substeps per collocation interval
     z: torch.Tensor | None = None     # bed (ny, nx); None -> flat
+    stochastic: bool = False          # sample one interval per call (SGD-style)
+    step_dtype: torch.dtype = torch.float64   # precision of the FV step in the loss
+
+
+def _interval_residual(model, spec, z_pad, k):
+    grid = spec.cfg.grid
+    t0, t1 = spec.times[k], spec.times[k + 1]
+    dt = (t1 - t0) / spec.n_sub
+    U = model.predict_grid(t0, grid).to(spec.step_dtype)
+    for _ in range(spec.n_sub):
+        U = step(U, z_pad, dt, spec.cfg)
+    U_next = model.predict_grid(t1, grid).to(spec.step_dtype)
+    diff = U_next - U
+    return (diff**2).mean(), (diff**2).mean(dim=(-2, -1)).detach()
 
 
 def fvm_residual_loss(
@@ -106,27 +120,29 @@ def fvm_residual_loss(
     """Mean-squared residual of the discrete FV update between consecutive
     collocation times: || U_pred(t_{k+1}) - FV_step^{n_sub}(U_pred(t_k)) ||^2.
 
-    Both states come from the network, so the gradient trains the network to
-    be consistent with the classical discrete operator.
+    Both states come from the network, so the gradient trains the network to be
+    consistent with the classical discrete operator. With ``stochastic=True`` a
+    single random interval is used per call (mini-batch SGD over intervals) —
+    this is the practical training mode, since backprop through the sequential
+    float64 solver steps is the dominant cost.
     """
     grid = spec.cfg.grid
     z = spec.z if spec.z is not None else torch.zeros(
-        grid.ny, grid.nx, dtype=torch.float64, device=grid.device)
-    z_pad = pad_scalar(z, spec.cfg.bc, grid.ng)
+        grid.ny, grid.nx, dtype=spec.step_dtype, device=grid.device)
+    z_pad = pad_scalar(z.to(spec.step_dtype), spec.cfg.bc, grid.ng)
+    n = len(spec.times) - 1
+
+    if spec.stochastic:
+        k = int(torch.randint(0, n, (1,)))
+        loss, pc = _interval_residual(model, spec, z_pad, k)
+        return loss.to(model.h_s.dtype), {"per_channel_mse": pc.tolist(), "interval": k}
 
     total = model.h_s.new_zeros(())
     per_channel = torch.zeros(3, dtype=torch.float64, device=grid.device)
-    n = len(spec.times) - 1
     for k in range(n):
-        t0, t1 = spec.times[k], spec.times[k + 1]
-        dt = (t1 - t0) / spec.n_sub
-        U = model.predict_grid(t0, grid)
-        for _ in range(spec.n_sub):
-            U = step(U, z_pad, dt, spec.cfg)
-        U_next = model.predict_grid(t1, grid)
-        diff = U_next - U
-        per_channel += (diff**2).mean(dim=(-2, -1)).detach()
-        total = total + (diff**2).mean().to(total.dtype)
+        loss, pc = _interval_residual(model, spec, z_pad, k)
+        per_channel += pc.double()
+        total = total + loss.to(total.dtype)
     total = total / max(n, 1)
     return total, {"per_channel_mse": (per_channel / max(n, 1)).tolist()}
 

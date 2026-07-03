@@ -12,9 +12,12 @@ Usage: python experiments/run_ml.py [configs/sciml_smoke.yaml]
 
 from __future__ import annotations
 
+import functools
 import statistics
 import sys
 from pathlib import Path
+
+print = functools.partial(print, flush=True)  # progress visible in piped logs
 
 import torch
 import yaml
@@ -92,8 +95,9 @@ def setup_pinn(entry, eval_bi, device, tr):
 
     # IC targets at all cell centers (u=v=0 -> same for both formulations)
     X, Y = grid.centers()
+    dev = X.device
     xyt0 = torch.stack([X.reshape(-1), Y.reshape(-1),
-                        torch.zeros(grid.ny * grid.nx)], dim=1).to(device)
+                        torch.zeros(grid.ny * grid.nx, device=dev)], dim=1).to(device)
     h0 = eval_bi.U0[0].reshape(-1).to(torch.float32).to(device)
     zero = torch.zeros_like(h0)
     phys = Physics(g=eval_bi.g, manning_n=eval_bi.manning_n)
@@ -112,8 +116,8 @@ def setup_pinn(entry, eval_bi, device, tr):
             preds = []
             for tt in eval_bi.output_times:
                 xyt = torch.stack([X.reshape(-1), Y.reshape(-1),
-                                   torch.full((grid.ny * grid.nx,), float(tt))],
-                                  dim=1).to(device)
+                                   torch.full((grid.ny * grid.nx,), float(tt),
+                                              device=dev)], dim=1).to(device)
                 h, u, v = model.state(xyt)   # physical (h,u,v) in both formulations
                 U = torch.stack([h, h * u, h * v], dim=0).reshape(3, grid.ny, grid.nx)
                 preds.append(U.double())
@@ -167,12 +171,13 @@ def _sample_gauges(eval_bi, n_gauge, device):
     """Sparse gauge points drawn from the reference fields at random cell/time."""
     grid = eval_bi.grid
     X, Y = grid.centers()
+    dev = X.device
     T = len(REF)
     gen = torch.Generator().manual_seed(12345)
-    idx = torch.randint(0, grid.ny * grid.nx, (n_gauge,), generator=gen)
+    idx = torch.randint(0, grid.ny * grid.nx, (n_gauge,), generator=gen).to(dev)
     tk = torch.randint(0, T, (n_gauge,), generator=gen)
     xs = X.reshape(-1)[idx]; ys = Y.reshape(-1)[idx]
-    ts = torch.tensor([eval_bi.output_times[int(k)] for k in tk])
+    ts = torch.tensor([eval_bi.output_times[int(k)] for k in tk], device=dev)
     xyt = torch.stack([xs, ys, ts], dim=1).to(device)
     hs = eval_bi.U0[0].reshape(-1)[idx].to(device)      # background at gauges
     Uref = torch.stack([REF[int(k)][:, i // grid.nx, i % grid.nx]

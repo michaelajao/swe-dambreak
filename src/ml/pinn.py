@@ -78,6 +78,8 @@ class PINN(nn.Module):
         self.net = nn.Sequential(*layers)
 
     def normalize(self, xyt: torch.Tensor) -> torch.Tensor:
+        # cast to the network's dtype/device (grid coords arrive as float64)
+        xyt = xyt.to(self.in_lo)
         return 2 * (xyt - self.in_lo) / (self.in_hi - self.in_lo) - 1
 
     def raw(self, xyt: torch.Tensor) -> torch.Tensor:
