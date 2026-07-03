@@ -78,6 +78,7 @@ def reconstruct_line(
     *,
     order: int = 2,
     limiter: Limiter = van_leer,
+    h_thin: float | None = None,
 ) -> tuple[torch.Tensor, ...]:
     """Interface traces of (h, un, ut, z) along axis -1.
 
@@ -90,6 +91,11 @@ def reconstruct_line(
     at the interfaces, with h traces clamped to >= 0. For ``order=1`` the
     traces are the adjacent cell values (z included), so the scheme degrades
     exactly to first order.
+
+    ``h_thin``: if given, slopes are zeroed (local first order) wherever the
+    three-cell stencil touches a cell with h <= h_thin — the standard wet/dry
+    front treatment; slope overshoots in under-resolved films otherwise feed
+    a velocity blow-up.
     """
     eta = h + z
     if order == 1:
@@ -100,6 +106,17 @@ def reconstruct_line(
     elif order == 2:
         W = torch.stack([h, un, ut, eta], dim=0)
         WL, WR = traces_muscl(W, limiter)
+        if h_thin is not None:
+            wet3 = (
+                (h[..., 1:-1] > h_thin)
+                & (h[..., :-2] > h_thin)
+                & (h[..., 2:] > h_thin)
+            )
+            keepL = wet3[..., :-1]
+            keepR = wet3[..., 1:]
+            W1L, W1R = traces_first_order(W)
+            WL = torch.where(keepL, WL, W1L)
+            WR = torch.where(keepR, WR, W1R)
         hL, unL, utL, eL = WL[0], WL[1], WL[2], WL[3]
         hR, unR, utR, eR = WR[0], WR[1], WR[2], WR[3]
     else:

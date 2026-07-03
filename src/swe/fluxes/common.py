@@ -25,6 +25,18 @@ def physical_flux(
     return torch.stack([hun, hun * un + 0.5 * g * h * h, hun * ut], dim=-3)
 
 
+def celerity(h: torch.Tensor, g: float = G) -> torch.Tensor:
+    """sqrt(g h) with a derivative-safe floor.
+
+    d(sqrt)/dh is infinite at h = 0, which turns into NaN gradients at dry
+    interfaces via 0 * inf products in the backward pass even when the wet/dry
+    ``torch.where`` masks zero the forward value. Clamping h at a subnormal
+    floor makes the gradient exactly 0 at h = 0 and leaves every physical
+    depth untouched.
+    """
+    return torch.sqrt(g * torch.clamp(h, min=1e-300))
+
+
 def safe_div(num: torch.Tensor, den: torch.Tensor, tiny: float = _TINY) -> torch.Tensor:
     """num / den with |den| floored at ``tiny`` (sign preserved; sign(0) -> +)."""
     sgn = torch.where(den >= 0, torch.ones_like(den), -torch.ones_like(den))
@@ -48,18 +60,20 @@ def wave_speeds(
         right state dry: SL = uL - aL,  SR = uL + 2 aL
         left  state dry: SL = uR - 2 aR, SR = uR + aR
     """
-    aL = torch.sqrt(g * hL)
-    aR = torch.sqrt(g * hR)
+    aL = celerity(hL, g)
+    aR = celerity(hR, g)
 
     h_star = torch.clamp((0.5 * (aL + aR) + 0.25 * (unL - unR)) ** 2 / g, min=0.0)
+    # the sqrt arguments are floored: at dry-dry interfaces h_star underflows
+    # to ~0 and sqrt(0) has an infinite derivative (NaN gradients via 0 * inf)
     qL = torch.where(
         h_star > hL,
-        torch.sqrt(0.5 * safe_div((h_star + hL) * h_star, hL * hL)),
+        torch.sqrt(torch.clamp(0.5 * safe_div((h_star + hL) * h_star, hL * hL), min=1e-300)),
         torch.ones_like(hL),
     )
     qR = torch.where(
         h_star > hR,
-        torch.sqrt(0.5 * safe_div((h_star + hR) * h_star, hR * hR)),
+        torch.sqrt(torch.clamp(0.5 * safe_div((h_star + hR) * h_star, hR * hR), min=1e-300)),
         torch.ones_like(hR),
     )
     SL = unL - aL * qL

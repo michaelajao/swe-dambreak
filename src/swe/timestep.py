@@ -12,6 +12,7 @@ from __future__ import annotations
 import torch
 
 from .constants import CFL_DEFAULT, G, H_EPS
+from .fluxes.common import celerity
 from .grid import Grid
 from .state import primitives
 
@@ -21,7 +22,7 @@ def max_wave_speeds(
 ) -> tuple[torch.Tensor, torch.Tensor]:
     """Max over wet cells of |u| + sqrt(gh) and |v| + sqrt(gh) (0-dim tensors)."""
     h, u, v = primitives(U, h_eps)
-    c = torch.sqrt(g * torch.clamp(h, min=0.0))
+    c = celerity(h, g)
     wet = h > h_eps
     zero = torch.zeros_like(c)
     sx = torch.where(wet, u.abs() + c, zero).amax()

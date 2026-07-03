@@ -9,7 +9,7 @@ from __future__ import annotations
 import torch
 
 from ..constants import G, H_EPS
-from .common import physical_flux, zero_dry_dry
+from .common import celerity, physical_flux, zero_dry_dry
 
 
 def rusanov_flux(
@@ -26,7 +26,7 @@ def rusanov_flux(
     FL = physical_flux(hL, unL, utL, g)
     FR = physical_flux(hR, unR, utR, g)
     a = torch.maximum(
-        unL.abs() + torch.sqrt(g * hL), unR.abs() + torch.sqrt(g * hR)
+        unL.abs() + celerity(hL, g), unR.abs() + celerity(hR, g)
     ).unsqueeze(-3)
     UL = torch.stack([hL, hL * unL, hL * utL], dim=-3)
     UR = torch.stack([hR, hR * unR, hR * utR], dim=-3)

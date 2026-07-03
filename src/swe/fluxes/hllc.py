@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import torch
 
-from ..constants import G, H_EPS
+from ..constants import G, H_EPS, THIN_FACTOR
 from .common import physical_flux, safe_div, wave_speeds, zero_dry_dry
 
 
@@ -33,6 +33,13 @@ def hllc_flux(
     Star states U*_K = h_K (S_K - u_K)/(S_K - S*) [1, S*, v_K]^T and
     F*_K = F_K + S_K (U*_K - U_K); the flux is picked by the signs of
     S_L, S*, S_R.
+
+    Thin-layer/dry interfaces (either side <= THIN_FACTOR * h_eps) fall back
+    to the HLL flux: in under-resolved films the two-rarefaction depth
+    estimate far exceeds both side depths, S* lands far from the physical
+    contact, and the star momentum flux flips sign — which pumps momentum
+    into near-empty cells and blows up the front. The contact restoration
+    HLLC exists for only matters in resolved wet regions.
     """
     FL = physical_flux(hL, unL, utL, g)
     FR = physical_flux(hR, unR, utR, g)
@@ -66,4 +73,12 @@ def hllc_flux(
         FL,
         torch.where(Ssc >= 0, FsL, torch.where(SRc > 0, FsR, FR)),
     )
+
+    # HLL fallback wherever either side is a thin layer or dry (see docstring)
+    F_hll = safe_div(SRc * FL - SLc * FR + SLc * SRc * (UR - UL), SRc - SLc)
+    F_hll = torch.where(SLc >= 0, FL, torch.where(SRc <= 0, FR, F_hll))
+    h_thin = THIN_FACTOR * h_eps
+    thin = ((hL <= h_thin) | (hR <= h_thin)).unsqueeze(-3)
+    F = torch.where(thin, F_hll, F)
+
     return zero_dry_dry(F, hL, hR, h_eps)

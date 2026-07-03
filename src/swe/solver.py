@@ -19,7 +19,7 @@ from typing import Callable
 
 import torch
 
-from .constants import CFL_DEFAULT, G, H_EPS
+from .constants import CFL_DEFAULT, G, H_EPS, THIN_FACTOR
 from .friction import apply_friction
 from .fluxes import FLUXES
 from .grid import NG, BoundaryConditions, Grid, apply_bc, pad_scalar
@@ -63,7 +63,10 @@ def _directional_rhs(
     restricted to the interior in axis -2). Returns (..., 3, ny, nx) with
     channels (mass, normal momentum, tangential momentum)."""
     hL, unL, utL, zL, hR, unR, utR, zR = reconstruct_line(
-        h, un, ut, z, order=cfg.order, limiter=cfg.limiter_fn()
+        h, un, ut, z,
+        order=cfg.order,
+        limiter=cfg.limiter_fn(),
+        h_thin=THIN_FACTOR * cfg.h_eps,
     )
     hLs, hRs = hydrostatic_depths(hL, zL, hR, zR)
     F = cfg.flux_fn()(hLs, unL, utL, hRs, unR, utR, cfg.g, cfg.h_eps)
