@@ -1,0 +1,43 @@
+source: data/raw (6 IC variants x {HLL, LW, MUSCLRS}); values from paper/main.tex Sect. 2.3, verified
+  against t=0 snapshots
+grid:
+  shape:
+  - 501
+  - 501
+  extent_m:
+  - 0.0
+  - 100.0
+  - 0.0
+  - 100.0
+  dx_m: 0.2
+  sample_location: nodes (501 = 500 intervals + 1)
+fields:
+  stored: 'free surface eta = h + Z [m] (verified: eta(t=0) == h_IC + Z)'
+  momentum: ABSENT from the drop
+time:
+  snapshot_times_s:
+  - 0.0
+  - 0.5
+  - 1.0
+  - 1.5
+  - 2.0
+  cadence_s: 0.5
+  t_end_s: 2.0
+physics:
+  g_m_per_s2: 2.0
+  manning_n: 0.0
+  topography: Z = 2*exp(-((x-50)^2 + (y-50)^2)/200)
+  wet_dry_threshold: not applicable (all runs wet-bed)
+boundary_conditions: reflective on all four sides (closed domain); depth zero-gradient, normal momentum
+  reflected, tangential momentum zero-gradient
+schemes:
+  HLL: HLL flux, SL=min(uL-cL,uR-cR), SR=max(uL+cL,uR+cR), SSP-RK3
+  LW: 2-step Lax-Wendroff + artificial viscosity (coefficient UNKNOWN)
+  MUSCLRS: MUSCL minmod on conserved variables + Rusanov flux + SSP-RK3
+source_term: bed slope -g h grad(Z), centered differences (no hydrostatic reconstruction; not well-balanced)
+open_questions:
+- momentum/velocity snapshots available?
+- fixed dt or CFL-adaptive (which CFL)?
+- LW artificial viscosity form/coefficient?
+- confirm stored field is eta (verified numerically)
+- confirm g = 2 m/s^2 is intentional

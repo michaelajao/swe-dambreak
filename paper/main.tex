@@ -1,0 +1,906 @@
+\documentclass[12pt]{article}
+\usepackage{graphicx} % Required for inserting images
+% Language setting
+% Replace english' with e.g. spanish' to change the document language
+\usepackage[english]{babel}
+\usepackage{booktabs}
+\usepackage{mathtools}
+\usepackage{subfig}
+\usepackage[hidelinks]{hyperref}
+\usepackage{caption}
+\usepackage{blindtext}
+\usepackage{graphicx}
+\usepackage{cleveref}
+\usepackage{setspace}
+\usepackage{tikz}
+\usepackage{placeins}  % in preamble
+\usepackage{flafter}
+% In your document
+\FloatBarrier 
+\usepackage{amsmath}
+\usepackage{float}
+\usepackage{multirow}
+\usepackage{placeins}
+\usepackage{hyperref}
+% \usepackage{placeins} % for tables placement hbt!
+\usepackage{float}
+\usepackage[letterpaper,top=2cm,bottom=2cm,left=2cm,right=2cm,marginparwidth=1.75cm]{geometry}
+
+\setlength{\arrayrulewidth}{0.5mm}
+\setlength{\tabcolsep}{18pt}
+\renewcommand{\arraystretch}{1.5}
+\usepackage{tabularx, tabulary, tabu, longtable}
+\usepackage{afterpage}
+\usepackage{afterpage}
+\usepackage{empheq}
+\usepackage{tikz}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage[table]{xcolor}
+\lstset{
+    language=Matlab,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue},
+    commentstyle=\color{green},
+    stringstyle=\color{red},
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    stepnumber=1,
+    numbersep=5pt,
+    backgroundcolor=\color{white},
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    frame=single,
+    rulecolor=\color{green},
+    tabsize=2,
+    captionpos=b,
+    breaklines=true,
+    breakatwhitespace=true,
+    title=\lstname
+}
+
+\usetikzlibrary{shapes.geometric, arrows}
+\usepackage{etoolbox}
+\usepackage{amsmath}
+\usepackage{subfig}
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
+\usepackage{authblk}
+\usepackage{amssymb}
+\usepackage{cite}
+\usepackage{amsfonts}
+\usepackage{amstext}
+\usepackage{amsthm}
+\usepackage{tikz}
+\usepackage{listings}
+\usepackage{xcolor}
+\usetikzlibrary{shapes.geometric, arrows}
+\usepackage{etoolbox}
+\usepackage{subcaption}
+\makeatletter
+\patchcmd{\subsection}{\bfseries}{\itshape}{}{}
+\patchcmd{\@sect}{\@addpunct.}{}{}{}
+\makeatother
+\newtheorem{theorem}{Theorem}
+\newtheorem{remark}{Remark}[theorem]
+
+
+\title{\textcolor{Black}{\textbf{Comparative Analysis of Numerical Schemes for Two-Dimensional Dam-Break Problems with Source Terms under Different Initial Dam Breaking Conditions
+}}}
+\author[1]{Zahra}
+\author[1]{M. Asif Farooq}
+\author[3]{Firdos Khan}
+\affil{Department of Mathematics, School of Natural Sciences (SNS), National University of Sciences and Technology (NUST), Islamabad, Pakistan\newline
+zahrasamad1998@gmail.com (zahra), asiffarooq.2007@gmail.com (M. Asif Farooq),
+fkyousafzai@gmail.com (Firdos Khan)}
+%\affil[2]{School of Natural Sciences, National University of Sciences and Technology, Islamabad, Pakistan,}
+\begin{document}
+\doublespacing
+\maketitle
+%\title{}
+%\author[1]{Snabil Khan}
+%\author[1]{Muhammad Asif Farooq}
+%\affil[1]{Department of Mathematics, School of Natural Sciences, National University of Sciences and Technology, Islamabad, Pakistan}
+\renewcommand\thesection{\arabic{section}}  % Ensures normal section numbering
+\renewcommand\thesubsection{\thesection.\arabic{subsection}}  % Subsections as 1.1, 1.2, etc.
+\section{Introduction}
+\section{Problem Setup}
+
+In this section, the two dimensional shallow water equations (SWEs) and the numerical schemes used to solve them are presented. The governing equations used in this study are the same as the standard equations, but they include bed topography source terms. The reference solutions are computed using the three numerical schemes: the Lax–Wendroff (LW) scheme, the Harten–Lax–van Leer (HLL) approximate Riemann solver, and the MUSCL-Rusanov (MUSCL-RS) scheme. The six dam-break scenarios examined include Step, Rectangular, Circular, Gaussian, Parabolic and Triangular water height profiles. These benchmark problems are described in detail in Sect.~2.3. The numerical solutions are then evaluated and compared with respect to the performance, accuracy and shock capturing ability of the numerical schemes considered.
+
+\subsection{Governing Equations}
+The mathematical model governing the hydrodynamic flow in this study is the two-dimensional (2D) Shallow Water Equations (SWEs). The equations are obtained by hydrostatic pressure distribution, by neglecting the vertical acceleration, and by considering the fluid density as constant and by depth integrating the Navier-Stokes equations. The SWEs are hyperbolic conservation laws which are in effect for the propagation of water waves in domains where the horizontal length scale is much greater than the water depth.The present study is based on the standard formulation of the equations to which a source term vector $\mathbf{S}$, representing the effects of bottom topography (bed slope), and bed friction are added. These source terms are important to include in order to simulate a realistic flood, as they describe the effects of topography and resistance to flow.
+
+\begin{equation}
+\frac{\partial \mathbf{U}}{\partial t}
++\frac{\partial \mathbf{F}(\mathbf{U})}{\partial x}
++\frac{\partial \mathbf{G}(\mathbf{U})}{\partial y}
+=\mathbf{S}(x,y,t,\mathbf{U}),
+\label{eq:swe}
+\end{equation}
+
+where $t$ denotes time, $x$ and $y$ are the spatial coordinates, $\mathbf{U}$ is the vector of conserved variables, $\mathbf{F}$ and $\mathbf{G}$ are the flux vectors in the $x$- and $y$-directions, respectively, and $\mathbf{S}$ is the source term vector.
+
+The vectors $\mathbf{U}$, $\mathbf{F}$, and $\mathbf{G}$ are defined as
+
+\begin{equation}
+\mathbf{U}=
+\begin{bmatrix}
+h \\
+hu \\
+hv
+\end{bmatrix},
+\qquad
+\mathbf{F}(\mathbf{U})=
+\begin{bmatrix}
+hu \\
+hu^{2}+\dfrac{1}{2}gh^{2} \\
+huv
+\end{bmatrix},
+\qquad
+\mathbf{G}(\mathbf{U})=
+\begin{bmatrix}
+hv \\
+huv \\
+hv^{2}+\dfrac{1}{2}gh^{2}
+\end{bmatrix}.
+\label{eq:flux}
+\end{equation}
+
+
+These are the expressions for the water depth $h$, the depth-averaged velocity components, $u$ and $v$ in the $x$ and $y$ directions, respectively, and $g$ the gravitational acceleration. The quantities $hu$ and $hv$ are the momentum fluxes per unit width.
+
+The source term vector $\mathbf{S}$ represents the forces on the flow other than its internal forces. The influence of bed slope (topography) and bed friction (Manning roughness) are taken into account in the present study. As a result, $\mathbf{S}$ is given by
+
+\begin{equation}
+\mathbf{S}=
+\begin{bmatrix}
+0 \\
+-gh\displaystyle\frac{\partial Z}{\partial x}
+-\displaystyle\frac{gn^{2}u\sqrt{u^{2}+v^{2}}}{h^{4/3}} \\
+-gh\displaystyle\frac{\partial Z}{\partial y}
+-\displaystyle\frac{gn^{2}v\sqrt{u^{2}+v^{2}}}{h^{4/3}}
+\end{bmatrix}.
+\label{eq:source}
+\end{equation}
+
+In this equation $Z(x,y)$ is the bed elevation and $n$ is the Manning roughness coefficient. The first term of $\mathbf{S}$ is null, meaning that the transfer of mass from an external source (rainfall and/or infiltration) is not taken into account in the continuity equation. The second term and third term are the terms that represent the momentum source terms in the $x$ and $y$ directions, respectively.
+
+The terms $-gh\frac{\partial Z}{\partial x}$, $-gh\frac{\partial Z}{\partial y}$ represent the driving forces due to the sloping bed, where $g$ and $h$ are the magnitude of gravity and the height above sea level, respectively.
+The terms involving $n$ represent the losses due to the friction between the bed and the water.
+
+For the present numerical study, the Manning coefficient is assumed as $n=0$. The friction terms then drop off and the source term vector becomes
+
+\begin{equation}
+\mathbf{S}=
+\begin{bmatrix}
+0 \\
+-gh\displaystyle\frac{\partial Z}{\partial x} \\
+-gh\displaystyle\frac{\partial Z}{\partial y}
+\end{bmatrix}.
+\label{eq:simplifiedsource}
+\end{equation}
+
+\subsection{Numerical Schemes}
+
+In this study, three distinct numerical schemes are employed to solve the two-dimensional shallow water equations with source terms. These schemes are the Lax--Wendroff (LW) method, the Harten--Lax--van Leer (HLL) approximate Riemann solver, and the MUSCL scheme with third-order Strong Stability Preserving Runge--Kutta (SSP--RK3) time integration. Each scheme is described in detail in the following subsections.
+
+\subsubsection{Lax--Wendroff Scheme}
+
+The Lax--Wendroff scheme is a second-order accurate finite difference method that employs a predictor--corrector approach. It is widely used for solving hyperbolic conservation laws due to its ability to capture wave propagation with reasonable accuracy while maintaining computational efficiency.
+
+The scheme follows a two-step procedure at each time level.
+
+\paragraph{Predictor Step}
+
+The intermediate solution at the half time level $t^{n+\frac{1}{2}}$ is computed as
+
+\begin{equation}
+U_{i,j}^{\,n+\frac{1}{2}}
+=
+U_{i,j}^{\,n}
+-\frac{\Delta t}{2\Delta x}
+\left(
+F_{i+1,j}^{\,n}
+-
+F_{i-1,j}^{\,n}
+\right)
+-\frac{\Delta t}{2\Delta y}
+\left(
+G_{i,j+1}^{\,n}
+-
+G_{i,j-1}^{\,n}
+\right)
++\frac{\Delta t}{2}S_{i,j}^{\,n},
+\end{equation}
+
+where $U_{i,j}^{\,n+\frac{1}{2}}$ denotes the predicted conservative variables at the half time level, and $S_{i,j}^{\,n}$ represents the source term vector associated with bed topography.
+
+The source term vector is given by
+
+\begin{equation}
+S=
+\begin{bmatrix}
+0 \\
+-gh\frac{\partial Z}{\partial x} \\
+-gh\frac{\partial Z}{\partial y}
+\end{bmatrix},
+\end{equation}
+
+where $Z(x,y)$ denotes the bed elevation.
+
+\paragraph{Flux Evaluation}
+
+After computing the intermediate variables, the flux vectors are evaluated at the half time level as
+
+\begin{equation}
+F^{\,n+\frac{1}{2}}
+=
+\begin{bmatrix}
+hu \\
+hu^{2}+\frac{1}{2}gh^{2} \\
+huv
+\end{bmatrix},
+\qquad
+G^{\,n+\frac{1}{2}}
+=
+\begin{bmatrix}
+hv \\
+huv \\
+hv^{2}+\frac{1}{2}gh^{2}
+\end{bmatrix}.
+\end{equation}
+
+\paragraph{Corrector Step}
+
+The full time-step update is given by
+
+\begin{equation}
+U_{i,j}^{n+1}
+=
+U_{i,j}^{n}
+-
+\frac{\Delta t}{\Delta x}
+\left(
+F_{i+\frac{1}{2},j}^{\,n+\frac{1}{2}}
+-
+F_{i-\frac{1}{2},j}^{\,n+\frac{1}{2}}
+\right)
+-
+\frac{\Delta t}{\Delta y}
+\left(
+G_{i,j+\frac{1}{2}}^{\,n+\frac{1}{2}}
+-
+G_{i,j-\frac{1}{2}}^{\,n+\frac{1}{2}}
+\right)
++
+\Delta t\,S_{i,j}^{\,n+\frac{1}{2}}.
+\end{equation}
+
+The scheme achieves second-order accuracy in both space and time. However, it may produce spurious oscillations near steep gradients or discontinuities, which is a known limitation of this method.
+
+\subsubsection{Harten--Lax--van Leer (HLL) Scheme}
+
+The HLL scheme is an approximate Riemann solver that computes intercell fluxes based on wave-speed estimates. It is a Godunov-type finite volume method that provides robust solutions for hyperbolic conservation laws, particularly in the presence of shocks and discontinuities.
+
+For the $x$-direction, the HLL flux between the left and right states, denoted by $\mathbf{U}_L$ and $\mathbf{U}_R$, respectively, is given by
+
+\begin{equation}
+\mathbf{F}_{i+\frac{1}{2}}^{HLL}=
+\begin{cases}
+\mathbf{F}_L, & \text{if } S_L \geq 0, \\[2mm]
+\dfrac{S_R\mathbf{F}_L-S_L\mathbf{F}_R+S_LS_R(\mathbf{U}_R-\mathbf{U}_L)}
+{S_R-S_L}, & \text{if } S_L<0<S_R, \\[3mm]
+\mathbf{F}_R, & \text{if } S_R \leq 0.
+\end{cases}
+\end{equation}
+
+where the wave speeds are estimated as
+
+\begin{equation}
+S_L=\min\left(u_L-c_L,\,u_R-c_R\right),
+\end{equation}
+
+\begin{equation}
+S_R=\max\left(u_L+c_L,\,u_R+c_R\right),
+\end{equation}
+
+where
+
+\begin{equation}
+c_L=\sqrt{gh_L},
+\qquad
+c_R=\sqrt{gh_R},
+\end{equation}
+
+and
+
+\begin{equation}
+u_L=\frac{(hu)_L}{h_L},
+\qquad
+u_R=\frac{(hu)_R}{h_R}.
+\end{equation}
+
+Similarly, for the $y$-direction, the HLL flux is given by
+
+\begin{equation}
+\mathbf{G}_{j+\frac{1}{2}}^{HLL}=
+\begin{cases}
+\mathbf{G}_B, & \text{if } S_L \geq 0, \\[2mm]
+\dfrac{S_R\mathbf{G}_B-S_L\mathbf{G}_T+S_LS_R(\mathbf{U}_T-\mathbf{U}_B)}
+{S_R-S_L}, & \text{if } S_L<0<S_R, \\[3mm]
+\mathbf{G}_T, & \text{if } S_R \leq 0.
+\end{cases}
+\end{equation}
+
+where the wave speeds in the $y$-direction are estimated as
+
+\begin{equation}
+S_L=\min\left(v_B-c_B,\,v_T-c_T\right),
+\end{equation}
+
+\begin{equation}
+S_R=\max\left(v_B+c_B,\,v_T+c_T\right),
+\end{equation}
+
+with
+
+\begin{equation}
+c_B=\sqrt{gh_B},
+\qquad
+c_T=\sqrt{gh_T}.
+\end{equation}
+
+The source term is incorporated explicitly through the semi-discrete formulation
+
+\begin{equation}
+\frac{\partial \mathbf{U}}{\partial t}
+=
+-\frac{\partial \mathbf{F}}{\partial x}
+-\frac{\partial \mathbf{G}}{\partial y}
++\mathbf{S}.
+\end{equation}
+
+The spatial derivatives are approximated using the HLL fluxes, whereas the temporal integration is performed using the SSP--RK3 scheme described in the next subsection.
+
+\subsubsection{MUSCL Scheme with SSP--RK3 Time Integration}
+
+The MUSCL (Monotonic Upstream-centered Scheme for Conservation Laws) approach is a higher-order reconstruction technique that improves spatial accuracy while preserving monotonicity near discontinuities. In this study, the MUSCL scheme is combined with the Minmod slope limiter, the Rusanov flux, and the third-order Strong Stability Preserving Runge--Kutta (SSP--RK3) time integration method.
+
+\paragraph{Spatial Reconstruction}
+
+For each computational cell, the left and right states at the cell interfaces are reconstructed as
+
+\begin{equation}
+\mathbf{U}_{i+\frac{1}{2}}^{L}
+=
+\mathbf{U}_{i}
++\frac{1}{2}\Delta x\,\Delta \mathbf{U}_{i},
+\end{equation}
+
+\begin{equation}
+\mathbf{U}_{i+\frac{1}{2}}^{R}
+=
+\mathbf{U}_{i+1}
+-\frac{1}{2}\Delta x\,\Delta \mathbf{U}_{i+1}.
+\end{equation}
+
+The slope $\Delta \mathbf{U}_{i}$ is computed using the Minmod limiter
+
+\begin{equation}
+\Delta \mathbf{U}_{i}
+=
+\mathrm{minmod}
+\left(
+\frac{\mathbf{U}_{i}-\mathbf{U}_{i-1}}{\Delta x},
+\frac{\mathbf{U}_{i+1}-\mathbf{U}_{i}}{\Delta x}
+\right).
+\end{equation}
+
+The Minmod function is defined as
+
+\begin{equation}
+\mathrm{minmod}(a,b)
+=
+\frac{1}{2}
+\left[
+\mathrm{sign}(a)+\mathrm{sign}(b)
+\right]
+\min(|a|,|b|).
+\end{equation}
+
+The same reconstruction procedure is applied in both spatial directions.
+
+\paragraph{Rusanov Flux}
+
+The numerical flux at each interface is evaluated using the Rusanov flux
+
+\begin{equation}
+\mathbf{F}_{i+\frac{1}{2}}
+=
+\frac{1}{2}
+\left(
+\mathbf{F}_L+\mathbf{F}_R
+\right)
+-\frac{1}{2}\alpha
+\left(
+\mathbf{U}_R-\mathbf{U}_L
+\right),
+\end{equation}
+
+where
+
+\begin{equation}
+\alpha
+=
+\max
+\left(
+|u_L|+c_L,\,
+|u_R|+c_R
+\right)
+\end{equation}
+
+denotes the maximum wave speed at the interface.
+
+Similarly, the flux in the $y$-direction is given by
+
+\begin{equation}
+\mathbf{G}_{j+\frac{1}{2}}
+=
+\frac{1}{2}
+\left(
+\mathbf{G}_B+\mathbf{G}_T
+\right)
+-\frac{1}{2}\alpha_y
+\left(
+\mathbf{U}_T-\mathbf{U}_B
+\right),
+\end{equation}
+
+where
+
+\begin{equation}
+\alpha_y
+=
+\max
+\left(
+|v_B|+c_B,\,
+|v_T|+c_T
+\right).
+\end{equation}
+
+\paragraph{SSP--RK3 Time Integration}
+
+The semi-discrete system
+
+\begin{equation}
+\frac{d\mathbf{U}}{dt}=R(\mathbf{U})
+\end{equation}
+
+is advanced in time using the SSP--RK3 scheme.
+
+Stage 1:
+
+\begin{equation}
+\mathbf{U}^{(1)}
+=
+\mathbf{U}^{n}
++
+\Delta t\,R(\mathbf{U}^{n}).
+\end{equation}
+
+Stage 2:
+
+\begin{equation}
+\mathbf{U}^{(2)}
+=
+\frac{3}{4}\mathbf{U}^{n}
++
+\frac{1}{4}
+\left[
+\mathbf{U}^{(1)}
++
+\Delta t\,R(\mathbf{U}^{(1)})
+\right].
+\end{equation}
+
+Stage 3:
+
+\begin{equation}
+\mathbf{U}^{n+1}
+=
+\frac{1}{3}\mathbf{U}^{n}
++
+\frac{2}{3}
+\left[
+\mathbf{U}^{(2)}
++
+\Delta t\,R(\mathbf{U}^{(2)})
+\right].
+\end{equation}
+
+Here, the operator $R(\mathbf{U})$ includes both the numerical flux divergences and the source term, namely
+
+\begin{equation}
+R(\mathbf{U})
+=
+-\frac{\partial \mathbf{F}}{\partial x}
+-\frac{\partial \mathbf{G}}{\partial y}
++\mathbf{S}.
+\end{equation}
+
+The SSP--RK3 scheme preserves the total variation diminishing (TVD) property and provides stable and accurate solutions for hyperbolic conservation laws.
+
+\paragraph{Boundary Conditions:}
+
+Reflective boundary conditions are imposed along all domain boundaries. The water depth is extrapolated using zero-gradient conditions, while the normal momentum component is reflected and the tangential momentum component is extrapolated with zero-gradient conditions.
+
+\subsection{Initial Conditions for Dam-Break Scenarios}
+
+In this study, six distinct initial water height profiles are considered to evaluate the performance of the numerical schemes. These profiles represent different dam-break configurations, ranging from simple discontinuous jumps to smooth Gaussian and geometric shapes. In all cases, the dam is assumed to be instantaneously removed at $t=0$, initiating wave propagation. The initial velocity is set to zero throughout the computational domain, i.e.,
+
+\begin{equation}
+u(x,y,0)=0,
+\qquad
+v(x,y,0)=0.
+\end{equation}
+
+The computational domain is taken as a square region of size
+
+\begin{equation}
+L_x \times L_y =100\times100~\mathrm{m}^2.
+\end{equation}
+
+The bed topography is prescribed as a Gaussian hump:
+
+\begin{equation}
+Z(x,y)=2.0\exp\left(
+-\frac{(x-50)^2+(y-50)^2}{200}
+\right).
+\end{equation}
+
+The gravitational acceleration is set to $g=2~\mathrm{m/s^2}$, while the Manning friction coefficient is taken as $n=0$.
+
+\subsubsection{Variant 1: Step (Simple) Dam-Break}
+
+This configuration represents the classical dam-break problem extended to two dimensions. The initial water height is defined as
+
+\begin{equation}
+h(x,y,0)=
+\begin{cases}
+h_l=10.0~\mathrm{m}, & \text{if } x\leq 50~\mathrm{m},\\
+h_r=1.0~\mathrm{m}, & \text{if } x>50~\mathrm{m}.
+\end{cases}
+\end{equation}
+
+This setup creates a sharp discontinuity at $x=50~\mathrm{m}$, producing a shock wave propagating to the right and a rarefaction wave propagating to the left after dam removal.
+
+\subsubsection{Variant 2: Rectangular Dam-Break}
+
+In this case, a rectangular region of high water is initially confined within the computational domain. The initial condition is given by
+
+\begin{equation}
+h(x,y,0)=
+\begin{cases}
+h_{\mathrm{in}}=5.0~\mathrm{m},
+& \text{if } 30\leq x\leq70~\mathrm{m}
+\text{ and }30\leq y\leq70~\mathrm{m},\\
+h_{\mathrm{out}}=0.2~\mathrm{m},
+& \text{otherwise}.
+\end{cases}
+\end{equation}
+
+This configuration models the sudden release of water from a rectangular reservoir, leading to complex wave interactions at the corners and edges.
+
+\subsubsection{Variant 3: Circular Dam-Break}
+
+The circular dam configuration consists of a cylindrical water column centered within the domain. The initial water height is prescribed as
+
+\begin{equation}
+h(x,y,0)=
+\begin{cases}
+h_{\mathrm{in}}=10.0~\mathrm{m},
+& \text{if }
+\sqrt{(x-50)^2+(y-50)^2}\leq R,\\
+h_{\mathrm{out}}=1.0~\mathrm{m},
+& \text{otherwise},
+\end{cases}
+\end{equation}
+
+where $R=20~\mathrm{m}$ denotes the radius of the circular dam.
+
+Following dam removal, a radially symmetric wave propagates outward, providing an effective benchmark for assessing the ability of numerical schemes to capture circular shock fronts.
+
+\subsubsection{Variant 4: Gaussian Dam-Break}
+
+Unlike the previous discontinuous profiles, the Gaussian initial condition represents a smooth and continuous water surface. The initial water height is defined as
+
+\begin{equation}
+h(x,y,0)
+=
+h_{\mathrm{peak}}
+\exp\left(
+-\frac{(x-x_c)^2+(y-y_c)^2}
+{2\sigma^2}
+\right),
+\end{equation}
+
+where
+
+\begin{itemize}
+\item $h_{\mathrm{peak}}=10.0~\mathrm{m}$ is the maximum water height,
+\item $(x_c,y_c)=(50.0,50.0)~\mathrm{m}$ denotes the center of the domain,
+\item $\sigma=10.0~\mathrm{m}$ is the standard deviation controlling the spread of the Gaussian profile.
+\end{itemize}
+
+This smooth profile allows the evaluation of numerical schemes in the absence of sharp gradients and tests their ability to preserve the shape and amplitude of smooth waves.
+
+\subsubsection{Variant 5: Parabolic Dam-Break}
+
+The parabolic dam configuration represents a curved dam structure. The upper and lower boundaries of the parabolic region are defined by
+
+\begin{equation}
+y_{\mathrm{top}}(x)
+=
+y_c+w-a(x-x_c)^2,
+\end{equation}
+
+\begin{equation}
+y_{\mathrm{bottom}}(x)
+=
+y_{\mathrm{top}}(x)-t,
+\end{equation}
+
+where the initial water height is prescribed as
+
+\begin{equation}
+h(x,y,0)=
+\begin{cases}
+h_{\mathrm{in}}=10.0~\mathrm{m},
+& \text{if }
+y_{\mathrm{bottom}}(x)
+\leq y \leq
+y_{\mathrm{top}}(x),\\
+h_{\mathrm{out}}=1.0~\mathrm{m},
+& \text{otherwise}.
+\end{cases}
+\end{equation}
+
+The parameters used are
+
+\begin{equation}
+(x_c,y_c)=(50.0,50.0)~\mathrm{m},
+\qquad
+a=0.03,
+\qquad
+w=15.0~\mathrm{m},
+\qquad
+t=8.0~\mathrm{m}.
+\end{equation}
+
+This configuration tests the ability of numerical schemes to handle curved boundaries and non-rectangular geometries.
+
+\subsubsection{Variant 6: Triangular (Equilateral) Dam-Break}
+
+The initial water height profile is defined by an equilateral triangle centered at
+
+\begin{equation}
+(x_c,y_c)=(50.0,50.0)~\mathrm{m},
+\end{equation}
+
+with side length
+
+\begin{equation}
+s=40.0~\mathrm{m}.
+\end{equation}
+
+The height of the triangle is given by
+
+\begin{equation}
+h_{\mathrm{tri}}
+=
+\frac{\sqrt{3}}{2}s
+=
+34.64~\mathrm{m}.
+\end{equation}
+
+The three vertices of the triangular region are located at
+
+\begin{align}
+\text{Apex (Top):}\qquad
+&(x_c,\; y_c+\tfrac{h_{\mathrm{tri}}}{3})
+=(50.0,\;61.55), \\
+\text{Left Base Vertex:}\qquad
+&(x_c-\tfrac{s}{2},\;
+y_c-\tfrac{2h_{\mathrm{tri}}}{3})
+=(30.0,\;26.91), \\
+\text{Right Base Vertex:}\qquad
+&(x_c+\tfrac{s}{2},\;
+y_c-\tfrac{2h_{\mathrm{tri}}}{3})
+=(70.0,\;26.91).
+\end{align}
+
+The initial water height is prescribed as
+
+\begin{equation}
+h(x,y,0)=
+\begin{cases}
+h_{\mathrm{in}}=10.0~\mathrm{m},
+& \text{if } (x,y) \text{ lies inside the triangular region},\\
+h_{\mathrm{out}}=1.0~\mathrm{m},
+& \text{otherwise}.
+\end{cases}
+\end{equation}
+
+The triangular region is defined by the following linear inequalities:
+
+\begin{equation}
+y \geq y_{\mathrm{base}},
+\end{equation}
+
+\begin{equation}
+y \leq
+y_c-\sqrt{3}(x-x_c)
++\frac{h_{\mathrm{tri}}}{3},
+\end{equation}
+
+\begin{equation}
+y \leq
+y_c+\sqrt{3}(x-x_c)
++\frac{h_{\mathrm{tri}}}{3},
+\end{equation}
+
+where
+
+\begin{equation}
+y_{\mathrm{base}}
+=
+y_c-\frac{2h_{\mathrm{tri}}}{3}.
+\end{equation}
+
+These inequalities ensure that a point lies above the base and below both inclined edges, thereby defining the equilateral triangular water body.
+\begin{table}[h!]
+\centering
+\caption{Summary of Initial Conditions Considered in This Study}
+\label{tab:initial_conditions}
+
+\resizebox{\textwidth}{!}{
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+\textbf{Variant} & \textbf{Name} & \textbf{Type} &
+\textbf{Inner Height} & \textbf{Outer Height} &
+\textbf{Special Parameters} \\
+\hline
+
+1 & Step & Discontinuous &
+10.0 m & 1.0 m &
+$x \leq 50$ \\
+\hline
+
+2 & Rectangular & Discontinuous &
+5.0 m & 0.2 m &
+$30 \leq x,y \leq 70$ \\
+\hline
+
+3 & Circular & Discontinuous &
+10.0 m & 1.0 m &
+$R = 20$ m \\
+\hline
+
+4 & Gaussian & Smooth &
+10.0 m (peak) & N/A &
+$\sigma = 10$ m \\
+\hline
+
+5 & Parabolic & Curved &
+10.0 m & 1.0 m &
+$a=0.03,\; w=15,\; t=8$ \\
+\hline
+
+6 & Triangular & Equilateral &
+10.0 m & 1.0 m &
+$s = 40$ m \\
+\hline
+
+\end{tabular}
+}
+
+\end{table}
+
+\subsubsection{Numerical Setup}
+
+For all six dam-break scenarios, the following numerical parameters are employed:
+
+\begin{itemize}
+\item Computational domain:
+$[0,100]\times[0,100]~\mathrm{m}^2$.
+\item Grid resolution:
+$N_x=N_y=501$.
+\item Spatial step size:
+$\Delta x=\Delta y=0.2~\mathrm{m}$.
+\item Total simulation time:
+$T=2.0~\mathrm{s}$.
+\item Gravitational acceleration:
+$g=2~\mathrm{m/s^2}$.
+\item Boundary conditions:
+Reflective boundary conditions are imposed along all boundaries.
+\item Artificial viscosity:
+Additional artificial viscosity is employed in the Lax--Wendroff scheme to suppress spurious oscillations.
+\end{itemize}
+
+The numerical solutions obtained for all six configurations serve as benchmark datasets for evaluating the performance of the numerical schemes presented in the subsequent sections.
+\section{Results and Discussion}
+
+We present the numerical results for the six dam-break examples that we consider in this work, obtained using the Lax--Wendroff (LW), Harten--Lax--van Leer (HLL), and MUSCL--Rusanov (MUSCL--RS) schemes. The main goal is to study and evaluate the performance of these numerical methods with respect to accuracy, stability, shock capturing and capability of modeling shallow water flows over non-flat bed topography.
+
+Numerical simulations are carried out on a 2D computational domain that includes a Gaussian bed elevation as a source term. The temporal evolution of the free-surface flow is analysed at selected times: $t=0.0,\, 0.5,\, 1.0,\, 1.5$ and $2.0$ s. The considered benchmark problems are discontinuous, smooth, and geometrically complex initial conditions which are the Step, Rectangular, Circular, Gaussian, Parabolic, and Triangular dam-break problems.
+
+Overall, all three numerical schemes can reproduce the overall hydrodynamic properties of the dam-break flows. But the solutions that are computed do show significant differences. The LW scheme typically gives better resolution of discontinuities and can have oscillatory behavior in the vicinity of steep gradients. The HLL scheme is stable and monotone, but it introduces additional numerical diffusion resulting in more smooth shock profiles when compared with other schemes. The MUSCL--Rusanov scheme, however, is able to retain sharp wave fronts while suppressing non-physical oscillations effectively in all of the tests, thus showing best overall performance in the schemes tested herein.
+\subsection{Variant 1: Step Dam-Break}
+
+The numerical results of the step dam break problem are given in Fig.~\ref{fig:step}. At first, a discontinuity in water depth is prescribed at the middle of the calculation domain. The shock wave will travel downstream and a rarefaction wave will travel upstream after the dam is removed in an instant.
+
+During the simulation, the propagating wave encounters the underlying Gaussian bed topography which produces noticeable changes in the free surface profile. All three numerical schemes are able to capture the main flow features. But there's a big disparity in their ability to capture shocks. The LW scheme is able to capture discontinuities well but has oscillatory behaviour close to steep gradients. The HLL scheme gives very stable and monotonic solutions, but with more numerical diffusion, which leads to shock profiles that are comparatively smooth. The MUSCL--Rusanov scheme on the other hand is able to generate the flow evolution without producing non-physical oscillations and with sharp wave fronts, giving the most accurate representation of the flow evolution.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{Step_Comparison_All_Times.png}
+\caption{Comparison of the LW, HLL, and MUSCL--Rusanov schemes for the step dam-break problem at different time instances.}
+\label{fig:step}
+\end{figure}
+\subsection{Variant 2: Rectangular Dam-Break}
+
+The numerical solutions for the rectangular dam-break configuration are shown in figure~\ref{fig:rectangular}. In this situation, the water is first trapped in a rectangular area in the middle of the computational area. After the removal of the dam, the water flows out in all directions, resulting in multidirectional wave propagation and strong interactions in the corners of the reservoir.
+
+Because of the interaction of waves at the edges and corners, these waves create complex structures in the rectangular geometry. All numerical schemes capture the overall spreading pattern, but there are discernible differences in the spreading near the discontinuities. The LW scheme is able to reproduce the growing fronts properly, while the regions with sharp gradients have oscillations. The HLL scheme produces stable and smooth solutions, but with a higher numerical diffusion. The MUSCL-Rusanov scheme provides a good solution and is able to keep the interface sharp and be numerically stable while giving a correct solution for the corner interactions.
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{Rectangular_Comparison_All_Times.png}
+\caption{Comparison of the LW, HLL, and MUSCL--Rusanov schemes for the Rectangular dam-break problem at different time instances.}
+\label{fig:rectangular}
+\end{figure}
+\subsection{Variant 3: Circular Dam-Break}
+
+The numeric solution results for the dam break problem with circular dams are displayed in Fig.~\ref{fig:circular}. The first water column that is confined to a cylinder is used as a source to set up radially symmetric waves that propagate outwards from the centre of the domain after the dam has been suddenly removed.
+
+The overall radial symmetry of the flow is maintained during the simulation with all the numerical schemes. However, there are variations in the representation of the growing shock front. The LW scheme is able to accurately represent the propagating wave, but has some oscillations in the vicinity of the shock region. The HLL scheme is diffusive and hence gives smoother solutions. This is in contrast with the MUSCL--Rusanov scheme which is able to capture the shock front as well as maintain the radial symmetry and avoid the appearance of numerical oscillations. As a result, the MUSCL--Rusanov method is shown to perform better for circular wave propagation.
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{Circular_Comparison_All_Times.png}
+\caption{Comparison of the LW, HLL, and MUSCL--Rusanov schemes for the Circular dam-break problem at different time instances.}
+\label{fig:circular}
+\end{figure}
+\subsection{Variant 4: Gaussian Dam-Break}
+
+The time evolution of the Gaussian dam-break configuration is shown in Figure~\ref{fig:gaussian}. In contrast to the previous discontinuous cases, the Gaussian initial condition is a smooth free surface profile, with a continuous water depth distribution.
+
+There are no initial sharp discontinuities and all three numerical schemes produce good results and retain the smoothness of the propagating wave. The LW scheme is highly accurate but can give some dispersive effects in a long time integration. The HLL scheme shows no change in the stability of the scheme during the simulation, but there is a little bit of numerical diffusion. The MUSCL--Rusanov scheme is able to preserve the amplitude and the shape of the Gaussian profile better, and thus the smooth flow evolution is best represented by this scheme.
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{Gaussian_Comparison_All_Times.png}
+\caption{Comparison of the LW, HLL, and MUSCL--Rusanov schemes for the Gaussian dam-break problem at different time instances.}
+\label{fig:gaussian}
+\end{figure}
+\subsection{Variant 5: Parabolic Dam-Break}
+
+In figure \ref{fig:parabolic} numerical solution to the parabolic dam-break problem is shown. The underlying bed topography has a complex relationship with the water profile, the propagation patterns are not uniform, and are curved in the first water profile.
+
+This curved boundary creates asymmetric patterns in the flow, which also results in changes in the wave speed at certain points. All schemes are able to reproduce the dominant hydrodynamic features, but the LW scheme shows oscillatory behaviour in the region of the steep gradients. The HLL scheme is stable, but the propagating wave fronts tend to smear, because of numerical diffusion. The MUSCL--Rusanov scheme, on the other hand, preserves the curved interfaces correctly and has excellent stability and stability minimizing spurious oscillations. The results presented here validate the robustness of the MUSCL--Rusanov scheme on the geometrically complex flow configurations.
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{Parabola_Comparison_All_Times.png}
+\caption{Comparison of the LW, HLL, and MUSCL--Rusanov schemes for the Parabola dam-break problem at different time instances.}
+\label{fig:parabolic}
+\end{figure}
+\subsection{Variant 6: Triangular Dam-Break}
+
+The numerical results for the triangular dam-break configuration are shown in figure~\ref{fig:triangular}. This benchmark problem is complicated by sharp vertices and tilted boundaries, which produce complex interactions of the waves and strong shock reflections.
+
+The propagating waves that come from the triangular vertices interact with each other and form complex flow structures throughout the computational domain. The LW scheme clearly reproduces these interactions, but there are discontinuities and noticeable oscillations near the vertices. This HLL scheme successfully suppresses oscillations but results in relatively broad wave fronts. The MUSCL--Rusanov scheme is accurate in solving the corner interactions and retains the overall triangularity of the solution with the stability of the numerical solution. Overall, the MUSCL--Rusanov scheme is the most accurate and stable for the triangular dam-break problem.
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{Triangular_Comparison_All_Times.png}
+\caption{Comparison of the LW, HLL, and MUSCL--Rusanov schemes for the Triangular dam-break problem at different time instances.}
+\label{fig:triangular}
+\end{figure}
+\end{document}
