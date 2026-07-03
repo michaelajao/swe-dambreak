@@ -39,7 +39,7 @@ def velocity_desingularized(
     """Kurganov–Petrova (2007) smoothed velocity for near-dry cells.
 
     q = sqrt(2) * h * hq / sqrt(h^4 + max(h^4, eps^4)); smooth in h, so it
-    gives usable gradients at wet/dry fronts (used by the ML phase).
+    gives usable gradients at wet/dry fronts (used by the ML models).
     """
     h4 = h**4
     denom = torch.sqrt(h4 + torch.clamp(h4, min=eps**4))

@@ -1,4 +1,4 @@
-# Phase 0 — Coauthor data inventory and QC
+# Coauthor data audit — inventory and QC
 
 Source: `data/raw/` — 18 runs, 90 CSV snapshot files.
 
@@ -109,23 +109,23 @@ All diagnostics are computed on the physical depth `h = eta − Z` (analytic Z).
 | variant6-triangular-LW | 0.000e+00 | 6.110e-04 | 5.720e-03 | 2.760e-02 | 6.700e-02 |
 | variant6-triangular-MUSCLRS | 0.000e+00 | -2.109e-15 | -3.886e-15 | -4.330e-15 | 6.661e-16 |
 
-![snapshots](figures/phase0_snapshots.png)
+![snapshots](figures/coauthor_audit_snapshots.png)
 
-![mass drift](figures/phase0_mass_drift.png)
+![mass drift](figures/coauthor_audit_mass_drift.png)
 
-## Key findings (2026-07-03 audit, updated with paper conventions)
+## Key findings
 
 - **Data hygiene is good**: no NaNs, no missing snapshots in any of the 18 runs; all grids are 501×501 with a uniform 0.5 s output cadence.
 - **Stored field identified**: t=0 snapshots equal `h_IC + Z` to float-rounding in all 18 runs (table above), confirming the files store the free surface eta on the 501×501 node grid.
-- **All runs are wet-bed**: the Gaussian variant's background depth decays to ~1.4e-11 at the corners but never reaches zero; no run exercises a true dry front. Our dry-bed benchmarks (Phase 2) therefore have no coauthor counterpart.
+- **All runs are wet-bed**: the Gaussian variant's background depth decays to ~1.4e-11 at the corners but never reaches zero; no run exercises a true dry front. Our planned dry-bed benchmarks therefore have no coauthor counterpart.
 - **LW mass drift is large and real**: with reflective (closed) boundaries, the LW runs lose up to 1.9e-1 (variant 5), 8.1e-2 (variant 3), 1.3e-2 (variant 2) of their volume — a conservation violation consistent with the paper's added artificial viscosity and the non-conservative FD form; worth discussing in the paper's comparison section.
 - **Symmetry anomaly**: on the radially symmetric variants 3 and 4, LW stays symmetric to ~1e-8 while HLL and MUSCL-RS show O(1e-4)–O(6e-2) asymmetry at t=2 s — an upwind sweep-ordering or splitting asymmetry in their implementation. Flag to coauthor.
 - **HLL/MUSCL-RS conservation is exact** (~1e-15) on variants 2, 3, 6 but drifts to ~3e-7 (variant 1) and ~2e-3 (variant 5) on cases whose IC touches the reflective walls — pointing at their wall-flux treatment.
-- **Well-balancing**: the paper discretizes the bed-slope source with centered differences (no hydrostatic reconstruction), so their schemes are not well-balanced over the hump; small spurious currents are expected in near-still regions. Our Phase 1 solver uses Audusse reconstruction, so residual differences of this type are *expected* in reconciliation and attributable to scheme, not convention.
+- **Well-balancing**: the paper discretizes the bed-slope source with centered differences (no hydrostatic reconstruction), so their schemes are not well-balanced over the hump; small spurious currents are expected in near-still regions. Our solver uses Audusse reconstruction, so residual differences of this type are *expected* in reconciliation and attributable to scheme, not convention.
 
 ## Remaining questions for the coauthor
 
-1. **Momentum/velocity fields**: are `hu, hv` (or `u, v`) snapshots available? Without them, momentum metrics and momentum gauge data (Phase 3) cannot use these runs.
+1. **Momentum/velocity fields**: are `hu, hv` (or `u, v`) snapshots available? Without them, momentum metrics and momentum gauge data (for the FVM-informed PINN) cannot use these runs.
 2. **Time step**: fixed dt or CFL-adaptive (which CFL)? Needed only for runtime comparisons, not accuracy.
 3. **LW artificial viscosity**: form and coefficient (needed to attribute the LW mass loss precisely).
 4. **Confirm the stored field is eta = h + Z** (we verified this numerically; a one-line confirmation closes it).

@@ -4,7 +4,7 @@ Restores the contact/shear wave dropped by HLL: the tangential momentum is
 upwinded across the middle wave S*, which is what keeps 2D dam-break shear
 fronts sharp. Fully vectorized over all interfaces; pure and differentiable
 (no in-place ops, no .item(), guarded denominators) — this kernel doubles as
-the FVM-informed PINN loss core in Phase 3.
+the FVM-informed PINN loss core.
 """
 
 from __future__ import annotations

@@ -1,9 +1,9 @@
-"""Phase 0 audit: inventory + QC of the coauthor's runs in data/raw.
+"""Coauthor data audit: inventory + QC of the coauthor's runs in data/raw.
 
 Writes:
-    reports/phase0_inventory.md
-    reports/figures/phase0_snapshots.png
-    reports/figures/phase0_mass_drift.png
+    reports/coauthor_data_audit.md
+    reports/figures/coauthor_audit_snapshots.png
+    reports/figures/coauthor_audit_mass_drift.png
     configs/coauthor_conventions.yaml
 
 Diagnostics only — the raw data is never modified.
@@ -73,7 +73,7 @@ def main() -> None:
 
     # ---------------- inventory + QC markdown ----------------
     lines: list[str] = []
-    lines.append("# Phase 0 — Coauthor data inventory and QC\n")
+    lines.append("# Coauthor data audit — inventory and QC\n")
     lines.append(f"Source: `data/raw/` — {len(runs)} runs, "
                  f"{sum(len(r.files) for r in runs)} CSV snapshot files.\n")
 
@@ -154,10 +154,10 @@ def main() -> None:
                      " | ".join(fmt(d) for d in rep.rel_mass_drift) + " |")
     lines.append("")
 
-    lines.append("![snapshots](figures/phase0_snapshots.png)\n")
-    lines.append("![mass drift](figures/phase0_mass_drift.png)\n")
+    lines.append("![snapshots](figures/coauthor_audit_snapshots.png)\n")
+    lines.append("![mass drift](figures/coauthor_audit_mass_drift.png)\n")
 
-    lines.append("## Key findings (2026-07-03 audit, updated with paper conventions)\n")
+    lines.append("## Key findings\n")
     lines.append(
         "- **Data hygiene is good**: no NaNs, no missing snapshots in any of the "
         "18 runs; all grids are 501×501 with a uniform 0.5 s output cadence.\n"
@@ -166,7 +166,7 @@ def main() -> None:
         "the free surface eta on the 501×501 node grid.\n"
         "- **All runs are wet-bed**: the Gaussian variant's background depth "
         "decays to ~1.4e-11 at the corners but never reaches zero; no run "
-        "exercises a true dry front. Our dry-bed benchmarks (Phase 2) therefore "
+        "exercises a true dry front. Our planned dry-bed benchmarks therefore "
         "have no coauthor counterpart.\n"
         "- **LW mass drift is large and real**: with reflective (closed) "
         "boundaries, the LW runs lose up to 1.9e-1 (variant 5), 8.1e-2 "
@@ -184,7 +184,7 @@ def main() -> None:
         "- **Well-balancing**: the paper discretizes the bed-slope source with "
         "centered differences (no hydrostatic reconstruction), so their schemes "
         "are not well-balanced over the hump; small spurious currents are "
-        "expected in near-still regions. Our Phase 1 solver uses Audusse "
+        "expected in near-still regions. Our solver uses Audusse "
         "reconstruction, so residual differences of this type are *expected* in "
         "reconciliation and attributable to scheme, not convention.\n"
     )
@@ -193,7 +193,7 @@ def main() -> None:
     lines.append(
         "1. **Momentum/velocity fields**: are `hu, hv` (or `u, v`) snapshots "
         "available? Without them, momentum metrics and momentum gauge data "
-        "(Phase 3) cannot use these runs.\n"
+        "(for the FVM-informed PINN) cannot use these runs.\n"
         "2. **Time step**: fixed dt or CFL-adaptive (which CFL)? Needed only for "
         "runtime comparisons, not accuracy.\n"
         "3. **LW artificial viscosity**: form and coefficient (needed to "
@@ -205,7 +205,7 @@ def main() -> None:
         "SWASHES-style validation uses g = 9.81).\n"
     )
 
-    (REPORTS / "phase0_inventory.md").write_text("\n".join(lines), encoding="utf-8")
+    (REPORTS / "coauthor_data_audit.md").write_text("\n".join(lines), encoding="utf-8")
 
     # ---------------- conventions yaml ----------------
     conv = {
@@ -266,7 +266,7 @@ def main() -> None:
             fig.colorbar(im, ax=ax, fraction=0.046)
     fig.suptitle("Coauthor HLL runs — free surface eta, first/last snapshot")
     fig.tight_layout()
-    fig.savefig(FIGS / "phase0_snapshots.png", dpi=140)
+    fig.savefig(FIGS / "coauthor_audit_snapshots.png", dpi=140)
     plt.close(fig)
 
     fig, axes = plt.subplots(2, 3, figsize=(13, 7), sharex=True)
@@ -282,10 +282,10 @@ def main() -> None:
         ax.set_ylabel("mass drift [%]")
     fig.suptitle("Relative mass drift of depth h vs time (closed domain: any drift is numerical)")
     fig.tight_layout()
-    fig.savefig(FIGS / "phase0_mass_drift.png", dpi=140)
+    fig.savefig(FIGS / "coauthor_audit_mass_drift.png", dpi=140)
     plt.close(fig)
 
-    print("\nwrote reports/phase0_inventory.md, configs/coauthor_conventions.yaml, figures")
+    print("\nwrote reports/coauthor_data_audit.md, configs/coauthor_conventions.yaml, figures")
 
 
 if __name__ == "__main__":

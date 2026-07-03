@@ -1,7 +1,6 @@
 # Design proposal: `state.py` / `grid.py` data layout
 
-Status: **awaiting approval** (pre-Phase-1 gate requested in the project brief).
-Date: 2026-07-03
+Status: approved 2026-07-03 (design review before solver implementation).
 
 ## 1. Core tensor layout
 

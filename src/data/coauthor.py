@@ -4,7 +4,7 @@ Observed layout (2026-07-03 drop):
     data/raw/Variant <k> <Name> Dam-Break/solution_outputs_<ic>_numerical_<SCHEME>/<stem>_t<time>.csv
 
 Conventions (from the coauthor's paper draft, paper/main.tex, cross-checked
-numerically against the t=0 snapshots — see reports/phase0_inventory.md):
+numerically against the t=0 snapshots — see reports/coauthor_data_audit.md):
     - domain [0,100] x [0,100] m, 501 x 501 *nodes*, dx = dy = 0.2 m
     - g = 2 m/s^2 (sic), Manning n = 0
     - bed: Gaussian hump Z = 2 exp(-((x-50)^2 + (y-50)^2)/200)
