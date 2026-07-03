@@ -1,0 +1,17 @@
+# Fast end-to-end validation of the SciML pipeline (NOT publication settings).
+# Full runs: raise iters to ~20000 and seeds to [0,1,2]; see configs/sciml.yaml.
+device: auto
+seeds: [0]
+entries:
+  - {name: pinn_primitive, kind: pinn, variables: primitive}
+  - {name: pinn_conservative, kind: pinn, variables: conservative}
+  - {name: fvm_pinn, kind: fvm}
+benchmarks:
+  - {id: b1_circular_wet, reference_n: 256, grid_n: 48}
+train:
+  iters: 400
+  lr: 1.0e-3
+  n_collocation: 4000
+  n_ic: 1000
+  fvm_times: 9          # collocation times in [0, t_end]
+  fvm_nsub: 4
