@@ -1,0 +1,17 @@
+benchmark,scheme,order,limiter,n,t_end,L1_h,L2_h,L1_speed,mass_drift,front_pos,wall_time_s,n_steps,device
+b1_circular_wet,hll,1,minmod,48,1.2,5.457448e+02,1.516287e+01,1.539949e+03,0.00021168179180164337,24.9239,0.2655,32,cuda
+b1_circular_wet,hll,2,van_leer,48,1.2,1.479979e+02,4.810957e+00,3.254443e+02,4.902517281024643e-10,22.8811,0.3258,34,cuda
+b1_circular_wet,hllc,1,minmod,48,1.2,5.323195e+02,1.476275e+01,1.485052e+03,0.00013535749621518267,24.7492,0.5076,32,cuda
+b1_circular_wet,hllc,2,van_leer,48,1.2,1.699476e+02,5.384673e+00,3.832719e+02,1.6709866823561015e-10,22.8811,0.4455,34,cuda
+b3_three_humps,hll,1,minmod,60,20.0,1.072589e+02,3.557002e+00,6.978854e+02,2.220446049250313e-16,,1.8494,212,cuda
+b3_three_humps,hll,2,van_leer,60,20.0,4.642229e+01,1.470582e+00,2.998450e+02,0.0,,2.2401,232,cuda
+b3_three_humps,hllc,1,minmod,60,20.0,1.087245e+02,3.646715e+00,6.980768e+02,2.220446049250313e-16,,2.6328,217,cuda
+b3_three_humps,hllc,2,van_leer,60,20.0,4.340321e+01,1.378640e+00,2.522923e+02,0.0,,3.2046,234,cuda
+b4_step_dry_instant,hllc,2,van_leer,48,10.0,,,,2.220446049250313e-16,,1.6706,122,cuda
+b4_step_dry_progressive,hllc,2,van_leer,48,10.0,,,,0.0,,1.7221,126,cuda
+b4_cone_wet_instant,hllc,2,van_leer,48,10.0,,,,0.0,,1.014,78,cuda
+b4_cone_wet_progressive,hllc,2,van_leer,48,10.0,,,,0.0,,1.0445,78,cuda
+b4_step_wet_instant,hllc,2,van_leer,48,10.0,,,,4.440892098500626e-16,,1.3528,103,cuda
+b4_step_wet_progressive,hllc,2,van_leer,48,10.0,,,,0.0,,1.4775,110,cuda
+b4_cone_dry_instant,hllc,2,van_leer,48,10.0,,,,0.0,,1.1655,90,cuda
+b4_cone_dry_progressive,hllc,2,van_leer,48,10.0,,,,0.0,,1.3959,90,cuda

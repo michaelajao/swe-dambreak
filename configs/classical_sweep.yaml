@@ -1,0 +1,39 @@
+# Classical scheme-comparison sweep (drives experiments/run_classical.py).
+# Two stories, matching the paper's classical section:
+#   scheme_sweep : {Rusanov,HLL,HLLC} x {1st, minmod, van_leer, superbee}
+#                  on representative benchmarks, each vs a fine self-convergence
+#                  reference (HLLC MUSCL-van Leer).
+#   ic_matrix    : one high-quality scheme over the B4 initial-condition matrix,
+#                  isolating the effect of the initial/breach configuration.
+device: auto          # auto -> cuda if available else cpu
+seed: 0
+
+reconstructions:
+  - {order: 1, limiter: minmod, label: first-order}
+  - {order: 2, limiter: minmod, label: MUSCL-minmod}
+  - {order: 2, limiter: van_leer, label: MUSCL-van_leer}
+  - {order: 2, limiter: superbee, label: MUSCL-superbee}
+
+schemes: [rusanov, hll, hllc]
+
+scheme_sweep:
+  - {id: b1_circular_wet,       n: 256, reference_n: 1024}
+  - {id: b1_circular_dry,       n: 256, reference_n: 1024}
+  - {id: b2_partial_breach,     n: 200, reference_n: 800}
+  - {id: b3_three_humps,        n: 300, reference_n: 600}
+  - {id: b4_step_dry_instant,   n: 200, reference_n: 800}
+
+ic_matrix:
+  scheme: hllc
+  order: 2
+  limiter: van_leer
+  n: 200
+  benchmarks:
+    - b4_step_dry_instant
+    - b4_step_dry_progressive
+    - b4_step_wet_instant
+    - b4_step_wet_progressive
+    - b4_cone_dry_instant
+    - b4_cone_dry_progressive
+    - b4_cone_wet_instant
+    - b4_cone_wet_progressive
