@@ -29,7 +29,7 @@
 \setlength{\arrayrulewidth}{0.5mm}
 \setlength{\tabcolsep}{18pt}
 \renewcommand{\arraystretch}{1.5}
-\usepackage{tabularx, tabulary, tabu, longtable}
+\usepackage{tabularx, tabulary, longtable}
 \usepackage{afterpage}
 \usepackage{afterpage}
 \usepackage{empheq}
@@ -365,67 +365,86 @@ The spatial derivatives are approximated using the HLL fluxes, whereas the tempo
 
 \subsubsection{MUSCL Scheme with SSP--RK3 Time Integration}
 
-The MUSCL (Monotonic Upstream-centered Scheme for Conservation Laws) approach is a higher-order reconstruction technique that improves spatial accuracy while preserving monotonicity near discontinuities. In this study, the MUSCL scheme is combined with the Minmod slope limiter, the Rusanov flux, and the third-order Strong Stability Preserving Runge--Kutta (SSP--RK3) time integration method.
+The \textbf{Monotonic Upstream-centered Scheme for Conservation Laws (MUSCL)} is a second-order spatial reconstruction technique that improves the accuracy of the finite volume method while preserving monotonicity near discontinuities. In the present work, the MUSCL scheme is coupled with the Minmod slope limiter, the Rusanov (Local Lax--Friedrichs) numerical flux, and the third-order Strong Stability Preserving Runge--Kutta (SSP--RK3) method for time integration.
 
 \paragraph{Spatial Reconstruction}
 
-For each computational cell, the left and right states at the cell interfaces are reconstructed as
+Within the finite volume framework, only the cell-averaged conservative variables are stored. Therefore, the left and right states at each cell interface are reconstructed using the MUSCL approach as
 
 \begin{equation}
-\mathbf{U}_{i+\frac{1}{2}}^{L}
+U_{i+\frac{1}{2}}^{L}
 =
-\mathbf{U}_{i}
-+\frac{1}{2}\Delta x\,\Delta \mathbf{U}_{i},
+U_i
++
+\frac{1}{2}
+\Delta x
+\,\Delta U_i,
+\label{eq:MUSCL_left}
 \end{equation}
 
 \begin{equation}
-\mathbf{U}_{i+\frac{1}{2}}^{R}
+U_{i+\frac{1}{2}}^{R}
 =
-\mathbf{U}_{i+1}
--\frac{1}{2}\Delta x\,\Delta \mathbf{U}_{i+1}.
+U_{i+1}
+-
+\frac{1}{2}
+\Delta x
+\,\Delta U_{i+1},
+\label{eq:MUSCL_right}
 \end{equation}
 
-The slope $\Delta \mathbf{U}_{i}$ is computed using the Minmod limiter
+where the limited slope is computed using the Minmod limiter
 
 \begin{equation}
-\Delta \mathbf{U}_{i}
+\Delta U_i
 =
-\mathrm{minmod}
+\operatorname{minmod}
 \left(
-\frac{\mathbf{U}_{i}-\mathbf{U}_{i-1}}{\Delta x},
-\frac{\mathbf{U}_{i+1}-\mathbf{U}_{i}}{\Delta x}
+\frac{U_i-U_{i-1}}{\Delta x},
+\frac{U_{i+1}-U_i}{\Delta x}
 \right).
+\label{eq:slope}
 \end{equation}
 
 The Minmod function is defined as
 
 \begin{equation}
-\mathrm{minmod}(a,b)
+\operatorname{minmod}(a,b)
 =
 \frac{1}{2}
 \left[
-\mathrm{sign}(a)+\mathrm{sign}(b)
+\operatorname{sign}(a)
++
+\operatorname{sign}(b)
 \right]
-\min(|a|,|b|).
+\min
+\left(
+|a|,
+|b|
+\right).
+\label{eq:minmod}
 \end{equation}
 
-The same reconstruction procedure is applied in both spatial directions.
+The same reconstruction procedure is applied independently in both the $x$- and $y$-directions.
 
-\paragraph{Rusanov Flux}
+\paragraph{Rusanov Numerical Flux}
 
-The numerical flux at each interface is evaluated using the Rusanov flux
+After reconstructing the left and right interface states, the physical fluxes are evaluated and the numerical flux at each interface is computed using the Rusanov (Local Lax--Friedrichs) flux
 
 \begin{equation}
-\mathbf{F}_{i+\frac{1}{2}}
+F_{i+\frac{1}{2}}
 =
 \frac{1}{2}
 \left(
-\mathbf{F}_L+\mathbf{F}_R
+F_L+F_R
 \right)
--\frac{1}{2}\alpha
+-
+\frac{1}{2}
+\alpha
 \left(
-\mathbf{U}_R-\mathbf{U}_L
+U_R-U_L
 \right),
+\label{eq:rusanov}
 \end{equation}
 
 where
@@ -437,24 +456,33 @@ where
 \left(
 |u_L|+c_L,\,
 |u_R|+c_R
-\right)
+\right),
+\label{eq:alpha}
 \end{equation}
 
-denotes the maximum wave speed at the interface.
-
-Similarly, the flux in the $y$-direction is given by
+denotes the maximum local wave speed, with
 
 \begin{equation}
-\mathbf{G}_{j+\frac{1}{2}}
+c=\sqrt{gh}.
+\label{eq:wavespeed}
+\end{equation}
+
+Similarly, the numerical flux in the $y$-direction is evaluated as
+
+\begin{equation}
+G_{j+\frac{1}{2}}
 =
 \frac{1}{2}
 \left(
-\mathbf{G}_B+\mathbf{G}_T
+G_B+G_T
 \right)
--\frac{1}{2}\alpha_y
+-
+\frac{1}{2}
+\alpha_y
 \left(
-\mathbf{U}_T-\mathbf{U}_B
+U_T-U_B
 \right),
+\label{eq:rusanov_y}
 \end{equation}
 
 where
@@ -467,70 +495,103 @@ where
 |v_B|+c_B,\,
 |v_T|+c_T
 \right).
+\label{eq:alpha_y}
+\end{equation}
+
+\paragraph{Semi-discrete Finite Volume Formulation}
+
+After computing the numerical fluxes, the governing shallow water equations are transformed into the following semi-discrete finite volume form
+
+\begin{equation}
+\frac{dU_{i,j}}{dt}
+=
+-
+\frac{
+F_{i+\frac{1}{2},j}
+-
+F_{i-\frac{1}{2},j}
+}{\Delta x}
+-
+\frac{
+G_{i,j+\frac{1}{2}}
+-
+G_{i,j-\frac{1}{2}}
+}{\Delta y}
++
+S_{i,j}.
+\label{eq:semidiscrete}
+\end{equation}
+
+The spatial discretization operator is denoted by
+
+\begin{equation}
+R(U)
+=
+-
+\frac{
+F_{i+\frac{1}{2},j}
+-
+F_{i-\frac{1}{2},j}
+}{\Delta x}
+-
+\frac{
+G_{i,j+\frac{1}{2}}
+-
+G_{i,j-\frac{1}{2}}
+}{\Delta y}
++
+S_{i,j}.
+\label{eq:residual}
 \end{equation}
 
 \paragraph{SSP--RK3 Time Integration}
 
-The semi-discrete system
+The semi-discrete finite volume system is advanced in time using the third-order Strong Stability Preserving Runge--Kutta (SSP--RK3) scheme.
+
+\textbf{Stage 1}
 
 \begin{equation}
-\frac{d\mathbf{U}}{dt}=R(\mathbf{U})
-\end{equation}
-
-is advanced in time using the SSP--RK3 scheme.
-
-Stage 1:
-
-\begin{equation}
-\mathbf{U}^{(1)}
+U^{(1)}
 =
-\mathbf{U}^{n}
+U^{n}
 +
-\Delta t\,R(\mathbf{U}^{n}).
+\Delta t\,R(U^{n}),
+\label{eq:rk3_stage1}
 \end{equation}
 
-Stage 2:
+\textbf{Stage 2}
 
 \begin{equation}
-\mathbf{U}^{(2)}
+U^{(2)}
 =
-\frac{3}{4}\mathbf{U}^{n}
+\frac{3}{4}U^{n}
 +
 \frac{1}{4}
 \left[
-\mathbf{U}^{(1)}
+U^{(1)}
 +
-\Delta t\,R(\mathbf{U}^{(1)})
-\right].
+\Delta t\,R(U^{(1)})
+\right],
+\label{eq:rk3_stage2}
 \end{equation}
 
-Stage 3:
+\textbf{Stage 3}
 
 \begin{equation}
-\mathbf{U}^{n+1}
+U^{n+1}
 =
-\frac{1}{3}\mathbf{U}^{n}
+\frac{1}{3}U^{n}
 +
 \frac{2}{3}
 \left[
-\mathbf{U}^{(2)}
+U^{(2)}
 +
-\Delta t\,R(\mathbf{U}^{(2)})
+\Delta t\,R(U^{(2)})
 \right].
+\label{eq:rk3_stage3}
 \end{equation}
 
-Here, the operator $R(\mathbf{U})$ includes both the numerical flux divergences and the source term, namely
-
-\begin{equation}
-R(\mathbf{U})
-=
--\frac{\partial \mathbf{F}}{\partial x}
--\frac{\partial \mathbf{G}}{\partial y}
-+\mathbf{S}.
-\end{equation}
-
-The SSP--RK3 scheme preserves the total variation diminishing (TVD) property and provides stable and accurate solutions for hyperbolic conservation laws.
-
+The MUSCL scheme is a second-order finite-volume reconstruction method in which piecewise linear states are constructed from cell averages using a slope limiter. In this work, the Minmod limiter is employed to suppress spurious oscillations near discontinuities, while intercell fluxes are evaluated using the Rusanov (local Lax–Friedrichs) flux. The resulting semi-discrete system is advanced in time using the SSP–RK3 method, with the spatial residual recomputed at each Runge–Kutta stage.
 \paragraph{Boundary Conditions:}
 
 Reflective boundary conditions are imposed along all domain boundaries. The water depth is extrapolated using zero-gradient conditions, while the normal momentum component is reflected and the tangential momentum component is extrapolated with zero-gradient conditions.

@@ -6,7 +6,8 @@ entries:
   - {name: pinn_primitive, kind: pinn, variables: primitive}
   - {name: pinn_conservative, kind: pinn, variables: conservative}
   - {name: fvm_pinn, kind: fvm}
-  - {name: fvm_pinn_data, kind: fvm, data: true}   # sparse-data ablation
+  # sparse-data ablation, only where it matters (dry-bed momentum collapse)
+  - {name: fvm_pinn_data, kind: fvm, data: true, only_benchmarks: [b1_circular_dry, b3_three_humps]}
 benchmarks:
   - {id: b1_circular_dry, reference_n: 1024, grid_n: 128}
   - {id: b1_circular_wet, reference_n: 1024, grid_n: 128}
@@ -16,7 +17,7 @@ train:
   lr: 1.0e-3
   n_collocation: 20000
   n_ic: 4000
-  fvm_times: 21
-  fvm_nsub: 8
+  fvm_times: 41         # collocation times; interval dt sets the CFL substep count
+  fvm_nsub_max: 24      # cap on CFL substeps per interval (bounds backprop depth)
   fvm_stochastic: true  # sample one collocation interval per iter (~20x faster)
   n_gauge: 64           # sparse gauge points for the data ablation

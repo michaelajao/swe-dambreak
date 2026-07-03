@@ -38,6 +38,7 @@ from ml.pinn import PINN, PINNConfig                        # noqa: E402
 from ml.train import TrainConfig, train                     # noqa: E402
 from swe.solver import Config, run                          # noqa: E402
 from swe.state import primitives                            # noqa: E402
+from swe.timestep import compute_dt                         # noqa: E402
 
 REPORTS = ROOT / "reports"
 
@@ -139,8 +140,15 @@ def setup_fvm(entry, eval_bi, device, tr):
     scfg = Config(grid=grid, bc=eval_bi.bc, scheme="hllc", order=2,
                   limiter="van_leer", g=eval_bi.g, manning_n=eval_bi.manning_n)
     times = torch.linspace(0.0, eval_bi.t_end, tr["fvm_times"]).tolist()
-    spec = FVMResidualSpec(cfg=scfg, times=times, n_sub=tr["fvm_nsub"], z=eval_bi.z,
+    # substeps must resolve the CFL condition over one collocation interval;
+    # this depends on t_end (B3 runs 20 s vs B1 1.2 s), so derive it instead of
+    # hard-coding. Cap it so the backprop depth (and cost) stays bounded.
+    dt_cfl = float(compute_dt(U0, grid, eval_bi.g, cfl=0.4, h_eps=1e-6))
+    dt_interval = eval_bi.t_end / (tr["fvm_times"] - 1)
+    n_sub = min(tr.get("fvm_nsub_max", 24), max(1, int(dt_interval / dt_cfl) + 1))
+    spec = FVMResidualSpec(cfg=scfg, times=times, n_sub=n_sub, z=eval_bi.z,
                            stochastic=tr.get("fvm_stochastic", True))
+    print(f"    [fvm] dt_cfl={dt_cfl:.4g}, dt_interval={dt_interval:.4g}, n_sub={n_sub}")
     U0 = eval_bi.U0.to(torch.float64).to(device)
 
     use_data = entry.get("data", False)
@@ -209,6 +217,8 @@ def main() -> None:
         print(f"  classical HLLC-vanleer @N={eval_n}: L1_h={classical[bid]['L1_h']:.3e}")
 
         for entry in cfg["entries"]:
+            if "only_benchmarks" in entry and bid not in entry["only_benchmarks"]:
+                continue
             for seed in cfg["seeds"]:
                 tag = f"{entry['name']}/{bid}/seed{seed}"
                 out_dir = ROOT / "runs" / "ml" / entry["name"] / bid / f"seed{seed}"

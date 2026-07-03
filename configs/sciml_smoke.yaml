@@ -14,4 +14,4 @@ train:
   n_collocation: 4000
   n_ic: 1000
   fvm_times: 9          # collocation times in [0, t_end]
-  fvm_nsub: 4
+  fvm_nsub_max: 8
