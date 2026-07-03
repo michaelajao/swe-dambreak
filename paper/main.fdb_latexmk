@@ -1,7 +1,15 @@
 # Fdb version 4
-["pdflatex"] 1783117692.97415 "c:/Users/ajaoo/Desktop/swe-dambreak/paper/main.tex" "main.pdf" "main" 1783117697.941 2
-  "C:/Users/ajaoo/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map" 1782303496 806075 f1f8d8f49b3419398f262f07ea1b66bd ""
-  "C:/Users/ajaoo/AppData/Local/MiKTeX/miktex/data/le/pdftex/pdflatex.fmt" 1773785255 13257295 ff303e7ade3bc1ed3747b21eda7361d2 ""
+["bibtex main"] 1783117976.16 "main.aux" "main.bbl" "main" 1783117981.82966 0
+  "./references.bib" 1783117548.72906 17558 95e79970adaea6685e2fdf96789fbfb4 ""
+  "C:/Users/ajaoo/AppData/Local/Programs/MiKTeX/bibtex/bst/bibtex/unsrt.bst" 1291864736 18030 1376b4b231b50c66211e47e42eda2875 ""
+  "main.aux" 1783117980.96537 16388 c751578ecd555265c7a7564447d3dd9b "pdflatex"
+  (generated)
+  "main.bbl"
+  "main.blg"
+  (rewritten before read)
+["pdflatex"] 1783117976.45567 "main.tex" "main.pdf" "main" 1783117981.83058 0
+  "C:/Users/ajaoo/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map" 1782303496.04932 806075 f1f8d8f49b3419398f262f07ea1b66bd ""
+  "C:/Users/ajaoo/AppData/Local/MiKTeX/miktex/data/le/pdftex/pdflatex.fmt" 1773785255.74799 13257295 7f29e540f426fdfa45367ed9f6e7446d ""
   "C:/Users/ajaoo/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/cm-super/cm-super-ts1.enc" 1001775420 2900 1537cc8184ad1792082cd229ecc269f4 ""
   "C:/Users/ajaoo/AppData/Local/Programs/MiKTeX/fonts/tfm/jknappen/ec/tcrm1200.tfm" 993062508 1444 95ffe0f19b974d50849790c8225c7ef7 ""
   "C:/Users/ajaoo/AppData/Local/Programs/MiKTeX/fonts/tfm/public/amsfonts/cmextra/cmex7.tfm" 1233951848 1004 54797486969f23fa377b128694d548df ""
@@ -194,16 +202,16 @@
   "C:/Users/ajaoo/AppData/Local/Programs/MiKTeX/tex/latex/tools/xspace.sty" 1749468414 4545 d7bb86d489a8ad5263e4c34304c03aee ""
   "C:/Users/ajaoo/AppData/Local/Programs/MiKTeX/tex/latex/url/url.sty" 1388490452 12796 8edb7d69a20b857904dd0ea757c14ec9 ""
   "C:/Users/ajaoo/AppData/Local/Programs/MiKTeX/tex/latex/xcolor/xcolor.sty" 1729265222 55384 b454dec21c2d9f45ec0b793f0995b992 ""
-  "Circular_Comparison_All_Times.png" 1782954839 1906081 b546c201798286d5566168a60e41e846 ""
-  "Gaussian_Comparison_All_Times.png" 1782954839 1742232 40dc1af3ad9ff5918116556ea9725349 ""
-  "Parabola_Comparison_All_Times.png" 1782954839 2291984 13afa0d6cfc60717adef754639ec5aa0 ""
-  "Rectangular_Comparison_All_Times.png" 1782954839 1681993 8fede7483124c0c95863e5aeaaf8c802 ""
-  "Step_Comparison_All_Times.png" 1782954839 2940971 41adb38d7674cf1fbef69dbee38926de ""
-  "Triangular_Comparison_All_Times.png" 1782954839 1787504 96de53d63a4db7d8359923a4656b775d ""
-  "c:/Users/ajaoo/Desktop/swe-dambreak/paper/main.tex" 1783117686 50886 d62d04be6c01422de7da37aa2b412a13 ""
-  "main.aux" 1783117697 13709 cf1d3e7e276e656b4e9704cb03aa148d "pdflatex"
-  "main.out" 1783117697 6717 9b1d2c5aead34cfe924c6301b8694feb "pdflatex"
-  "main.tex" 1783117686 50886 d62d04be6c01422de7da37aa2b412a13 ""
+  "Circular_Comparison_All_Times.png" 1782954839.19278 1906081 6ce5abfb0a23c2e806e049c69c8d9aee ""
+  "Gaussian_Comparison_All_Times.png" 1782954839.15838 1742232 41c09bfd4f0329d2fd0ad021f09c33f4 ""
+  "Parabola_Comparison_All_Times.png" 1782954839.12166 2291984 4843c1ed4002c7f217e8885158ac4337 ""
+  "Rectangular_Comparison_All_Times.png" 1782954839.17501 1681993 f39320f820c553d5111f82af4697e440 ""
+  "Step_Comparison_All_Times.png" 1782954839.21661 2940971 221fc62b1463b36d4eaee84d72c7c788 ""
+  "Triangular_Comparison_All_Times.png" 1782954839.14086 1787504 13b0f66aff3468d678d4841983c17589 ""
+  "main.aux" 1783117980.96537 16388 c751578ecd555265c7a7564447d3dd9b "pdflatex"
+  "main.bbl" 1783117976.37976 12433 3c1a22511f82454ef7dc790d5c4cbb58 "bibtex main"
+  "main.out" 1783117980.97741 7944 d30fcfae5dde9543c3a1724103e86c00 "pdflatex"
+  "main.tex" 1783117948.6364 55490 3eee6d393c8c59ab794caf58b2006ef9 ""
   (generated)
   "main.aux"
   "main.log"
