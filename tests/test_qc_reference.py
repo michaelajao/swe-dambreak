@@ -1,4 +1,4 @@
-"""Tests for data.qc and data.coauthor on synthetic inputs."""
+"""Tests for data.qc and data.reference on synthetic inputs."""
 
 from pathlib import Path
 
@@ -6,7 +6,7 @@ import numpy as np
 import pytest
 import torch
 
-from data.coauthor import (
+from data.reference import (
     bed_elevation,
     initial_depth,
     load_run,
@@ -19,7 +19,7 @@ from data.qc import run_qc, symmetry_errors
 RAW = Path(__file__).resolve().parents[1] / "data" / "raw"
 
 
-@pytest.mark.skipif(not RAW.exists(), reason="coauthor data not present")
+@pytest.mark.skipif(not RAW.exists(), reason="reference data not present")
 def test_stored_field_is_eta_on_real_data():
     """Lock the convention: stored t=0 snapshot equals h_IC + Z to rounding.
 

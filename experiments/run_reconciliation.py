@@ -1,6 +1,6 @@
-"""Reconciliation: reproduce the coauthor's variant-3 (circular) HLL run.
+"""Reconciliation: reproduce the reference variant-3 (circular) HLL run.
 
-Setup matched to configs/coauthor_conventions.yaml: domain [0,100]^2, g = 2,
+Setup matched to configs/reference_conventions.yaml: domain [0,100]^2, g = 2,
 Gaussian hump bed, reflective walls, T = 2 s. Our grid is 500x500 cell
 centers (their 501x501 nodes); comparison happens on our cell centers by
 bilinearly sampling their node fields. We compare free surface eta = h + z.
@@ -23,8 +23,8 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import torch
 
-from data.coauthor import (
-    G_COAUTHOR,
+from data.reference import (
+    G_REF,
     SRC_EXTENT,
     bed_elevation,
     initial_depth,
@@ -49,7 +49,7 @@ DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 def our_run(scheme: str, order: int, limiter: str = "minmod"):
     grid = Grid.from_extent(nx=N, ny=N, extent=SRC_EXTENT, device=DEVICE)
     cfg = Config(grid=grid, bc=REFLECTIVE, scheme=scheme, order=order,
-                 limiter=limiter, g=G_COAUTHOR)
+                 limiter=limiter, g=G_REF)
     X, Y = grid.centers()
     z = bed_elevation(X, Y)
     h0 = initial_depth(VARIANT, X, Y)
@@ -119,8 +119,8 @@ def main() -> None:
 
     # ---------------- report ----------------
     L: list[str] = []
-    L.append("# Reconciliation vs coauthor variant 3 (circular dam break, HLL)\n")
-    L.append(f"Setup: [0,100]^2 m, g = {G_COAUTHOR}, Gaussian hump bed, reflective "
+    L.append("# Reconciliation vs reference variant 3 (circular dam break, HLL)\n")
+    L.append(f"Setup: [0,100]^2 m, g = {G_REF}, Gaussian hump bed, reflective "
              f"walls, T = 2 s. Their run: 501x501 nodes; ours: {N}x{N} cell "
              "centers (their nodes bilinearly sampled onto our centers). "
              "Comparison field: free surface eta.\n")

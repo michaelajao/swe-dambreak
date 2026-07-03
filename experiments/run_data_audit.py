@@ -1,10 +1,10 @@
-"""Coauthor data audit: inventory + QC of the coauthor's runs in data/raw.
+"""Reference data audit: inventory + QC of the reference runs in data/raw.
 
 Writes:
-    reports/coauthor_data_audit.md
-    reports/figures/coauthor_audit_snapshots.png
-    reports/figures/coauthor_audit_mass_drift.png
-    configs/coauthor_conventions.yaml
+    reports/data_audit.md
+    reports/figures/data_audit_snapshots.png
+    reports/figures/data_audit_mass_drift.png
+    configs/reference_conventions.yaml
 
 Diagnostics only — the raw data is never modified.
 """
@@ -21,8 +21,8 @@ import matplotlib.pyplot as plt
 import torch
 import yaml
 
-from data.coauthor import (
-    G_COAUTHOR,
+from data.reference import (
+    G_REF,
     SRC_EXTENT,
     bed_elevation,
     discover_runs,
@@ -73,7 +73,7 @@ def main() -> None:
 
     # ---------------- inventory + QC markdown ----------------
     lines: list[str] = []
-    lines.append("# Coauthor data audit — inventory and QC\n")
+    lines.append("# Reference data audit — inventory and QC\n")
     lines.append(f"Source: `data/raw/` — {len(runs)} runs, "
                  f"{sum(len(r.files) for r in runs)} CSV snapshot files.\n")
 
@@ -81,7 +81,7 @@ def main() -> None:
     lines.append(
         f"- Domain `[0,100] x [0,100]` m, 501×501 **nodes**, dx = dy = 0.2 m; "
         f"T = 2 s, snapshots every 0.5 s.\n"
-        f"- **g = {G_COAUTHOR} m/s²** (nonstandard — our reconciliation runs must "
+        f"- **g = {G_REF} m/s²** (nonstandard — our reconciliation runs must "
         "match it), Manning n = 0.\n"
         "- Bed topography: Gaussian hump `Z = 2 exp(-((x-50)² + (y-50)²)/200)`.\n"
         "- **Reflective boundaries on all four sides** — the domain is closed, so "
@@ -98,7 +98,7 @@ def main() -> None:
     lines.append("Nodes where `eta(t=0)` differs from `h_IC + Z` by more than 1e-9 "
                  "(out of 251,001), plus the max deviation over all remaining "
                  "nodes. Mismatched nodes sit exactly on IC discontinuity loci "
-                 "(float rounding in the coauthor's inside/outside tests).\n")
+                 "(float rounding in the reference solver's inside/outside tests).\n")
     lines.append("| run | mismatched nodes | max dev elsewhere |")
     lines.append("|---|---|---|")
     for run, (n_mis, dev_smooth) in zip(runs, ic_dev):
@@ -154,8 +154,8 @@ def main() -> None:
                      " | ".join(fmt(d) for d in rep.rel_mass_drift) + " |")
     lines.append("")
 
-    lines.append("![snapshots](figures/coauthor_audit_snapshots.png)\n")
-    lines.append("![mass drift](figures/coauthor_audit_mass_drift.png)\n")
+    lines.append("![snapshots](figures/data_audit_snapshots.png)\n")
+    lines.append("![mass drift](figures/data_audit_mass_drift.png)\n")
 
     lines.append("## Key findings\n")
     lines.append(
@@ -167,7 +167,7 @@ def main() -> None:
         "- **All runs are wet-bed**: the Gaussian variant's background depth "
         "decays to ~1.4e-11 at the corners but never reaches zero; no run "
         "exercises a true dry front. Our planned dry-bed benchmarks therefore "
-        "have no coauthor counterpart.\n"
+        "have no reference-run counterpart.\n"
         "- **LW mass drift is large and real**: with reflective (closed) "
         "boundaries, the LW runs lose up to 1.9e-1 (variant 5), 8.1e-2 "
         "(variant 3), 1.3e-2 (variant 2) of their volume — a conservation "
@@ -177,7 +177,7 @@ def main() -> None:
         "- **Symmetry anomaly**: on the radially symmetric variants 3 and 4, "
         "LW stays symmetric to ~1e-8 while HLL and MUSCL-RS show O(1e-4)–O(6e-2) "
         "asymmetry at t=2 s — an upwind sweep-ordering or splitting asymmetry in "
-        "their implementation. Flag to coauthor.\n"
+        "their implementation. Flag to the solver authors.\n"
         "- **HLL/MUSCL-RS conservation is exact** (~1e-15) on variants 2, 3, 6 "
         "but drifts to ~3e-7 (variant 1) and ~2e-3 (variant 5) on cases whose IC "
         "touches the reflective walls — pointing at their wall-flux treatment.\n"
@@ -189,7 +189,7 @@ def main() -> None:
         "reconciliation and attributable to scheme, not convention.\n"
     )
 
-    lines.append("## Remaining questions for the coauthor\n")
+    lines.append("## Remaining questions for the solver authors\n")
     lines.append(
         "1. **Momentum/velocity fields**: are `hu, hv` (or `u, v`) snapshots "
         "available? Without them, momentum metrics and momentum gauge data "
@@ -205,7 +205,7 @@ def main() -> None:
         "SWASHES-style validation uses g = 9.81).\n"
     )
 
-    (REPORTS / "coauthor_data_audit.md").write_text("\n".join(lines), encoding="utf-8")
+    (REPORTS / "data_audit.md").write_text("\n".join(lines), encoding="utf-8")
 
     # ---------------- conventions yaml ----------------
     conv = {
@@ -247,7 +247,7 @@ def main() -> None:
             "confirm g = 2 m/s^2 is intentional",
         ],
     }
-    (ROOT / "configs" / "coauthor_conventions.yaml").write_text(
+    (ROOT / "configs" / "reference_conventions.yaml").write_text(
         yaml.safe_dump(conv, sort_keys=False, width=100), encoding="utf-8"
     )
 
@@ -264,9 +264,9 @@ def main() -> None:
                          if i == 0 else f"t={run.times[ti]:g}s", fontsize=9)
             ax.set_xticks([]); ax.set_yticks([])
             fig.colorbar(im, ax=ax, fraction=0.046)
-    fig.suptitle("Coauthor HLL runs — free surface eta, first/last snapshot")
+    fig.suptitle("Reference HLL runs — free surface eta, first/last snapshot")
     fig.tight_layout()
-    fig.savefig(FIGS / "coauthor_audit_snapshots.png", dpi=140)
+    fig.savefig(FIGS / "data_audit_snapshots.png", dpi=140)
     plt.close(fig)
 
     fig, axes = plt.subplots(2, 3, figsize=(13, 7), sharex=True)
@@ -282,10 +282,10 @@ def main() -> None:
         ax.set_ylabel("mass drift [%]")
     fig.suptitle("Relative mass drift of depth h vs time (closed domain: any drift is numerical)")
     fig.tight_layout()
-    fig.savefig(FIGS / "coauthor_audit_mass_drift.png", dpi=140)
+    fig.savefig(FIGS / "data_audit_mass_drift.png", dpi=140)
     plt.close(fig)
 
-    print("\nwrote reports/coauthor_data_audit.md, configs/coauthor_conventions.yaml, figures")
+    print("\nwrote reports/data_audit.md, configs/reference_conventions.yaml, figures")
 
 
 if __name__ == "__main__":

@@ -3,7 +3,7 @@
 These are *diagnostics only* — they report; they never modify data. All
 functions accept a snapshot stack ``h`` of shape (T, ny, nx) (float64) plus
 the snapshot times, and are unit-agnostic where possible (relative measures),
-because the coauthor grid spacing is not yet confirmed.
+because the reference grid spacing is not yet confirmed.
 """
 
 from __future__ import annotations

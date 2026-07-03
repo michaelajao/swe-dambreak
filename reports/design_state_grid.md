@@ -131,14 +131,14 @@ conversion of whatever it is given.
   (adaptive stepping is inherently data-dependent); for the FVM-PINN loss dt is a
   *fixed input*, so the differentiable path never touches the reduction.
 
-## 6. Phase 0 note — coauthor data (already in `data/raw/`)
+## 6. Phase 0 note — reference data (already in `data/raw/`)
 
 Inventory so far: 6 IC variants (step, rectangular, circular, Gaussian, parabolic,
 triangular) × 3 schemes (HLL, Lax–Wendroff, MUSCL-"RS") × 5 snapshots
 (t = 0.0, 0.5, 1.0, 1.5, 2.0 s). Each file is a **headerless 501×501 CSV of a single
 field** — depth (or free surface) only, values ≈ 10 at t=0 for Variant 1.
 
-Open questions for the coauthor (needed before the Phase-1 reconciliation gate;
+Open questions for the solver authors (needed before the Phase-1 reconciliation gate;
 will be tabulated formally in `reports/phase0_inventory.md`):
 
 1. Domain extents and whether the 501 values are cell centers or nodes
@@ -156,7 +156,7 @@ will be tabulated formally in `reports/phase0_inventory.md`):
    package skeleton.
 2. `constants.py`, `grid.py`, `state.py` + pytest units (BC fills, dry-guard values
    *and gradients*, 1D-as-ny=1 round trip).
-3. Phase 0 proper: `qc.py`, `coauthor.py`, `reports/phase0_inventory.md` — the QC
+3. Phase 0 proper: `qc.py`, `reference.py`, `reports/phase0_inventory.md` — the QC
    diagnostics (mass drift, min h, azimuthal symmetry on Variant 3, NaN scan) run
    fine on depth-only data even while the convention questions above are pending.
 4. Then Phase 1 fluxes/reconstruction/well-balancing per the brief.

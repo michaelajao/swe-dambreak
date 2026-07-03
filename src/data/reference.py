@@ -1,10 +1,10 @@
-"""Loaders and case definitions for the coauthor's solver outputs in ``data/raw/``.
+"""Loaders and case definitions for the reference solver outputs in ``data/raw/``.
 
 Observed layout (2026-07-03 drop):
     data/raw/Variant <k> <Name> Dam-Break/solution_outputs_<ic>_numerical_<SCHEME>/<stem>_t<time>.csv
 
-Conventions (from the coauthor's paper draft, paper/main.tex, cross-checked
-numerically against the t=0 snapshots — see reports/coauthor_data_audit.md):
+Conventions (from the paper draft, paper/main.tex, cross-checked
+numerically against the t=0 snapshots — see reports/data_audit.md):
     - domain [0,100] x [0,100] m, 501 x 501 *nodes*, dx = dy = 0.2 m
     - g = 2 m/s^2 (sic), Manning n = 0
     - bed: Gaussian hump Z = 2 exp(-((x-50)^2 + (y-50)^2)/200)
@@ -26,9 +26,9 @@ from pathlib import Path
 import numpy as np
 import torch
 
-# --- coauthor conventions (paper/main.tex, Sect. 2.3) ---
+# --- reference-run conventions (paper/main.tex, Sect. 2.3) ---
 SRC_EXTENT: tuple[float, float, float, float] = (0.0, 100.0, 0.0, 100.0)
-G_COAUTHOR: float = 2.0
+G_REF: float = 2.0
 N_NODES: int = 501
 DX: float = 0.2
 SNAPSHOT_TIMES = (0.0, 0.5, 1.0, 1.5, 2.0)
@@ -57,7 +57,7 @@ def read_field(path: Path | str) -> np.ndarray:
 
 
 def node_coords(n: int = N_NODES) -> tuple[torch.Tensor, torch.Tensor]:
-    """Meshgrid (X, Y) of the coauthor's node-centered grid, each (n, n)."""
+    """Meshgrid (X, Y) of the reference node-centered grid, each (n, n)."""
     x = torch.linspace(SRC_EXTENT[0], SRC_EXTENT[1], n, dtype=torch.float64)
     y = torch.linspace(SRC_EXTENT[2], SRC_EXTENT[3], n, dtype=torch.float64)
     Y, X = torch.meshgrid(y, x, indexing="ij")
@@ -70,7 +70,7 @@ def bed_elevation(X: torch.Tensor, Y: torch.Tensor) -> torch.Tensor:
 
 
 def initial_depth(variant: int, X: torch.Tensor, Y: torch.Tensor) -> torch.Tensor:
-    """Initial water depth h(x, y, 0) for coauthor variants 1..6 (paper Sect. 2.3)."""
+    """Initial water depth h(x, y, 0) for paper IC variants 1..6 (paper Sect. 2.3)."""
     one = torch.ones_like(X)
     if variant == 1:  # step: 10 m for x <= 50, else 1 m
         return torch.where(X <= 50.0, 10.0 * one, one)
@@ -99,7 +99,7 @@ def initial_depth(variant: int, X: torch.Tensor, Y: torch.Tensor) -> torch.Tenso
 
 
 @dataclass
-class CoauthorRun:
+class ReferenceRun:
     """One (variant, scheme) run: snapshots of the stored free-surface field."""
 
     variant: int                  # 1..6
@@ -130,7 +130,7 @@ def _parse_variant_dir(vdir: Path) -> tuple[int, str]:
     return int(m.group(1)), m.group(2)
 
 
-def load_run(scheme_dir: Path | str) -> CoauthorRun:
+def load_run(scheme_dir: Path | str) -> ReferenceRun:
     """Load all snapshots of one scheme directory, sorted by time."""
     scheme_dir = Path(scheme_dir)
     m = _SCHEME_RE.search(scheme_dir.name)
@@ -154,7 +154,7 @@ def load_run(scheme_dir: Path | str) -> CoauthorRun:
     if len(shapes) != 1:
         raise ValueError(f"{scheme_dir}: inconsistent snapshot shapes {shapes}")
 
-    return CoauthorRun(
+    return ReferenceRun(
         variant=variant,
         variant_name=vname,
         scheme=scheme,
@@ -179,7 +179,7 @@ def regrid(
     *,
     node_centered: bool = True,
 ) -> torch.Tensor:
-    """Bilinearly sample coauthor snapshots onto our cell centers.
+    """Bilinearly sample reference snapshots onto our cell centers.
 
     ``fields``: (T, ny, nx) on a uniform grid spanning ``src_extent``
     (x0, x1, y0, y1). ``node_centered=True`` treats sample (0,0) as lying on

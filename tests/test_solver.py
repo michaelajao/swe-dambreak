@@ -35,7 +35,7 @@ def test_lake_at_rest_is_machine_still(scheme, order):
 
 
 def test_lake_at_rest_2d_with_hump():
-    """2D still lake over the coauthor-style Gaussian hump, reflective box."""
+    """2D still lake over the reference-style Gaussian hump, reflective box."""
     grid = Grid.from_extent(nx=48, ny=48, extent=(0, 100, 0, 100))
     cfg = Config(grid=grid, bc=REFLECTIVE, scheme="hllc", order=2)
     X, Y = grid.centers()
@@ -89,7 +89,7 @@ def test_dry_dam_break_positivity(scheme):
 
 def test_circular_dam_break_preserves_symmetry():
     """Radial IC on a square grid: x-flip, y-flip and 90-degree rotation
-    symmetry must hold to near machine precision (unlike the coauthor's
+    symmetry must hold to near machine precision (unlike the reference
     upwind runs, which drift)."""
     grid = Grid.from_extent(nx=50, ny=50, extent=(0, 100, 0, 100))
     cfg = Config(grid=grid, bc=REFLECTIVE, scheme="hllc", order=2)
