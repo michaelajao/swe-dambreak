@@ -103,6 +103,26 @@ def test_pad_scalar_mirrors_without_sign_flip():
     assert torch.equal(zp2[NG:-NG, 0], z[:, 0])
 
 
+def test_reflective_narrow_interior_full_ghost_width():
+    """ny=1 (1D as degenerate 2D) with reflective walls must still produce
+    full ng-wide ghost blocks (regression: slicing under-filled them)."""
+    U = make_state(ny=1, nx=6)
+    Up = apply_bc(U, REFLECTIVE)
+    assert Up.shape == (3, 1 + 2 * NG, 6 + 2 * NG)
+    # every ghost row mirrors the single interior row (hv negated)
+    for k in range(NG):
+        assert torch.equal(Up[0, k, NG:-NG], U[0, 0, :])
+        assert torch.equal(Up[2, k, NG:-NG], -U[2, 0, :])
+        assert torch.equal(Up[0, -1 - k, NG:-NG], U[0, 0, :])
+
+
+def test_periodic_narrow_interior_raises():
+    U = make_state(ny=1, nx=6)
+    bc = BoundaryConditions("transmissive", "transmissive", "periodic", "periodic")
+    with pytest.raises(ValueError, match="periodic"):
+        apply_bc(U, bc)
+
+
 def test_interior_roundtrip():
     g = Grid.from_extent(nx=5, ny=4, extent=(0, 5, 0, 4))
     U = make_state()

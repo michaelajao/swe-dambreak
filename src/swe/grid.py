@@ -143,14 +143,24 @@ def _ghost_1d(
     the normal momentum; ``None`` means the tensor has no channel axis (bed
     elevation), in which case reflection is a plain mirror.
     """
+    w = u.shape[-1]
     if kind == "transmissive":
         edge = u[..., :1] if side == "low" else u[..., -1:]
         return edge.expand(*edge.shape[:-1], ng)
     if kind == "periodic":
+        if w < ng:
+            raise ValueError(f"periodic BC needs at least {ng} interior cells, got {w}")
         return u[..., -ng:] if side == "low" else u[..., :ng]
     if kind == "reflective":
-        strip = u[..., :ng] if side == "low" else u[..., -ng:]
-        strip = strip.flip(-1)
+        # ghost layer k (adjacent to the wall is innermost) mirrors interior
+        # cell k; the mirror index is clamped so narrow interiors (w < ng,
+        # e.g. 1D runs with ny=1) still get full-width ghost blocks
+        m = torch.arange(ng, device=u.device)
+        if side == "low":
+            sel = torch.clamp(ng - 1 - m, max=w - 1)   # outermost..innermost
+        else:
+            sel = torch.clamp(w - 1 - m, min=0)        # innermost..outermost
+        strip = u.index_select(-1, sel)
         if sign is not None:
             s = strip.new_tensor(sign).view(3, 1, 1)
             strip = strip * s
