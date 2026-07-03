@@ -54,30 +54,25 @@ def wave_speeds(
 ) -> tuple[torch.Tensor, torch.Tensor]:
     """Left/right wave-speed estimates SL, SR with dry-bed handling.
 
-    Toro (2001) §10.4: two-rarefaction estimate of the star depth, with the
-    depth-based correction factor q_K for shocks, and the exact dry-front
-    speeds when one side is dry (h <= h_eps):
+    Davies-type direct bounds
+        SL = min(uL - aL, uR - aR),  SR = max(uL + aL, uR + aR),
+    plus the exact dry-front speeds when one side is dry (h <= h_eps):
         right state dry: SL = uL - aL,  SR = uL + 2 aL
-        left  state dry: SL = uR - 2 aR, SR = uR + aR
+        left  state dry: SL = uR - 2 aR, SR = uR + aR.
+
+    Toro's two-rarefaction estimate with the q_K shock correction was tried
+    first and abandoned: in thin films at wet/dry fronts q_K amplifies the
+    interface speeds far beyond every *cell* speed (|S| ~ 100x |u|+a), so the
+    CFL time step chosen from cell speeds is locally violated and the front
+    blows up. The Davies bounds are bounded by the cell speeds by
+    construction, hence consistent with the CFL control — and match the
+    estimate used by the reference paper's HLL, which helps reconciliation.
     """
     aL = celerity(hL, g)
     aR = celerity(hR, g)
 
-    h_star = torch.clamp((0.5 * (aL + aR) + 0.25 * (unL - unR)) ** 2 / g, min=0.0)
-    # the sqrt arguments are floored: at dry-dry interfaces h_star underflows
-    # to ~0 and sqrt(0) has an infinite derivative (NaN gradients via 0 * inf)
-    qL = torch.where(
-        h_star > hL,
-        torch.sqrt(torch.clamp(0.5 * safe_div((h_star + hL) * h_star, hL * hL), min=1e-300)),
-        torch.ones_like(hL),
-    )
-    qR = torch.where(
-        h_star > hR,
-        torch.sqrt(torch.clamp(0.5 * safe_div((h_star + hR) * h_star, hR * hR), min=1e-300)),
-        torch.ones_like(hR),
-    )
-    SL = unL - aL * qL
-    SR = unR + aR * qR
+    SL = torch.minimum(unL - aL, unR - aR)
+    SR = torch.maximum(unL + aL, unR + aR)
 
     dryL = hL <= h_eps
     dryR = hR <= h_eps
