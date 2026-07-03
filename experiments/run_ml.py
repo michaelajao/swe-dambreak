@@ -140,6 +140,7 @@ def setup_fvm(entry, eval_bi, device, tr):
     scfg = Config(grid=grid, bc=eval_bi.bc, scheme="hllc", order=2,
                   limiter="van_leer", g=eval_bi.g, manning_n=eval_bi.manning_n)
     times = torch.linspace(0.0, eval_bi.t_end, tr["fvm_times"]).tolist()
+    U0 = eval_bi.U0.to(torch.float64).to(device)
     # substeps must resolve the CFL condition over one collocation interval;
     # this depends on t_end (B3 runs 20 s vs B1 1.2 s), so derive it instead of
     # hard-coding. Cap it so the backprop depth (and cost) stays bounded.
@@ -149,7 +150,6 @@ def setup_fvm(entry, eval_bi, device, tr):
     spec = FVMResidualSpec(cfg=scfg, times=times, n_sub=n_sub, z=eval_bi.z,
                            stochastic=tr.get("fvm_stochastic", True))
     print(f"    [fvm] dt_cfl={dt_cfl:.4g}, dt_interval={dt_interval:.4g}, n_sub={n_sub}")
-    U0 = eval_bi.U0.to(torch.float64).to(device)
 
     use_data = entry.get("data", False)
     gauge = None
