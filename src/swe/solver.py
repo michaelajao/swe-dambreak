@@ -58,10 +58,17 @@ def _directional_rhs(
     z: torch.Tensor,
     dx: float,
     cfg: Config,
+    wall_iface: torch.Tensor | None = None,
 ) -> torch.Tensor:
     """Flux divergence + bed source along axis -1 (padded inputs, rows already
     restricted to the interior in axis -2). Returns (..., 3, ny, nx) with
-    channels (mass, normal momentum, tangential momentum)."""
+    channels (mass, normal momentum, tangential momentum).
+
+    ``wall_iface`` (bool, broadcastable to the interface axis) marks solid
+    internal walls: those interfaces carry zero mass/tangential flux and the
+    hydrostatic pressure of each side's own face trace (a free-slip
+    impermeable dam), used for partial-breach benchmarks.
+    """
     hL, unL, utL, zL, hR, unR, utR, zR = reconstruct_line(
         h, un, ut, z,
         order=cfg.order,
@@ -78,6 +85,14 @@ def _directional_rhs(
 
     F_minus = F + corrL   # F_{i+1/2} in the update of cell i
     F_plus = F + corrR    # F_{i-1/2} in the update of cell i
+
+    if wall_iface is not None:
+        m = wall_iface.unsqueeze(-3)
+        wallL = torch.stack([zero, 0.5 * cfg.g * hL * hL, zero], dim=-3)
+        wallR = torch.stack([zero, 0.5 * cfg.g * hR * hR, zero], dim=-3)
+        F_minus = torch.where(m, wallL, F_minus)
+        F_plus = torch.where(m, wallR, F_plus)
+
     dU = -(F_minus[..., 1:] - F_plus[..., :-1]) / dx
 
     # second-order in-cell source: cell i's own face traces are
@@ -87,18 +102,31 @@ def _directional_rhs(
     return dU + torch.stack([zero_c, src, zero_c], dim=-3)
 
 
-def rhs(U: torch.Tensor, z_pad: torch.Tensor, cfg: Config) -> torch.Tensor:
+def rhs(
+    U: torch.Tensor,
+    z_pad: torch.Tensor,
+    cfg: Config,
+    wall: tuple[torch.Tensor, torch.Tensor] | None = None,
+) -> torch.Tensor:
     """dU/dt for the interior state U (..., 3, ny, nx); z_pad is the
-    ghost-padded bed (ny+2ng, nx+2ng)."""
+    ghost-padded bed (ny+2ng, nx+2ng).
+
+    ``wall`` = (mx, my): bool masks of solid internal-wall interfaces, mx of
+    shape (ny, nx+1) over x-interfaces, my of shape (ny+1, nx) over
+    y-interfaces. None means no internal walls.
+    """
     ng = NG
     Up = apply_bc(U, cfg.bc, ng)
     h, u, v = primitives(Up, cfg.h_eps)
+    mx = my = None
+    if wall is not None:
+        mx, my = wall
 
     # x-direction: interior rows, reconstruct along x
     rows = slice(ng, -ng)
     dU_x = _directional_rhs(
         h[..., rows, :], u[..., rows, :], v[..., rows, :], z_pad[rows, :],
-        cfg.grid.dx, cfg,
+        cfg.grid.dx, cfg, wall_iface=mx,
     )
 
     # y-direction: transpose so y becomes axis -1; normal velocity is v
@@ -106,7 +134,8 @@ def rhs(U: torch.Tensor, z_pad: torch.Tensor, cfg: Config) -> torch.Tensor:
     ut_ = u.transpose(-1, -2)[..., rows, :]
     vt = v.transpose(-1, -2)[..., rows, :]
     zt = z_pad.transpose(-1, -2)[rows, :]
-    dU_y_t = _directional_rhs(ht, vt, ut_, zt, cfg.grid.dy, cfg)
+    my_t = my.transpose(-1, -2) if my is not None else None
+    dU_y_t = _directional_rhs(ht, vt, ut_, zt, cfg.grid.dy, cfg, wall_iface=my_t)
     # back to (..., 3, ny, nx); channels arrive as (mass, y-mom, x-mom)
     dU_y = dU_y_t.transpose(-1, -2)[..., (0, 2, 1), :, :]
 
@@ -118,12 +147,13 @@ def step(
     z_pad: torch.Tensor,
     dt: float | torch.Tensor,
     cfg: Config,
+    wall: tuple[torch.Tensor, torch.Tensor] | None = None,
 ) -> torch.Tensor:
     """One SSP-RK2 (Heun) step + positivity + friction split. Pure and
     differentiable; dt is a fixed input (the ML loss path never touches the
     adaptive CFL reduction)."""
-    U1 = enforce_positivity(U + dt * rhs(U, z_pad, cfg), cfg.h_eps)
-    U2 = 0.5 * (U + U1 + dt * rhs(U1, z_pad, cfg))
+    U1 = enforce_positivity(U + dt * rhs(U, z_pad, cfg, wall), cfg.h_eps)
+    U2 = 0.5 * (U + U1 + dt * rhs(U1, z_pad, cfg, wall))
     U2 = enforce_positivity(U2, cfg.h_eps)
     U2 = apply_friction(U2, dt, cfg.manning_n, cfg.g, cfg.h_eps)
     return U2
@@ -136,12 +166,15 @@ def run(
     t_end: float,
     output_times: list[float] | None = None,
     *,
+    wall_fn=None,
     max_steps: int = 10_000_000,
     progress: bool = False,
 ) -> dict:
     """Advance U0 to t_end with adaptive dt; snapshot at ``output_times``.
 
-    z is the cell-centered bed (ny, nx) or None for a flat bed. Returns
+    z is the cell-centered bed (ny, nx) or None for a flat bed. ``wall_fn``,
+    if given, maps time t -> (mx, my) internal-wall masks (or None) evaluated
+    fresh each step, for static or progressive breaches. Returns
     {"t": [...], "U": [tensors], "mass": [...], "n_steps": int}.
     """
     grid = cfg.grid
@@ -174,7 +207,8 @@ def run(
         dt = float(compute_dt(U, grid, cfg.g, cfg.cfl, cfg.h_eps))
         # never step past the next output time
         dt = min(dt, outputs[0] - t)
-        U = step(U, z_pad, dt, cfg)
+        wall = wall_fn(t) if wall_fn is not None else None
+        U = step(U, z_pad, dt, cfg, wall)
         t += dt
         snaps["n_steps"] += 1
         if t >= outputs[0] - 1e-12:
