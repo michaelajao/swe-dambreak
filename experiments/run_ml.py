@@ -139,7 +139,8 @@ def setup_fvm(entry, eval_bi, device, tr):
     scfg = Config(grid=grid, bc=eval_bi.bc, scheme="hllc", order=2,
                   limiter="van_leer", g=eval_bi.g, manning_n=eval_bi.manning_n)
     times = torch.linspace(0.0, eval_bi.t_end, tr["fvm_times"]).tolist()
-    spec = FVMResidualSpec(cfg=scfg, times=times, n_sub=tr["fvm_nsub"], z=eval_bi.z)
+    spec = FVMResidualSpec(cfg=scfg, times=times, n_sub=tr["fvm_nsub"], z=eval_bi.z,
+                           stochastic=tr.get("fvm_stochastic", True))
     U0 = eval_bi.U0.to(torch.float64).to(device)
 
     use_data = entry.get("data", False)

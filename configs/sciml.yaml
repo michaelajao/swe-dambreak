@@ -18,4 +18,5 @@ train:
   n_ic: 4000
   fvm_times: 21
   fvm_nsub: 8
-  n_gauge: 64            # sparse gauge points for the data ablation
+  fvm_stochastic: true  # sample one collocation interval per iter (~20x faster)
+  n_gauge: 64           # sparse gauge points for the data ablation
