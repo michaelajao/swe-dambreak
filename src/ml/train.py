@@ -54,6 +54,10 @@ def train(
     def closure_step(i: int) -> dict:
         opt.zero_grad(set_to_none=True)
         total, comps = loss_fn()
+        if not torch.isfinite(total):
+            # skip a diverged step rather than let NaN gradients poison the net
+            return {"iter": i, "loss": float("inf"), **{k: float("nan") for k in comps
+                                                        if isinstance(comps[k], (int, float))}}
         total.backward()
         if cfg.grad_clip > 0:
             torch.nn.utils.clip_grad_norm_(model.parameters(), cfg.grad_clip)
