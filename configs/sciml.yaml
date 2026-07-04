@@ -13,7 +13,7 @@ benchmarks:
   - {id: b1_circular_wet, reference_n: 1024, grid_n: 128}
   - {id: b3_three_humps, reference_n: 600, grid_n: 150}
 train:
-  iters: 20000
+  iters: 12000
   lr: 1.0e-3
   n_collocation: 20000
   n_ic: 4000
