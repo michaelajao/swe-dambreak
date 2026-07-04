@@ -7,11 +7,14 @@ entries:
   - {name: pinn_conservative, kind: pinn, variables: conservative}
   - {name: fvm_pinn, kind: fvm}
   # sparse-data ablation, only where it matters (dry-bed momentum collapse)
-  - {name: fvm_pinn_data, kind: fvm, data: true, only_benchmarks: [b1_circular_dry, b3_three_humps]}
+  - {name: fvm_pinn_data, kind: fvm, data: true, only_benchmarks: [ca_circular_dry]}
 benchmarks:
-  - {id: b1_circular_dry, reference_n: 1024, grid_n: 128}
-  - {id: b1_circular_wet, reference_n: 1024, grid_n: 128}
-  - {id: b3_three_humps, reference_n: 600, grid_n: 150}
+  # Coauthor-convention cases so the SciML section overlaps the classical
+  # section (Circular = paper Variant 3, Step = paper Variant 1), plus a dry
+  # circular to exercise the FVM-PINN low-momentum collapse + data guidance.
+  - {id: ca_circular_wet, reference_n: 512, grid_n: 128}
+  - {id: ca_step,         reference_n: 512, grid_n: 128}
+  - {id: ca_circular_dry, reference_n: 512, grid_n: 128}
 train:
   iters: 12000
   lr: 1.0e-3

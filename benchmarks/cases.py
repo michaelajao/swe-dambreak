@@ -187,6 +187,55 @@ def build_b4(
 
 
 # --------------------------------------------------------------------------
+# Coauthor-convention cases (CA*): reproduce the paper's own dam-break variants
+# under their exact setup so the SciML section overlaps the classical section.
+# Domain [0,100]^2, g=2, Gaussian-hump bed, reflective walls, t_end=2 s,
+# snapshots every 0.5 s (see reports/data_audit.md / paper Sect. 2.3).
+# --------------------------------------------------------------------------
+
+G_CA = 2.0  # coauthor gravity (nonstandard but matches the reference runs)
+
+
+def ca_bed(X: torch.Tensor, Y: torch.Tensor) -> torch.Tensor:
+    """Gaussian hump Z = 2 exp(-((x-50)^2 + (y-50)^2)/200)."""
+    return 2.0 * torch.exp(-((X - 50.0) ** 2 + (Y - 50.0) ** 2) / 200.0)
+
+
+def build_ca_circular(n: int, device: Device = "cpu", *, wet: bool = True) -> BenchmarkInstance:
+    """Paper Variant 3 (circular) at the paper's conventions. h_in=10 m in
+    R=20 m; downstream h_out=1 m (wet, matches the classical section) or 0
+    (dry, added to exercise the FVM-PINN low-momentum collapse story)."""
+    grid = Grid.from_extent(n, n, (0.0, 100.0, 0.0, 100.0), device=device)
+    X, Y = grid.centers()
+    z = ca_bed(X, Y)
+    inside = (X - 50.0) ** 2 + (Y - 50.0) ** 2 <= 20.0**2
+    h_out = 1.0 if wet else 0.0
+    h0 = torch.where(inside, torch.full_like(X, 10.0), torch.full_like(X, h_out))
+    return BenchmarkInstance(
+        name=f"ca_circular_{'wet' if wet else 'dry'}",
+        grid=grid, bc=REFLECTIVE, U0=_still(h0), z=z,
+        g=G_CA, manning_n=0.0, t_end=2.0, output_times=[0.5, 1.0, 1.5, 2.0],
+        center=(50.0, 50.0),
+        metadata={"paper_variant": 3, "wet": wet, "h_in": 10.0, "h_out": h_out},
+    )
+
+
+def build_ca_step(n: int, device: Device = "cpu") -> BenchmarkInstance:
+    """Paper Variant 1 (step) at the paper's conventions: h_l=10 m for x<=50,
+    h_r=1 m otherwise, over the Gaussian hump."""
+    grid = Grid.from_extent(n, n, (0.0, 100.0, 0.0, 100.0), device=device)
+    X, Y = grid.centers()
+    z = ca_bed(X, Y)
+    h0 = torch.where(X <= 50.0, torch.full_like(X, 10.0), torch.full_like(X, 1.0))
+    return BenchmarkInstance(
+        name="ca_step", grid=grid, bc=REFLECTIVE, U0=_still(h0), z=z,
+        g=G_CA, manning_n=0.0, t_end=2.0, output_times=[0.5, 1.0, 1.5, 2.0],
+        center=None,
+        metadata={"paper_variant": 1, "h_l": 10.0, "h_r": 1.0},
+    )
+
+
+# --------------------------------------------------------------------------
 # registry: benchmark id -> builder(n, device)
 # --------------------------------------------------------------------------
 
@@ -195,6 +244,9 @@ BENCHMARKS: dict[str, Callable[..., BenchmarkInstance]] = {
     "b1_circular_dry": lambda n, device="cpu": build_b1(n, device, wet=False),
     "b2_partial_breach": build_b2,
     "b3_three_humps": build_b3,
+    "ca_circular_wet": lambda n, device="cpu": build_ca_circular(n, device, wet=True),
+    "ca_circular_dry": lambda n, device="cpu": build_ca_circular(n, device, wet=False),
+    "ca_step": build_ca_step,
 }
 for _prof in ("step", "cone"):
     for _down in ("dry", "wet"):
