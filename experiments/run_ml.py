@@ -158,7 +158,8 @@ def setup_fvm(entry, eval_bi, device, tr):
     use_data = entry.get("data", False)
     gauge = None
     if use_data:
-        gauge = _sample_gauges(eval_bi, tr.get("n_gauge", 64), device)
+        n_gauge = entry.get("n_gauge", tr.get("n_gauge", 64))
+        gauge = _sample_gauges(eval_bi, n_gauge, device)
 
     def loss_fn():
         L_res, info = fvm_residual_loss(model, spec)
