@@ -109,6 +109,25 @@ def test_fvm_residual_and_ic_have_gradients():
                for p in model.parameters())
 
 
+def test_data_anchor_uses_same_reconstruction_as_predict_grid():
+    """The gauge misfit must be measured on the network's actual (h,hu,hv),
+    i.e. the same softplus depth and h*vel reparametrization as predict_grid.
+    Feeding the model's own grid prediction as the target => ~zero loss."""
+    from ml.fvm_pinn import data_anchor_loss
+
+    grid, model, _, _ = _fvm_setup(n=16)
+    model.cfg.vel_scale = 8.0  # exercise the bounded-velocity path
+    t = 0.5
+    X, Y = grid.centers()
+    xyt = torch.stack([X.reshape(-1), Y.reshape(-1),
+                       torch.full((grid.ny * grid.nx,), t)], dim=1)
+    U = model.predict_grid(t, grid)                     # (3, ny, nx)
+    targets = torch.stack([U[0].reshape(-1), U[1].reshape(-1), U[2].reshape(-1)], dim=1)
+    h_s = model.h_s.reshape(-1)
+    loss = data_anchor_loss(model, xyt, h_s, targets)
+    assert float(loss) < 1e-8
+
+
 def test_train_reduces_loss(tmp_path):
     """Short FVM-PINN training on a lake-at-rest reduces the loss and writes
     artifacts."""

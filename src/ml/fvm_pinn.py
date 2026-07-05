@@ -176,5 +176,13 @@ def data_anchor_loss(
     """
     out = model._forward_points(xyt.to(model.in_lo))
     h = torch.nn.functional.softplus(out[..., 0] + h_s_pts.to(out))
-    pred = torch.stack([h, out[..., 1], out[..., 2]], dim=-1)
+    # recover momentum with the SAME reparametrization as predict_grid, so the
+    # gauge misfit is measured on the network's actual (h, hu, hv), not the raw
+    # pre-activation outputs
+    if model.cfg.vel_scale > 0:
+        hu = h * model.cfg.vel_scale * torch.tanh(out[..., 1])
+        hv = h * model.cfg.vel_scale * torch.tanh(out[..., 2])
+    else:
+        hu, hv = out[..., 1], out[..., 2]
+    pred = torch.stack([h, hu, hv], dim=-1)
     return ((pred - targets_U.to(out)) ** 2).mean()
