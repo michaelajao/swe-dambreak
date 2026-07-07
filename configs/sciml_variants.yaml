@@ -1,0 +1,22 @@
+# Neural methods on the remaining paper IC variants (2,4,5,6), completing the
+# across-IC comparison started with ca_circular_wet (V3) and ca_step (V1).
+device: auto
+seeds: [0, 1, 2]
+entries:
+  - {name: pinn_primitive, kind: pinn, variables: primitive}
+  - {name: pinn_conservative, kind: pinn, variables: conservative}
+  - {name: fvm_pinn, kind: fvm}
+benchmarks:
+  - {id: ca_rectangular, reference_n: 512, grid_n: 128}
+  - {id: ca_gaussian,    reference_n: 512, grid_n: 128}
+  - {id: ca_parabolic,   reference_n: 512, grid_n: 128}
+  - {id: ca_triangular,  reference_n: 512, grid_n: 128}
+train:
+  iters: 12000
+  lr: 1.0e-3
+  n_collocation: 20000
+  n_ic: 4000
+  fvm_times: 41
+  fvm_nsub_max: 24
+  fvm_stochastic: true
+  n_gauge: 64

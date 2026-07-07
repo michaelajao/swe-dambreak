@@ -220,19 +220,35 @@ def build_ca_circular(n: int, device: Device = "cpu", *, wet: bool = True) -> Be
     )
 
 
-def build_ca_step(n: int, device: Device = "cpu") -> BenchmarkInstance:
-    """Paper Variant 1 (step) at the paper's conventions: h_l=10 m for x<=50,
-    h_r=1 m otherwise, over the Gaussian hump."""
+_CA_VARIANT_NAMES = {1: "step", 2: "rectangular", 3: "circular", 4: "gaussian",
+                     5: "parabolic", 6: "triangular"}
+# radially symmetric variants get a front-position metric about the centre
+_CA_RADIAL = {3, 4}
+
+
+def build_ca_variant(variant: int, n: int, device: Device = "cpu") -> BenchmarkInstance:
+    """Any of the paper's six IC variants at the paper's conventions, with the
+    initial depth taken from the same definition used to audit the reference
+    data (src/data/reference.py: initial_depth)."""
+    from data.reference import initial_depth
+
     grid = Grid.from_extent(n, n, (0.0, 100.0, 0.0, 100.0), device=device)
     X, Y = grid.centers()
     z = ca_bed(X, Y)
-    h0 = torch.where(X <= 50.0, torch.full_like(X, 10.0), torch.full_like(X, 1.0))
+    h0 = initial_depth(variant, X, Y)
     return BenchmarkInstance(
-        name="ca_step", grid=grid, bc=REFLECTIVE, U0=_still(h0), z=z,
+        name=f"ca_{_CA_VARIANT_NAMES[variant]}",
+        grid=grid, bc=REFLECTIVE, U0=_still(h0), z=z,
         g=G_CA, manning_n=0.0, t_end=2.0, output_times=[0.5, 1.0, 1.5, 2.0],
-        center=None,
-        metadata={"paper_variant": 1, "h_l": 10.0, "h_r": 1.0},
+        center=(50.0, 50.0) if variant in _CA_RADIAL else None,
+        metadata={"paper_variant": variant,
+                  "h_out": float(h0.min())},
     )
+
+
+def build_ca_step(n: int, device: Device = "cpu") -> BenchmarkInstance:
+    """Paper Variant 1 (step): kept as a named builder for existing configs."""
+    return build_ca_variant(1, n, device)
 
 
 # --------------------------------------------------------------------------
@@ -248,6 +264,12 @@ BENCHMARKS: dict[str, Callable[..., BenchmarkInstance]] = {
     "ca_circular_dry": lambda n, device="cpu": build_ca_circular(n, device, wet=False),
     "ca_step": build_ca_step,
 }
+# all six paper variants under their own ids (ca_step/ca_circular kept above
+# for configs that already reference them; ca_circular == ca_circular_wet)
+for _v, _nm in _CA_VARIANT_NAMES.items():
+    BENCHMARKS.setdefault(
+        f"ca_{_nm}", lambda n, device="cpu", v=_v: build_ca_variant(v, n, device)
+    )
 for _prof in ("step", "cone"):
     for _down in ("dry", "wet"):
         for _br in ("instant", "progressive"):
