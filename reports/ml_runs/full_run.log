@@ -1,0 +1,54 @@
+device=cuda
+
+=== ca_circular_wet: reference N=512, eval N=128 ===
+  classical HLLC-vanleer @N=128: L1_h=3.914e+02
+  pinn_primitive/ca_circular_wet/seed0: L1_h=1.676e+03 drift=8.60e-03 train=523.0s
+  pinn_primitive/ca_circular_wet/seed1: L1_h=1.660e+03 drift=1.02e-02 train=514.3s
+  pinn_primitive/ca_circular_wet/seed2: L1_h=1.603e+03 drift=3.79e-03 train=514.5s
+  pinn_conservative/ca_circular_wet/seed0: L1_h=2.672e+03 drift=1.25e-02 train=439.6s
+  pinn_conservative/ca_circular_wet/seed1: L1_h=2.300e+03 drift=4.74e-02 train=440.6s
+  pinn_conservative/ca_circular_wet/seed2: L1_h=2.484e+03 drift=5.54e-02 train=440.2s
+    [fvm] dt_cfl=0.06988, dt_interval=0.05, n_sub=1
+  fvm_pinn/ca_circular_wet/seed0: L1_h=1.203e+04 drift=3.70e-01 train=572.4s
+    [fvm] dt_cfl=0.06988, dt_interval=0.05, n_sub=1
+  fvm_pinn/ca_circular_wet/seed1: L1_h=1.367e+04 drift=3.63e-01 train=569.3s
+    [fvm] dt_cfl=0.06988, dt_interval=0.05, n_sub=1
+  fvm_pinn/ca_circular_wet/seed2: L1_h=1.294e+04 drift=4.25e-01 train=574.9s
+
+=== ca_step: reference N=512, eval N=128 ===
+  classical HLLC-vanleer @N=128: L1_h=2.476e+02
+  pinn_primitive/ca_step/seed0: L1_h=1.123e+03 drift=2.51e-03 train=519.7s
+  pinn_primitive/ca_step/seed1: L1_h=1.126e+03 drift=1.90e-03 train=514.2s
+  pinn_primitive/ca_step/seed2: L1_h=1.016e+03 drift=7.55e-04 train=514.1s
+  pinn_conservative/ca_step/seed0: L1_h=1.485e+03 drift=4.31e-03 train=439.7s
+  pinn_conservative/ca_step/seed1: L1_h=3.254e+03 drift=4.10e-02 train=439.9s
+  pinn_conservative/ca_step/seed2: L1_h=1.820e+03 drift=1.12e-02 train=440.2s
+    [fvm] dt_cfl=0.06988, dt_interval=0.05, n_sub=1
+  fvm_pinn/ca_step/seed0: L1_h=9.522e+03 drift=5.70e-02 train=573.9s
+    [fvm] dt_cfl=0.06988, dt_interval=0.05, n_sub=1
+  fvm_pinn/ca_step/seed1: L1_h=9.309e+03 drift=5.31e-02 train=573.3s
+    [fvm] dt_cfl=0.06988, dt_interval=0.05, n_sub=1
+  fvm_pinn/ca_step/seed2: L1_h=7.155e+03 drift=2.66e-02 train=572.1s
+
+=== ca_circular_dry: reference N=512, eval N=128 ===
+  classical HLLC-vanleer @N=128: L1_h=3.798e+02
+  pinn_primitive/ca_circular_dry/seed0: L1_h=1.892e+03 drift=9.07e-03 train=519.8s
+  pinn_primitive/ca_circular_dry/seed1: L1_h=1.594e+03 drift=2.34e-02 train=513.8s
+  pinn_primitive/ca_circular_dry/seed2: L1_h=1.543e+03 drift=1.28e-02 train=513.9s
+  pinn_conservative/ca_circular_dry/seed0: L1_h=1.955e+03 drift=1.86e-02 train=439.6s
+  pinn_conservative/ca_circular_dry/seed1: L1_h=1.692e+03 drift=2.01e-02 train=439.7s
+  pinn_conservative/ca_circular_dry/seed2: L1_h=2.475e+03 drift=5.10e-02 train=439.6s
+    [fvm] dt_cfl=0.06988, dt_interval=0.05, n_sub=1
+  fvm_pinn/ca_circular_dry/seed0: L1_h=8.852e+03 drift=4.00e-01 train=571.0s
+    [fvm] dt_cfl=0.06988, dt_interval=0.05, n_sub=1
+  fvm_pinn/ca_circular_dry/seed1: L1_h=9.230e+03 drift=3.60e-01 train=559.3s
+    [fvm] dt_cfl=0.06988, dt_interval=0.05, n_sub=1
+  fvm_pinn/ca_circular_dry/seed2: L1_h=8.986e+03 drift=4.72e-01 train=572.0s
+    [fvm] dt_cfl=0.06988, dt_interval=0.05, n_sub=1
+  fvm_pinn_data/ca_circular_dry/seed0: L1_h=1.155e+04 drift=3.00e-01 train=602.9s
+    [fvm] dt_cfl=0.06988, dt_interval=0.05, n_sub=1
+  fvm_pinn_data/ca_circular_dry/seed1: L1_h=1.150e+04 drift=7.70e-02 train=599.9s
+    [fvm] dt_cfl=0.06988, dt_interval=0.05, n_sub=1
+  fvm_pinn_data/ca_circular_dry/seed2: L1_h=1.203e+04 drift=5.56e-01 train=603.6s
+
+wrote reports/sciml_comparison.md

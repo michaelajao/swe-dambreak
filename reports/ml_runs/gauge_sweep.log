@@ -1,0 +1,24 @@
+device=cuda
+
+=== ca_circular_dry: reference N=512, eval N=128 ===
+  classical HLLC-vanleer @N=128: L1_h=3.798e+02
+    [fvm] dt_cfl=0.06988, dt_interval=0.05, n_sub=1
+  fvm_data_g64/ca_circular_dry/seed0: L1_h=6.775e+03 drift=2.07e-01 train=602.9s
+    [fvm] dt_cfl=0.06988, dt_interval=0.05, n_sub=1
+  fvm_data_g64/ca_circular_dry/seed1: L1_h=6.837e+03 drift=1.27e-01 train=614.4s
+    [fvm] dt_cfl=0.06988, dt_interval=0.05, n_sub=1
+  fvm_data_g64/ca_circular_dry/seed2: L1_h=6.156e+03 drift=1.63e-01 train=619.7s
+    [fvm] dt_cfl=0.06988, dt_interval=0.05, n_sub=1
+  fvm_data_g256/ca_circular_dry/seed0: L1_h=5.386e+03 drift=8.41e-02 train=610.2s
+    [fvm] dt_cfl=0.06988, dt_interval=0.05, n_sub=1
+  fvm_data_g256/ca_circular_dry/seed1: L1_h=5.804e+03 drift=1.60e-01 train=607.5s
+    [fvm] dt_cfl=0.06988, dt_interval=0.05, n_sub=1
+  fvm_data_g256/ca_circular_dry/seed2: L1_h=5.827e+03 drift=1.68e-01 train=622.3s
+    [fvm] dt_cfl=0.06988, dt_interval=0.05, n_sub=1
+  fvm_data_g1024/ca_circular_dry/seed0: L1_h=3.364e+03 drift=8.34e-02 train=629.0s
+    [fvm] dt_cfl=0.06988, dt_interval=0.05, n_sub=1
+  fvm_data_g1024/ca_circular_dry/seed1: L1_h=3.362e+03 drift=6.48e-02 train=636.3s
+    [fvm] dt_cfl=0.06988, dt_interval=0.05, n_sub=1
+  fvm_data_g1024/ca_circular_dry/seed2: L1_h=3.498e+03 drift=8.13e-02 train=616.4s
+
+wrote reports/sciml_comparison.md
