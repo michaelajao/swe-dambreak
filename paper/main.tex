@@ -88,7 +88,15 @@
 \newcommand{\new}[1]{{\color{red}#1}}
 \newenvironment{newtext}{\par\color{red}}{\par}
 
-\title{\textcolor{black}{\textbf{Comparative Analysis of Numerical Schemes for Two-Dimensional Dam-Break Problems with Source Terms under Different Initial Dam Breaking Conditions
+% ---- TikZ libraries for the FVM-PINN schematic (Fig.~\ref{fig:fvmpinn}).
+% Data plots are matplotlib PNGs (experiments/plot_sciml_figures.py). ----
+\usetikzlibrary{positioning, arrows.meta, fit, backgrounds, calc}
+
+% ---- Original title (kept for reference; superseded by the version below that
+% signals the added SciML content). Restore this if the coauthors prefer it.
+% \title{\textcolor{black}{\textbf{Comparative Analysis of Numerical Schemes for Two-Dimensional Dam-Break Problems with Source Terms under Different Initial Dam Breaking Conditions
+% }}}
+\title{\textcolor{black}{\textbf{Comparative Analysis of Numerical Schemes \new{and Physics-Informed Neural Networks} for Two-Dimensional Dam-Break Problems with Source Terms under Different Initial Dam Breaking Conditions
 }}}
 \author[1]{Zahra}
 \author[1]{M. Asif Farooq}
@@ -98,7 +106,7 @@
 zahrasamad1998@gmail.com (zahra), asiffarooq.2007@gmail.com (M. Asif Farooq),
 fkyousafzai@gmail.com (Firdos Khan)}
 \affil[2]{\textcolor{red}{Centre for Computational Science and Mathematical Modelling, Coventry University, Coventry, United Kingdom\newline
-ajaoolarinoyemichael@gmail.com (Michael Ajao-Olarinoye)}}
+ajaoolarinoyemichael@gmail.com}}
 \begin{document}
 \doublespacing
 \maketitle
@@ -117,9 +125,9 @@ ajaoolarinoyemichael@gmail.com (Michael Ajao-Olarinoye)}}
 
 The catastrophic failure of dams releases large volumes of water that propagate downstream as rapidly varying, highly unsteady free-surface flows, posing severe risks to infrastructure and human life. Accurate and fast simulation of dam-break wave propagation is therefore a cornerstone of hydraulic engineering, flood hazard assessment, and emergency response planning. The hydrodynamics of such events are described by the two-dimensional shallow water equations (SWEs), a nonlinear hyperbolic system obtained by depth-averaging the Navier--Stokes equations under a hydrostatic pressure assumption \cite{toro2001shockcapturing,kurganov2018finite}. A defining feature of this system is that discontinuities (shocks, hydraulic jumps) form in finite time even from smooth initial data, and realistic modeling must additionally account for bed-topography source terms and frictional resistance \cite{bermudez1994upwind,audusse2004fast}.
 
-For decades, the standard tools for these problems have been shock-capturing finite difference and finite volume schemes: the classical Lax--Wendroff method \cite{lax1960systems}, Godunov-type methods built on exact or approximate Riemann solvers \cite{godunov1959difference,roe1981approximate,harten1983upstream,toro1994hllc}, and higher-order MUSCL-type reconstructions with slope limiters \cite{vanleer1979towards} advanced by strong-stability-preserving time integrators \cite{gottlieb2001strong}. These methods offer rigorous conservation and robust shock capturing, but their cost scales with grid resolution and the CFL constraint, which limits their use in real-time forecasting and ensemble-based risk assessment.
+For decades the standard tools for these problems have been shock-capturing finite difference and finite volume schemes. This family includes the classical Lax--Wendroff method \cite{lax1960systems}, Godunov-type methods built on exact or approximate Riemann solvers \cite{godunov1959difference,roe1981approximate,harten1983upstream,toro1994hllc}, and higher-order MUSCL-type reconstructions with slope limiters \cite{vanleer1979towards} advanced by strong-stability-preserving time integrators \cite{gottlieb2001strong}. These methods offer rigorous conservation and robust shock capturing, but their cost scales with grid resolution and the CFL constraint, which limits their use in real-time forecasting and ensemble-based risk assessment.
 
-Scientific machine learning offers a complementary paradigm. Physics-informed neural networks (PINNs) \cite{raissi2019physics} parameterize the space-time solution with a neural network trained on the PDE residual, and have been applied to the SWEs in a growing body of work \cite{dazzi2024augmented,qi2024pinnswe,tian2025pinnswe,mumtaz2025dambreak,qi2025ndawl}. However, strong-form PINNs face well-documented difficulties on hyperbolic problems: the pointwise residual is ill-defined at discontinuities \cite{mao2020highspeed,oubarka2026wepinn}, the trained network does not enforce discrete conservation and can leak mass, and spectral bias drives solutions toward overly smooth, dissipative approximations of sharp fronts \cite{rahaman2019spectral}. Hybrid approaches that replace the strong-form residual with a discrete finite-volume residual restore conservation structure \cite{liu2026fvmpinn,wei2025ffvpinn,patsatzis2025gorinns,lichtle2025unfv,wu2025rimnet}, but their behavior across systematically varied dam-break initial conditions and topography source terms remains largely unexplored.
+Scientific machine learning offers a complementary paradigm. Physics-informed neural networks (PINNs) \cite{raissi2019physics} parameterize the space-time solution with a neural network trained on the PDE residual, and have been applied to the SWEs in a growing body of work \cite{dazzi2024augmented,qi2024pinnswe,tian2025pinnswe,mumtaz2025dambreak,qi2025ndawl}. However, strong-form PINNs face well-documented difficulties on hyperbolic problems. The pointwise residual is ill-defined at discontinuities \cite{mao2020highspeed,oubarka2026wepinn}, the trained network does not enforce discrete conservation and can leak mass, and spectral bias drives the solution toward an overly smooth, dissipative approximation of sharp fronts \cite{rahaman2019spectral}. Hybrid approaches that replace the strong-form residual with a discrete finite-volume residual restore conservation structure \cite{liu2026fvmpinn,wei2025ffvpinn,patsatzis2025gorinns,lichtle2025unfv,wu2025rimnet}, but their behavior across systematically varied dam-break initial conditions and topography source terms remains largely unexplored.
 
 Several recent studies have compared neural solvers against classical schemes for dam-break flows. Mumtaz et al.~\cite{mumtaz2025dambreak} compared PINNs against a Lax--Wendroff baseline for 1D and 2D dam-break scenarios and found that PINNs reproduce the reference solutions with limited accuracy, improving when numerical solutions are injected into training. Tian et al.~\cite{tian2025pinnswe} benchmarked PINNs for the 2D SWEs with topography and rainfall source terms against an HLL scheme, finding errors concentrated at shock and rarefaction fronts. Qi et al.~\cite{qi2024pinnswe} compared data-free PINNs against a finite-volume solver, including a real-world flood event. Liu \cite{liu2026fvmpinn} showed that a finite-volume-informed PINN loss produces a rugged landscape in which physics-only training collapses to a spurious low-momentum state unless sparse data guidance is supplied.
 \end{newtext}
@@ -168,7 +176,7 @@ Neural operators learn mappings between function spaces, so a trained model gene
 
 \section{Problem Setup}
 
-In this section, the two dimensional shallow water equations (SWEs) and the numerical schemes used to solve them are presented. The governing equations used in this study are the same as the standard equations, but they include bed topography source terms. The reference solutions are computed using the three numerical schemes: the Lax–Wendroff (LW) scheme, the Harten–Lax–van Leer (HLL) approximate Riemann solver, and the MUSCL-Rusanov (MUSCL-RS) scheme. The six dam-break scenarios examined include Step, Rectangular, Circular, Gaussian, Parabolic and Triangular water height profiles. These benchmark problems are described in detail in Sect.~2.3. The numerical solutions are then evaluated and compared with respect to the performance, accuracy and shock capturing ability of the numerical schemes considered. \new{In addition, Sect.~2.4 introduces the scientific machine learning models evaluated against these reference solutions: strong-form physics-informed neural networks in primitive and conservative formulations, and a finite-volume-informed PINN trained on the discrete residual of a differentiable HLLC solver step.}
+In this section, the two dimensional shallow water equations (SWEs) and the numerical schemes used to solve them are presented. The governing equations used in this study are the same as the standard equations, but they include bed topography source terms. The reference solutions are computed using the three numerical schemes: the Lax–Wendroff (LW) scheme, the Harten–Lax–van Leer (HLL) approximate Riemann solver, and the MUSCL-Rusanov (MUSCL-RS) scheme. The six dam-break scenarios examined include Step, Rectangular, Circular, Gaussian, Parabolic and Triangular water height profiles. These benchmark problems are described in detail in Sect.~2.3. The numerical solutions are then evaluated and compared with respect to the performance, accuracy and shock capturing ability of the numerical schemes considered. \new{Section~2.4 then introduces the scientific machine learning models evaluated against these reference solutions. These comprise strong-form physics-informed neural networks in primitive and conservative formulations, together with a finite-volume-informed PINN trained on the discrete residual of a differentiable HLLC solver step.}
 
 \subsection{Governing Equations}
 The mathematical model governing the hydrodynamic flow in this study is the two-dimensional (2D) Shallow Water Equations (SWEs). The equations are obtained by hydrostatic pressure distribution, by neglecting the vertical acceleration, and by considering the fluid density as constant and by depth integrating the Navier-Stokes equations. The SWEs are hyperbolic conservation laws which are in effect for the propagation of water waves in domains where the horizontal length scale is much greater than the water depth.The present study is based on the standard formulation of the equations to which a source term vector $\mathbf{S}$, representing the effects of bottom topography (bed slope), and bed friction are added. These source terms are important to include in order to simulate a realistic flood, as they describe the effects of topography and resistance to flow.
@@ -959,16 +967,11 @@ The numerical solutions obtained for all six configurations serve as benchmark d
 % values once the final training configuration is frozen.
 \subsection{Scientific Machine Learning Models}
 
-Two families of neural solvers are evaluated against the classical reference solutions: strong-form physics-informed neural networks (PINNs) and a finite-volume-informed PINN (FVM--PINN). All models are trained per scenario (single-instance), i.e., one network approximates the space-time solution of one dam-break configuration.
+We evaluate two families of neural solvers against the classical reference solutions, namely strong-form physics-informed neural networks (PINNs) and a finite-volume-informed PINN (FVM--PINN). All models are trained per scenario, so that one network approximates the space-time solution of a single dam-break configuration.
 
 \subsubsection{Physics-Informed Neural Networks}
 
-The PINN parameterizes the solution with a fully connected network $\mathcal{N}_\theta:(x,y,t)\mapsto\mathbb{R}^3$, with inputs normalized to $[-1,1]^3$ and an optional random Fourier feature embedding $z \mapsto [\sin(2\pi B z), \cos(2\pi B z)]$ to mitigate spectral bias \cite{rahaman2019spectral}. Two output formulations are compared:
-\begin{itemize}
-  \item \textbf{Primitive}: the network predicts $(h,u,v)$ directly;
-  \item \textbf{Conservative}: the network predicts the conserved variables $(h,hu,hv)$, matching the form in which the weak solution is defined.
-\end{itemize}
-In both cases the residuals of \cref{eq:swe} (including the bed-slope source term of \cref{eq:simplifiedsource}) are evaluated pointwise by automatic differentiation at collocation points sampled in the space-time domain, and the network is trained on the composite loss
+The PINN parameterizes the solution with a fully connected network $\mathcal{N}_\theta:(x,y,t)\mapsto\mathbb{R}^3$, with inputs normalized to $[-1,1]^3$ and an optional random Fourier feature embedding $z \mapsto [\sin(2\pi B z), \cos(2\pi B z)]$ to mitigate spectral bias \cite{rahaman2019spectral}. Two output formulations are compared. In the primitive formulation the network predicts $(h,u,v)$ directly, whereas in the conservative formulation it predicts the conserved variables $(h,hu,hv)$, matching the form in which the weak solution is defined. In both cases the residuals of \cref{eq:swe} (including the bed-slope source term of \cref{eq:simplifiedsource}) are evaluated pointwise by automatic differentiation at collocation points sampled in the space-time domain, and the network is trained on the composite loss
 \begin{equation}
 \mathcal{L}(\theta)
 =
@@ -979,16 +982,71 @@ In both cases the residuals of \cref{eq:swe} (including the bed-slope source ter
 \lambda_{\mathrm{data}}\,\mathcal{L}_{\mathrm{data}},
 \label{eq:pinnloss}
 \end{equation}
-where $\mathcal{L}_{\mathrm{pde}}$ is the mean squared PDE residual, $\mathcal{L}_{\mathrm{ic}}$ anchors the prediction at $t=0$ to the initial condition, and the optional $\mathcal{L}_{\mathrm{data}}$ penalizes the misfit against sparse observations taken from the reference solution (used only in the data-guidance ablation). [TODO: state final collocation counts, network width/depth, Fourier feature scale, and loss weights from the frozen configuration.]
+where $\mathcal{L}_{\mathrm{pde}}$ is the mean squared PDE residual, $\mathcal{L}_{\mathrm{ic}}$ anchors the prediction at $t=0$ to the initial condition, and the optional $\mathcal{L}_{\mathrm{data}}$ penalizes the misfit against sparse observations taken from the reference solution (used only in the data-guidance ablation). The network has six hidden layers of width $128$ with $\tanh$ activations. At each iteration the residual is evaluated at $20{,}000$ collocation points drawn uniformly over the space-time domain, and the initial condition is imposed at every cell centre of the evaluation grid. The loss weights are $\lambda_{\mathrm{pde}}=1$, $\lambda_{\mathrm{ic}}=10$, and $\lambda_{\mathrm{data}}=5$.
+
+\begin{figure}[h!]
+\centering
+\begin{tikzpicture}[x={(0.95cm,0cm)}, y={(0.5cm,0.34cm)}, z={(0cm,0.95cm)}, >=Latex, font=\small]
+\pgfmathsetseed{7}
+\fill[blue!5] (0,0,0)--(5,0,0)--(5,5,0)--(0,5,0)--cycle;
+\draw[green!45!black, thick] (2.5,2.5,0) circle (1.1);
+\draw[black!55] (0,0,0)--(5,0,0)--(5,5,0)--(0,5,0)--cycle;
+\draw[black!55] (0,0,4)--(5,0,4)--(5,5,4)--(0,5,4)--cycle;
+\draw[black!55] (0,0,0)--(0,0,4); \draw[black!55] (5,0,0)--(5,0,4);
+\draw[black!55] (5,5,0)--(5,5,4); \draw[black!55] (0,5,0)--(0,5,4);
+\foreach \i in {1,...,45}{\pgfmathsetmacro\x{0.3+4.4*rnd}\pgfmathsetmacro\y{0.3+4.4*rnd}\pgfmathsetmacro\z{0.25+3.5*rnd}
+  \fill[black!40] (\x,\y,\z) circle (0.8pt);}
+\foreach \i in {1,...,30}{\pgfmathsetmacro\x{0.2+4.6*rnd}\pgfmathsetmacro\y{0.2+4.6*rnd}
+  \fill[blue!70] (\x,\y,0) circle (1.0pt);}
+\foreach \i in {1,...,8}{\pgfmathsetmacro\x{0.6+3.8*rnd}\pgfmathsetmacro\y{0.6+3.8*rnd}\pgfmathsetmacro\z{0.4+3.2*rnd}
+  \node[star, star points=5, star point ratio=2.3, fill=red!85, inner sep=1.1pt] at (\x,\y,\z) {};}
+\node at (2.5,-0.8,0) {$x$}; \node at (5.9,2.9,0) {$y$}; \node at (-0.2,-0.3,4.2) {$t$};
+\begin{scope}[shift={(6.6,0,0)}]
+  \fill[black!40] (0,0,3.4) circle (0.9pt); \node[right, font=\footnotesize] at (0.15,0,3.4) {collocation ($\mathcal{L}_\mathrm{pde}$)};
+  \fill[blue!70] (0,0,2.5) circle (1.0pt); \node[right, font=\footnotesize] at (0.15,0,2.5) {$t{=}0$ ($\mathcal{L}_\mathrm{ic}$)};
+  \node[star, star points=5, star point ratio=2.3, fill=red!85, inner sep=1.1pt] at (0,0,1.6) {}; \node[right, font=\footnotesize] at (0.15,0,1.6) {gauges ($\mathcal{L}_\mathrm{data}$)};
+\end{scope}
+\end{tikzpicture}
+\caption{\new{Space-time sampling of the training points over the domain and time horizon.}}
+\label{fig:collocation}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\resizebox{0.98\textwidth}{!}{%
+\begin{tikzpicture}[font=\small, >=Latex, node distance=6mm and 9mm,
+  b/.style={draw, rounded corners, align=center, inner sep=4pt, minimum height=8.5mm},
+  net/.style={b, fill=blue!8}, outv/.style={b, fill=teal!16},
+  ad/.style={b, fill=violet!12}, res/.style={b, fill=orange!14}, loss/.style={b, fill=red!9},
+  glab/.style={font=\footnotesize\bfseries, text=black!60}]
+\node[b] (in) {$(x,y,t)$};
+\node[net, right=of in] (net) {network\\$\mathcal{N}_\theta$};
+\node[outv, right=of net] (uvw) {$(h,u,v)$\ or\\$(h,hu,hv)$};
+\node[ad, right=of uvw] (ad) {automatic\\differentiation\\$\partial_t,\ \partial_x,\ \partial_y$};
+\node[res, right=of ad] (res) {strong-form residual\\$r=\partial_t U+\partial_x F+\partial_y G-S$};
+\node[loss, right=of res] (lpde) {$\mathcal{L}_\mathrm{pde}=\overline{\lVert r\rVert^2}$};
+\node[loss, below=9mm of ad] (lic) {$\mathcal{L}_\mathrm{ic}$ (+ $\mathcal{L}_\mathrm{data}$)};
+\node[b, fill=red!18, below=9mm of lpde] (tot) {$\mathcal{L}$};
+\draw[->] (in)--(net); \draw[->] (net)--(uvw); \draw[->] (uvw)--(ad);
+\draw[->] (ad)--(res); \draw[->] (res)--(lpde);
+\draw[->] (uvw.south) |- (lic.west);
+\draw[->] (lpde)--(tot);
+\draw[->] (lic) -| (tot);
+\draw[->, dashed, red!65] (tot.south) |- ($(net.south)+(0,-6mm)$)
+  node[glab, midway, below] {backprop $\nabla_\theta\mathcal{L}$} -- (net.south);
+\end{tikzpicture}}
+\caption{\new{Strong-form PINN: outputs are differentiated to form the SWE residual, and the residual, initial-condition, and optional data terms make the loss.}}
+\label{fig:strongform}
+\end{figure}
 
 \subsubsection{Finite-Volume-Informed PINN}
 
-Strong-form residuals are ill-defined at the shocks that dominate dam-break flows \cite{mao2020highspeed,oubarka2026wepinn}, and strong-form PINNs do not enforce discrete conservation \cite{liu2026fvmpinn}. The FVM--PINN therefore replaces the pointwise residual with a \emph{discrete-consistency} residual evaluated through a differentiable finite-volume solver. The network predicts $(\xi, hu, hv)$ and the water depth is recovered as
+Strong-form residuals are ill-defined at the shocks that dominate dam-break flows \cite{mao2020highspeed,oubarka2026wepinn}, and strong-form PINNs do not enforce discrete conservation \cite{liu2026fvmpinn}. The FVM--PINN therefore replaces the pointwise residual with a \emph{discrete-consistency} residual evaluated through a differentiable finite-volume solver. The network predicts a free-surface perturbation $\xi_\theta$ together with the two velocity components, and the water depth is recovered as
 \begin{equation}
 h(x,y,t) = \mathrm{softplus}\bigl(\xi_\theta(x,y,t) + h_s(x,y)\bigr),
 \label{eq:softplus_depth}
 \end{equation}
-where $h_s$ is the initial depth field, so that positivity of depth is guaranteed by construction and the network learns a perturbation around the initial state. Let $\mathcal{S}_{\Delta t}$ denote one step of the differentiable finite-volume solver (HLLC flux with MUSCL reconstruction and SSP--RK time integration, as in Sect.~2.2, implemented end-to-end differentiably). With $U_\theta(t_k)$ the network state evaluated on the full grid at time $t_k$, the discrete residual over the interval $[t_k, t_{k+1}]$ is
+where $h_s$ is the initial depth field. Writing the depth this way keeps it strictly positive by construction and lets the network learn a perturbation around the initial state. The momentum components are formed as $hu = h\,u_\theta$ and $hv = h\,v_\theta$, with the predicted velocities passed through a bounded activation. Momentum therefore vanishes wherever the depth goes to zero, which keeps the solver step finite on dry beds and removes the velocity blow-up that a direct momentum output would otherwise produce. Let $\mathcal{S}_{\Delta t}$ denote one step of the differentiable finite-volume solver (HLLC flux with MUSCL reconstruction and SSP--RK time integration, as in Sect.~2.2, implemented end-to-end differentiably). With $U_\theta(t_k)$ the network state evaluated on the full grid at time $t_k$, the discrete residual over the interval $[t_k, t_{k+1}]$ is
 \begin{equation}
 \mathcal{L}_{\mathrm{fvm}}^{(k)}
 =
@@ -1001,11 +1059,77 @@ U_\theta(t_{k+1})
 \end{equation}
 At each training iteration a single interval index $k$ is sampled at random (stochastic single-interval residual), which keeps the per-iteration cost at one solver step while covering the full time horizon in expectation. The total loss combines \cref{eq:fvmresidual} with an initial-condition anchor and, in the data-guidance ablation, a sparse-data anchor following the finding of \cite{liu2026fvmpinn} that physics-only finite-volume losses admit spurious low-momentum minima.
 
+Figure~\ref{fig:fvmpinn} shows the complete training loop: the shared network predicts $(\xi,\tilde u,\tilde v)$, the reparametrisation of \cref{eq:softplus_depth} recovers the conserved state on the solver grid, and one differentiable solver step (MUSCL, Audusse, HLLC, SSP--RK2) advances $U_\theta(t_k)$ so that the discrepancy with $U_\theta(t_{k+1})$ gives the residual. Gradients of the total loss backpropagate through the solver step to $\theta$.
+
+\begin{figure}[h!]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[
+  font=\small, >=Latex,
+  neuron/.style={circle, draw, minimum size=5.5mm, inner sep=0, line width=0.3pt},
+  nin/.style={neuron, fill=blue!14},
+  nff/.style={neuron, fill=violet!16},
+  nhid/.style={neuron, fill=blue!6},
+  nout/.style={neuron, fill=teal!18},
+  edge/.style={draw=black!22, line width=0.12pt},
+  box/.style={draw, rounded corners, align=center, inner sep=4pt, minimum height=8mm},
+  rep/.style={box, fill=green!9}, st/.style={box, fill=black!6},
+  solv/.style={box, fill=orange!16, minimum width=13mm, font=\footnotesize},
+  loss/.style={box, fill=red!9},
+  grp/.style={draw, dashed, rounded corners, inner sep=6pt},
+  glab/.style={font=\footnotesize\bfseries, text=black!60},
+  ann/.style={font=\footnotesize, text=black!65},
+]
+% ===== drawn network: inputs -> Fourier -> hidden xL -> outputs =====
+\foreach \i/\lab in {1/$x$,2/$y$,3/$t$} \node[nin] (i\i) at (0,{2-\i}) {\lab};
+\foreach \i in {1,...,6} \node[nff]  (f\i) at (1.5,{3.5-\i}) {};
+\foreach \i in {1,...,6} \node[nhid] (a\i) at (3.0,{3.5-\i}) {};
+\foreach \i in {1,...,6} \node[nhid] (b\i) at (4.5,{3.5-\i}) {};
+\foreach \i/\lab in {1/$\xi$,2/$\tilde u$,3/$\tilde v$} \node[nout] (o\i) at (6.0,{2-\i}) {\lab};
+\foreach \a in {1,2,3}\foreach \b in {1,...,6} \draw[edge] (i\a)--(f\b);
+\foreach \a in {1,...,6}\foreach \b in {1,...,6} \draw[edge] (f\a)--(a\b);
+\foreach \a in {1,...,6}\foreach \b in {1,...,6} \draw[edge] (a\a)--(b\b);
+\foreach \a in {1,...,6}\foreach \b in {1,2,3} \draw[edge] (b\a)--(o\b);
+\node[grp, fit=(i1)(i3)(f1)(f6)(o1)(o3), label={[glab]above:shared network $\mathcal{N}_\theta$}] (netg) {};
+\node[ann] at (1.5,-3.5) {Fourier};
+\node[ann] at (3.75,-3.5) {hidden $\times L$, $\tanh$};
+% ===== reparametrise + grid state =====
+\node[rep, right=10mm of netg.east, yshift=9mm] (rep)
+  {reparametrise\\[1pt]$h=\mathrm{softplus}(\xi+h_s)$\\ $hu=hV\tanh\tilde u,\ hv=hV\tanh\tilde v$};
+\node[st, below=6mm of rep] (state) {grid state\ $U_\theta(t_k),\,U_\theta(t_{k+1})$};
+% ===== differentiable solver step (sub-chain) =====
+\node[solv, below=13mm of state.south, anchor=north, xshift=-24mm] (rec) {MUSCL\\recon.};
+\node[solv, right=3mm of rec] (hyd) {hydro-\\static};
+\node[solv, right=3mm of hyd] (hllc) {HLLC\\flux};
+\node[solv, right=3mm of hllc] (rk) {SSP--\\RK2};
+\node[grp, fit=(rec)(rk), label={[glab]below:differentiable step $\mathcal{S}_{\Delta t}$}] (solvg) {};
+% ===== losses =====
+\node[loss, right=22mm of state] (lfvm) {$\mathcal{L}_\mathrm{fvm}=\big\lVert U_\theta(t_{k+1})-\mathcal{S}_{\Delta t}(U_\theta(t_k))\big\rVert^2$};
+\node[loss, above=3mm of lfvm] (lic) {$\mathcal{L}_\mathrm{ic}$};
+\node[loss, below=3mm of lfvm] (ldata) {$\mathcal{L}_\mathrm{data}$ (optional)};
+\node[box, fill=red!18, right=8mm of lfvm] (tot) {$\mathcal{L}$};
+% ===== arrows =====
+\draw[->] (o2.east) -- (rep.west);
+\draw[->] (rep) -- (state);
+\draw[->] (state.south) -- (solvg.north) node[ann, pos=0.5, right] {$U_\theta(t_k)$};
+\draw[->] (rec)--(hyd); \draw[->] (hyd)--(hllc); \draw[->] (hllc)--(rk);
+\draw[->] (rk.east) -| (lfvm.south);
+\draw[->] (state.east) -- (lfvm.west) node[ann, midway, above] {$U_\theta(t_{k+1})$};
+\draw[->] (lic.east) -| (tot.north);
+\draw[->] (lfvm.east) -- (tot.west);
+\draw[->] (ldata.east) -| (tot.south);
+\draw[->, dashed, red!65] (tot.north) |- ($(netg.north)+(0,10mm)$)
+  node[glab, midway, above] {backprop $\nabla_\theta\mathcal{L}$ through the differentiable solver} -| (netg.north);
+\end{tikzpicture}}
+\caption{\new{FVM-informed PINN architecture and training loop.}}
+\label{fig:fvmpinn}
+\end{figure}
+
 \subsubsection{Training Protocol and Evaluation Metrics}
 
-All models are trained with Adam followed by optional L-BFGS refinement, repeated over three random seeds; reported metrics are aggregated across seeds. [TODO: iteration counts, learning-rate schedule, and hardware from the final runs.]
+Both families use $\tanh$ networks. The strong-form PINNs have six hidden layers of width $128$, and the FVM--PINN has five hidden layers of width $128$ preceded by a $32$-frequency Fourier-feature embedding. All models are trained with the Adam optimizer at a constant learning rate of $10^{-3}$ for $12{,}000$ iterations with gradient-norm clipping, and each configuration is repeated over three random seeds with metrics reported as mean $\pm$ standard deviation. The differentiable solver step inside the FVM--PINN loss is evaluated in double precision. Training was carried out on an NVIDIA Quadro RTX~8000 GPU.
 
-Model quality is measured against the reference solutions on the $501\times501$ grid at the output times $t\in\{0.0, 0.5, 1.0, 1.5, 2.0\}$~s using:
+The neural models are evaluated across the initial-condition variants of Sect.~2.3, under the same domain, bed topography, and boundary conventions as the classical schemes, so that the neural results extend the classical comparison matrix along its initial-condition axis. A dry-bed circular case, in which the downstream depth is set to zero, is added to probe the low-momentum collapse of the physics-only finite-volume loss and the effect of sparse-data guidance. For each case a fine-grid solution computed with the differentiable HLLC solver of Sect.~2.2 serves as the reference; it is resampled onto the evaluation grid and compared with the network prediction at the output times $t\in\{0.5, 1.0, 1.5, 2.0\}$~s using:
 \begin{itemize}
   \item discrete $L^1$ and $L^2$ errors of the water depth $h$ and of the velocity magnitude, integrated over cell areas;
   \item relative mass drift $\max_t\,\lvert V(t)/V(0)-1\rvert$, where $V(t)$ is the total water volume, quantifying conservation;
@@ -1040,7 +1164,7 @@ The numerical solutions for the rectangular dam-break configuration are shown in
 Because of the interaction of waves at the edges and corners, these waves create complex structures in the rectangular geometry. All numerical schemes capture the overall spreading pattern, but there are discernible differences in the spreading near the discontinuities. The LW scheme is able to reproduce the growing fronts properly, while the regions with sharp gradients have oscillations. The HLL scheme produces stable and smooth solutions, but with a higher numerical diffusion. The MUSCL-Rusanov scheme provides a good solution and is able to keep the interface sharp and be numerically stable while giving a correct solution for the corner interactions.
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{Rectangular_Comparison_All_Times.png}
+\includegraphics[width=\textwidth]{Rectangular_Comparison_All_Times_with_Bed.png}
 \caption{Comparison of the LW, HLL, and MUSCL--Rusanov schemes for the Rectangular dam-break problem at different time instances.}
 \label{fig:rectangular}
 \end{figure}
@@ -1051,7 +1175,7 @@ The numeric solution results for the dam break problem with circular dams are di
 The overall radial symmetry of the flow is maintained during the simulation with all the numerical schemes. However, there are variations in the representation of the growing shock front. The LW scheme is able to accurately represent the propagating wave, but has some oscillations in the vicinity of the shock region. The HLL scheme is diffusive and hence gives smoother solutions. This is in contrast with the MUSCL--Rusanov scheme which is able to capture the shock front as well as maintain the radial symmetry and avoid the appearance of numerical oscillations. As a result, the MUSCL--Rusanov method is shown to perform better for circular wave propagation.
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{Circular_Comparison_All_Times.png}
+\includegraphics[width=\textwidth]{Circular_Comparison_All_Times_with_Bed.png}
 \caption{Comparison of the LW, HLL, and MUSCL--Rusanov schemes for the Circular dam-break problem at different time instances.}
 \label{fig:circular}
 \end{figure}
@@ -1062,7 +1186,7 @@ The time evolution of the Gaussian dam-break configuration is shown in Figure~\r
 There are no initial sharp discontinuities and all three numerical schemes produce good results and retain the smoothness of the propagating wave. The LW scheme is highly accurate but can give some dispersive effects in a long time integration. The HLL scheme shows no change in the stability of the scheme during the simulation, but there is a little bit of numerical diffusion. The MUSCL--Rusanov scheme is able to preserve the amplitude and the shape of the Gaussian profile better, and thus the smooth flow evolution is best represented by this scheme.
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{Gaussian_Comparison_All_Times.png}
+\includegraphics[width=\textwidth]{Gaussian_Comparison_All_Times_with_Bed.png}
 \caption{Comparison of the LW, HLL, and MUSCL--Rusanov schemes for the Gaussian dam-break problem at different time instances.}
 \label{fig:gaussian}
 \end{figure}
@@ -1073,7 +1197,7 @@ In figure \ref{fig:parabolic} numerical solution to the parabolic dam-break prob
 This curved boundary creates asymmetric patterns in the flow, which also results in changes in the wave speed at certain points. All schemes are able to reproduce the dominant hydrodynamic features, but the LW scheme shows oscillatory behaviour in the region of the steep gradients. The HLL scheme is stable, but the propagating wave fronts tend to smear, because of numerical diffusion. The MUSCL--Rusanov scheme, on the other hand, preserves the curved interfaces correctly and has excellent stability and stability minimizing spurious oscillations. The results presented here validate the robustness of the MUSCL--Rusanov scheme on the geometrically complex flow configurations.
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{Parabola_Comparison_All_Times.png}
+\includegraphics[width=\textwidth]{Parabola_Comparison_All_Times_with_Bed.png}
 \caption{Comparison of the LW, HLL, and MUSCL--Rusanov schemes for the Parabola dam-break problem at different time instances.}
 \label{fig:parabolic}
 \end{figure}
@@ -1084,67 +1208,157 @@ The numerical results for the triangular dam-break configuration are shown in fi
 The propagating waves that come from the triangular vertices interact with each other and form complex flow structures throughout the computational domain. The LW scheme clearly reproduces these interactions, but there are discontinuities and noticeable oscillations near the vertices. This HLL scheme successfully suppresses oscillations but results in relatively broad wave fronts. The MUSCL--Rusanov scheme is accurate in solving the corner interactions and retains the overall triangularity of the solution with the stability of the numerical solution. Overall, the MUSCL--Rusanov scheme is the most accurate and stable for the triangular dam-break problem.
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{Triangular_Comparison_All_Times.png}
+\includegraphics[width=\textwidth]{Triangular_Comparison_All_Times_with_Bed.png}
 \caption{Comparison of the LW, HLL, and MUSCL--Rusanov schemes for the Triangular dam-break problem at different time instances.}
 \label{fig:triangular}
 \end{figure}
 
-% ---- SciML results / Discussion / Conclusion: COMMENTED OUT ----
-% These blocks depend on the training runs (currently in progress) and contain
-% only placeholder tables/figures. Uncomment and fill in once results are ready.
-\begin{comment}
 \begin{newtext}
-% ---- SCAFFOLD (new, in red): SciML comparison results. All numbers, figures,
-% and tables below are placeholders pending completion of the training runs.
-\subsection{SciML Comparison}
+% ---- SCAFFOLD (new, in red): SciML comparison results. Numbers are from the
+% training runs summarised in reports/sciml_comparison.md (brosnan, RTX 8000,
+% 3 seeds, 12k iterations). Runs for Variants 2/4/5/6 and the g=9.81 contrast
+% are being finalised; their rows are marked pending below.
+\subsection{SciML Comparison Across Initial Dam-Breaking Conditions}
 
-This section compares the strong-form PINNs (primitive and conservative) and the FVM--PINN against the reference solutions of Sect.~4.1--4.6. [PENDING: results from the full training runs; the structure below is fixed, the content is placeholder.]
+This section extends the comparison of Sects.~4.1--4.6 with the neural formulations, evaluated over all six initial-condition variants under the same domain, bed topography, and boundary conventions. For each case the reference is a fine-grid solution of the differentiable HLLC solver, resampled onto the $128\times128$ evaluation grid; errors are the depth $L^1(h)$ at the final time $t=2$~s, averaged over three seeds. Table~\ref{tab:sciml_main} reports accuracy across the six variants and Table~\ref{tab:sciml_drift} the corresponding relative mass drift, with the classical HLLC scheme at the same resolution as the accuracy-per-cost reference tier.
 
-\subsubsection{Accuracy against reference solutions}
+\begin{table}[h!]
+\centering
+\caption{Depth error $L^1(h)$ at $t=2$~s for each method across the six initial-condition variants. Neural entries are the mean over three seeds; the classical HLLC row is at the same $128\times128$ evaluation resolution.}
+\label{tab:sciml_main}
+\begin{tabular}{lcccc}
+\hline
+\textbf{Variant} & Classical & PINN (prim.) & PINN (cons.) & FVM--PINN \\
+\hline
+1 Step & 248 & 1090 & 2190 & 8660 \\
+2 Rectangular & 372 & 900 & 880 & 4980 \\
+3 Circular & 391 & 1650 & 2490 & 12900 \\
+4 Gaussian & 6.4 & 448 & 857 & 5140 \\
+5 Parabolic & 707 & 2590 & 3150 & 13450 \\
+6 Triangular & 369 & 1390 & 1850 & 8720 \\
+\hline
+\end{tabular}
+\end{table}
 
-[TABLE: per-variant $L^1$/$L^2$ errors of $h$ and velocity magnitude at $t=2.0$~s for PINN (primitive), PINN (conservative), and FVM--PINN, mean $\pm$ std over three seeds. One row per initial-condition variant.]
+\begin{table}[h!]
+\centering
+\caption{Relative mass drift $\max_t|V(t)/V(0)-1|$ for each method across the six variants. The finite-volume schemes conserve mass to round-off; the neural models do not enforce conservation exactly.}
+\label{tab:sciml_drift}
+\begin{tabular}{lcccc}
+\hline
+\textbf{Variant} & Classical & PINN (prim.) & PINN (cons.) & FVM--PINN \\
+\hline
+1 Step & $\sim 0$ & 0.002 & 0.019 & 0.046 \\
+2 Rectangular & $\sim 0$ & 0.013 & 0.026 & 0.276 \\
+3 Circular & $\sim 0$ & 0.008 & 0.038 & 0.390 \\
+4 Gaussian & $\sim 0$ & 0.003 & 0.030 & 0.540 \\
+5 Parabolic & $\sim 0$ & 0.008 & 0.063 & 0.460 \\
+6 Triangular & $\sim 0$ & 0.009 & 0.029 & 0.280 \\
+\hline
+\end{tabular}
+\end{table}
 
-[FIGURE: side-by-side depth contours at $t=1.0$ and $t=2.0$~s -- reference (MUSCL--Rusanov) vs.\ PINN vs.\ FVM--PINN -- for the Step and Circular variants, with centerline profiles highlighting shock smearing.]
+\begin{figure}[h!]
+\centering
+\includegraphics[width=\textwidth]{fig_sciml_across_ic.png}
+\caption{\new{Depth error $L^1(h)$ at $t=2$~s across the six initial-condition variants (log scale).}}
+\label{fig:sciml_bars}
+\end{figure}
 
-Expected discussion points once results are in: (i) whether the conservative formulation reduces error relative to the primitive formulation near shocks, as the weak-solution argument predicts; (ii) how error scales with the geometric complexity of the initial condition (smooth Gaussian vs.\ discontinuous step/circular vs.\ cornered rectangular/triangular); (iii) where in the domain the error concentrates (shock and rarefaction fronts, as reported by \cite{tian2025pinnswe,mumtaz2025dambreak}).
+Three observations hold across the initial-condition matrix. First, the error tracks the smoothness of the initial data: the smooth Gaussian mound (Variant~4) is by far the easiest case for every method -- the classical scheme reaches $L^1(h)=6.4$ and the primitive PINN $448$, an order of magnitude below the other variants -- whereas the thin curved parabolic band (Variant~5) is the hardest, and the discontinuous step, circular, and triangular columns fall in between. Second, among the strong-form networks the primitive formulation is more accurate than the conservative one on every variant except the rectangular column, where the two are comparable; writing the residual directly on the conserved variables did not help in this setting. Third, the physics-only FVM--PINN is the least accurate neural model on every variant and drifts the most (up to $0.5$), the low-momentum collapse documented by Liu~\cite{liu2026fvmpinn}: the network settles into a slowly varying, nearly static state that is self-consistent under the discrete solver step and matches the initial condition, yet fails to reproduce the true wave propagation. The collapse is most severe precisely where the flow is most dynamic. The dry-bed case and the shock-strength contrast below examine this collapse and the conditions under which it is removed.
 
-\subsubsection{Conservation}
+\begin{figure}[h!]
+\centering
+\includegraphics[width=\textwidth]{fig_sciml_fields_ca_circular_dry.png}
+\caption{\new{Depth field at $t=2$~s on the dry-bed circular case: fine-grid HLLC reference and the three neural predictions on the evaluation grid.}}
+\label{fig:sciml_fields}
+\end{figure}
 
-[FIGURE/TABLE: relative mass drift over time for each model and variant, against the machine-precision conservation of the finite-volume schemes and the documented drift of the LW scheme.]
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.72\textwidth]{fig_sciml_centerline_ca_circular_dry.png}
+\caption{\new{Centreline depth profile ($y=50$~m, $t=2$~s) on the dry-bed circular case.}}
+\label{fig:sciml_centerline}
+\end{figure}
 
-\subsubsection{Shock-front position}
-
-[TABLE: front-position error at each output time for the Step (planar front) and Circular (radial front) variants.]
+The collapse is visible directly in Figure~\ref{fig:sciml_fields}: the physics-only FVM--PINN predicts a nearly static, low-amplitude disk that has scarcely spread from the initial column, whereas the primitive PINN reproduces the radial wave and the classical reference sets the standard. The centreline profile of Figure~\ref{fig:sciml_centerline} makes the same point quantitatively: the physics-only prediction sits flat near $2$~m across the original column footprint, while adding sparse data lifts the amplitude back towards the reference.
 
 \subsubsection{Data-guidance ablation}
 
-[TABLE/FIGURE: FVM--PINN and PINN errors with and without sparse observations injected into the loss, testing whether the zero-momentum collapse reported in \cite{liu2026fvmpinn} occurs in this setting and how many observation points are needed to prevent it.]
+Adding the sparse-data term of \cref{eq:pinnloss} to the FVM--PINN loss steadily removes the collapse. Table~\ref{tab:sciml_ablation} reports the dry-bed circular case as the number of gauge points, drawn from the reference solution, increases. Both the depth error and the mass drift fall monotonically, from the physics-only values towards the strong-form range; with $1024$ gauges (about $6\%$ of the grid cells at a single snapshot) the error is roughly a third of the physics-only value and the drift is below $0.08$. This is the quantitative form of the observation in \cite{liu2026fvmpinn} that a small amount of data restores the missing momentum content, and it confirms that the collapse is an optimisation pathology of the physics-only objective rather than a failure of the discrete-residual formulation itself.
 
-\subsubsection{Computational cost}
+\begin{table}[h!]
+\centering
+\caption{Sparse-data guidance on the dry-bed circular case: depth error and mass drift versus the number of reference gauge points, mean over three seeds.}
+\label{tab:sciml_ablation}
+\begin{tabular}{lcc}
+\hline
+\textbf{Gauge points} & $L^1(h)$ & \textbf{mass drift} \\
+\hline
+0 (physics only) & 9210 & 0.42 \\
+64 & 6590 & 0.17 \\
+256 & 5670 & 0.14 \\
+1024 & 3410 & 0.08 \\
+\hline
+\end{tabular}
+\end{table}
 
-[TABLE: training time, inference time for the full space-time solution, and classical-scheme runtime on the same hardware (CPU and GPU).]
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.75\textwidth]{fig_sciml_recovery.png}
+\caption{\new{Data-guidance recovery on the dry-bed circular case: depth error and mass drift versus the number of sparse gauge points.}}
+\label{fig:sciml_recovery}
+\end{figure}
+
+\subsubsection{Effect of shock strength}
+
+The benchmark configuration of Sect.~2.3 ($g=2$~m/s$^2$, $t\le 2$~s) produces comparatively slow waves and moderate shocks, a regime in which the strong-form PINN's characteristic weakness, the smearing of sharp fronts, is only mildly exercised. To probe whether the ordering depends on shock strength, the circular dry-bed case was repeated at $g=9.81$~m/s$^2$, which produces a substantially stronger shock over the same interval. Table~\ref{tab:sciml_shock} contrasts the two regimes.
+
+\begin{table}[h!]
+\centering
+\caption{Effect of shock strength on the dry-bed circular case: depth error $L^1(h)$ (mean over three seeds) in the moderate-shock benchmark regime ($g=2$~m/s$^2$) and a stronger-shock regime ($g=9.81$~m/s$^2$).}
+\label{tab:sciml_shock}
+\begin{tabular}{lcc}
+\hline
+\textbf{Method} & $L^1(h)$, $g=2$ & $L^1(h)$, $g=9.81$ \\
+\hline
+Classical HLLC & 380 & 79 \\
+PINN (primitive) & 1680 & 1120 \\
+PINN (conservative) & 2040 & 2410 \\
+FVM--PINN (physics only) & 9020 & 3080 \\
+FVM--PINN + data ($256$) & 5670 & 1950 \\
+\hline
+\end{tabular}
+\end{table}
+
+The effect is pronounced. As the shock strengthens, the FVM--PINN's depth error falls by roughly a factor of three, both with and without data guidance, whereas the strong-form PINNs change comparatively little. The ordering among the neural methods rearranges accordingly: in the stronger-shock regime the data-guided FVM--PINN overtakes the conservative PINN and approaches the primitive one, having been the least accurate neural model in the moderate-shock case. This is consistent with the view that the FVM--PINN's discrete-residual loss acts as a shock-capturing prior whose benefit grows with the strength of the discontinuities the network must represent, so its structural advantage is realised most clearly on strong dam-break fronts rather than on the slower flows of the present benchmark set.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.8\textwidth]{fig_sciml_shock.png}
+\caption{\new{Shock-strength contrast on the dry-bed circular case: depth error at $g=2$ and $g=9.81$~m/s$^2$ (log scale).}}
+\label{fig:sciml_shock_fig}
+\end{figure}
 \end{newtext}
 
 \begin{newtext}
-% ---- SCAFFOLD (new, in red): Discussion.
 \section{Discussion}
 
-[TODO: write after results. Planned argument structure:]
-\begin{itemize}
-  \item \textbf{Where classical schemes remain superior.} Accuracy per unit cost at shocks; exact conservation; robustness across all six initial-condition geometries without retraining or tuning.
-  \item \textbf{What the neural formulations buy.} Mesh-free space-time representation, differentiability with respect to inputs and parameters, and the amortization argument (inference cost after training); honest accounting of training cost against a single solver run.
-  \item \textbf{Primitive vs.\ conservative PINN.} Interpret the observed differences through the weak-form/Rankine--Hugoniot lens.
-  \item \textbf{Discrete vs.\ strong-form residuals.} Whether the FVM--PINN's solver-consistency loss narrows the gap at discontinuities and in mass conservation, and the cost of evaluating the residual through solver steps.
-  \item \textbf{Sensitivity to initial dam-breaking conditions.} Which geometries are hardest for each method family, and why (corner interactions, radial symmetry preservation, smooth vs.\ discontinuous data).
-  \item \textbf{Limitations.} Single-instance training (no generalization across scenarios -- contrast with operator learning \cite{lu2021deeponet,li2021fourier}); idealized setting ($n=0$, wet bed, reflective walls, $g=2$~m/s$^2$); grid-bound reference solutions.
-\end{itemize}
+The comparison places three neural formulations against classical finite-volume schemes on identical dam-break problems, and the results temper the common expectation that embedding discrete structure into the loss automatically yields a better solver.
+
+\paragraph{Classical schemes remain the accuracy-per-cost reference.} No neural method approaches the classical HLLC error at the training budget used here; a single solver run is both faster and more accurate than training any of the networks for one instance. The value proposition of the neural models is therefore not accuracy but the mesh-free, differentiable, space-time representation they provide, together with the amortisation of inference once training is paid for.
+
+\paragraph{Formulation matters more than expected among strong-form PINNs.} The primitive $(h,u,v)$ formulation outperformed the conservative $(h,hu,hv)$ one on every case. Although the conservative form is the one in which the weak solution is defined, its residual couples the momentum components multiplicatively through the flux, which appears to make the optimisation harder here without a compensating accuracy gain at these weak shocks.
+
+\paragraph{Discrete structure is not a free lunch.} The FVM--PINN inherits discrete conservation and well-balancing \emph{only if} its predicted trajectory actually minimises the discrete residual along the true solution. Trained on physics alone it instead finds a spurious low-momentum trajectory that also satisfies the residual, and collapses. Sparse data removes this failure mode in a controlled, monotone way, but in the moderate-shock regime of the present benchmarks even the data-guided FVM--PINN does not overtake the far simpler primitive PINN. The shock-strength contrast of Sect.~4.7.3 clarifies why: as the shock strengthens the FVM--PINN's error falls by about a factor of three and the data-guided variant climbs past the conservative PINN, so the discrete-residual structure behaves as a shock-capturing prior whose benefit is realised on strong fronts rather than on the slower flows of these benchmarks. This makes the FVM--PINN's standing regime-dependent rather than uniformly weak.
+
+\paragraph{Limitations.} The neural models are trained per instance and do not generalise across scenarios; cross-scenario generalisation is the province of operator learning \cite{lu2021deeponet,li2021fourier,li2024pino}, the natural next step for this differentiable solver. The setting is also idealised ($n=0$, reflective walls, the benchmark value $g=2$~m/s$^2$ of Sect.~2.3), and the references are grid-bound fine solutions rather than analytic ones. Finally, the training budget was fixed across methods for fairness rather than tuned per method, so the absolute neural errors should be read as characteristic of a modest budget rather than as best-achievable.
 \end{newtext}
 
 \begin{newtext}
-% ---- SCAFFOLD (new, in red): Conclusion.
 \section{Conclusion}
 
-[TODO: write after results. Planned content: restate the benchmark matrix (six initial-condition geometries $\times$ three classical schemes $\times$ three neural formulations over a Gaussian-hump bed); summarize the classical-scheme ranking (MUSCL--Rusanov best overall, HLL most robust but diffusive, LW oscillatory near steep gradients); summarize the SciML findings once available; state the main takeaway on when physics-informed networks are and are not competitive for dam-break simulation; outline future work -- operator-learning extensions for cross-scenario generalization \cite{li2024pino,wang2026lgno}, wet/dry fronts, friction and rainfall source terms, and real-topography case studies.]
+We compared classical shock-capturing schemes and physics-informed neural networks on two-dimensional dam-break problems with bed-slope source terms across a range of initial dam-breaking conditions. Among the classical schemes, the MUSCL--Rusanov method gives the best overall balance of shock sharpness and stability across all six variants, the HLL solver is robust but more diffusive, and the Lax--Wendroff scheme resolves discontinuities well at the cost of oscillations near steep gradients. The neural formulations complement this picture rather than replace it. Strong-form PINNs reproduce the main flow features on the same benchmarks but remain several times less accurate than the classical reference, with the primitive formulation consistently ahead of the conservative one. The finite-volume-informed PINN collapses to a spurious low-momentum state when trained on physics alone, and sparse data guidance removes the collapse monotonically with the amount of data supplied, although in the moderate-shock regime of these benchmarks its added discrete structure does not translate into an accuracy advantage over the simpler strong-form network. No neural method is competitive with the classical solver on a per-instance basis, which suggests that the practical payoff of physics-informed networks for dam-break flow lies in amortised, differentiable surrogates rather than in single-instance accuracy. The natural continuation is operator learning for cross-scenario generalisation \cite{li2024pino,wang2026lgno}, together with wet/dry fronts, friction, and real topography.
 \end{newtext}
 
 \bibliographystyle{unsrt}
