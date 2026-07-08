@@ -14,6 +14,15 @@ numerically against the t=0 snapshots — see reports/data_audit.md):
     - schemes: LW (+artificial viscosity), HLL, MUSCL(minmod)+Rusanov+SSP-RK3
 No momentum fields are present in the drop.
 
+2026-07-08 correction from the solver authors: the ``data/raw`` files are the
+free surface eta = h + Z (plotting field); the actual SWE output is the water
+depth h, supplied separately in ``data/CSV_FILE_h/`` (same layout, filenames
+``h_t*.csv``). Verified: the HLL and MUSCL-RS depth files equal ``raw - Z`` to
+~1e-15, so those runs are unchanged; only the LW files were genuinely
+re-computed (see reports/data_audit.md addendum). Our SciML comparison is
+unaffected (analytic depth ICs + our own HLLC reference), and the reconciliation
+error is invariant to the eta/h choice.
+
 Everything is returned as float64 torch tensors per the project convention.
 """
 

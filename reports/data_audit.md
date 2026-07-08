@@ -130,3 +130,29 @@ All diagnostics are computed on the physical depth `h = eta − Z` (analytic Z).
 3. **LW artificial viscosity**: form and coefficient (needed to attribute the LW mass loss precisely).
 4. **Confirm the stored field is eta = h + Z** (we verified this numerically; a one-line confirmation closes it).
 5. **g = 2 m/s²**: confirm this is intentional (it is unusual; all cross-solver comparisons will use it for reconciliation, while our SWASHES-style validation uses g = 9.81).
+
+## Addendum 2026-07-08 — depth (h) files received; field confirmed, LW re-run
+
+The solver authors confirmed that the original `data/raw` files store the free
+surface eta = h + Z (used for plotting) and supplied depth-only files in
+`data/CSV_FILE_h/` (same 6×3×5 layout, filenames `h_t*.csv`). Question 4 above
+is thus answered: the original field was eta.
+
+Cell-by-cell comparison of the new depth files against `old - Z` over all 90
+files (Z the fixed Gaussian hump):
+
+- **HLL and MUSCL-RS**: `new == old - Z` to ~1e-15 on every variant and time.
+  These runs are unchanged; the new files are the free surface with the static
+  bed removed.
+- **LW (all six variants)**: `new != old - Z`, with differences up to ~8.6 m
+  growing in time. The LW runs were genuinely re-computed (consistent with the
+  LW mass-loss/artificial-viscosity issues noted above), not merely converted.
+
+**Impact on our contribution: none.** The SciML section never consumes these
+CSVs — it trains on analytic depth ICs (`initial_depth`, already h) and
+evaluates against our own differentiable HLLC solver (the HLL/MUSCL-RS tier,
+which is unchanged). The Phase-1 reconciliation compared our free surface
+against their HLL free surface; since both differ by the same bed Z, the
+reconciliation error is identical whether measured in eta or h, so those numbers
+stand. Only the paper's *classical* LW figures (the coauthors' section) need to
+be regenerated from the corrected LW data.
