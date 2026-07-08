@@ -65,10 +65,26 @@ Liu (2026) finding that data guidance cures the collapse.
 
 ## 3. Contrasting sharp-shock regime (g=9.81 dry circular)
 
-*Pending — run in progress. This case (g=9.81, R=11, flat bed, t=1.2 s) has a
-much stronger shock, where the FVM-PINN's shock-capturing structure should be
-worth more relative to the strong-form PINNs than in the near-shock-free g=2
-coauthor regime.*
+The dry circular case repeated at g=9.81 (R=11, flat bed, t=1.2 s) produces a
+much stronger shock. Depth error $L^1(h)$, mean over 3 seeds, vs the moderate-
+shock benchmark regime (g=2, ca_circular_dry):
+
+| method | L1(h) @ g=2 | drift @ g=2 | L1(h) @ g=9.81 | drift @ g=9.81 |
+|---|---|---|---|---|
+| classical HLLC | 380 | ~0 | 79 | ~0 |
+| PINN (primitive) | 1680 | 0.015 | 1120 | 0.026 |
+| PINN (conservative) | 2040 | 0.030 | 2410 | 0.185 |
+| FVM-PINN (physics only) | 9020 | 0.41 | 3080 | 0.152 |
+| FVM-PINN + data (256) | 5670 | 0.14 | 1950 | 0.112 |
+
+**Finding:** the FVM-PINN's error drops ~3× at the stronger shock (both with and
+without data), while the strong-form PINNs barely move. The ordering rearranges:
+the data-guided FVM-PINN goes from least-accurate neural model (g=2) to 2nd best
+(g=9.81), overtaking the conservative PINN and approaching the primitive one. The
+discrete-residual structure behaves as a shock-capturing prior whose benefit
+grows with shock strength — its advantage shows on strong fronts, not the slow
+flows of the g=2 benchmark set. This makes the FVM-PINN's standing
+regime-dependent rather than uniformly weak.
 
 ## 4. Interpretation
 
