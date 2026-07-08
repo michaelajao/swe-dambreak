@@ -10,6 +10,7 @@ dist/
 # Data — raw reference outputs are large and external; keep out of git
 data/raw/
 data/cache/
+data/CSV_FILE_h/
 
 # Experiment outputs
 runs/
