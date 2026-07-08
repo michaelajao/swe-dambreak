@@ -1001,10 +1001,10 @@ where $\mathcal{L}_{\mathrm{pde}}$ is the mean squared PDE residual, $\mathcal{L
 \foreach \i in {1,...,8}{\pgfmathsetmacro\x{0.6+3.8*rnd}\pgfmathsetmacro\y{0.6+3.8*rnd}\pgfmathsetmacro\z{0.4+3.2*rnd}
   \node[star, star points=5, star point ratio=2.3, fill=red!85, inner sep=1.1pt] at (\x,\y,\z) {};}
 \node at (2.5,-0.8,0) {$x$}; \node at (5.9,2.9,0) {$y$}; \node at (-0.2,-0.3,4.2) {$t$};
-\begin{scope}[shift={(6.6,0,0)}]
-  \fill[black!40] (0,0,3.4) circle (0.9pt); \node[right, font=\footnotesize] at (0.15,0,3.4) {collocation ($\mathcal{L}_\mathrm{pde}$)};
-  \fill[blue!70] (0,0,2.5) circle (1.0pt); \node[right, font=\footnotesize] at (0.15,0,2.5) {$t{=}0$ ($\mathcal{L}_\mathrm{ic}$)};
-  \node[star, star points=5, star point ratio=2.3, fill=red!85, inner sep=1.1pt] at (0,0,1.6) {}; \node[right, font=\footnotesize] at (0.15,0,1.6) {gauges ($\mathcal{L}_\mathrm{data}$)};
+\begin{scope}[shift={(8.8,0,0)}]
+  \fill[black!40] (0,0,3.4) circle (0.9pt); \node[right, font=\footnotesize] at (0.2,0,3.4) {collocation ($\mathcal{L}_\mathrm{pde}$)};
+  \fill[blue!70] (0,0,2.5) circle (1.0pt); \node[right, font=\footnotesize] at (0.2,0,2.5) {$t{=}0$ ($\mathcal{L}_\mathrm{ic}$)};
+  \node[star, star points=5, star point ratio=2.3, fill=red!85, inner sep=1.1pt] at (0,0,1.6) {}; \node[right, font=\footnotesize] at (0.2,0,1.6) {gauges ($\mathcal{L}_\mathrm{data}$)};
 \end{scope}
 \end{tikzpicture}
 \caption{\new{Space-time sampling of the training points over the domain and time horizon.}}
@@ -1025,17 +1025,17 @@ where $\mathcal{L}_{\mathrm{pde}}$ is the mean squared PDE residual, $\mathcal{L
 \node[ad, right=of uvw] (ad) {automatic\\differentiation\\$\partial_t,\ \partial_x,\ \partial_y$};
 \node[res, right=of ad] (res) {strong-form residual\\$r=\partial_t U+\partial_x F+\partial_y G-S$};
 \node[loss, right=of res] (lpde) {$\mathcal{L}_\mathrm{pde}=\overline{\lVert r\rVert^2}$};
-\node[loss, below=9mm of ad] (lic) {$\mathcal{L}_\mathrm{ic}$ (+ $\mathcal{L}_\mathrm{data}$)};
+\node[loss, below=9mm of ad] (lic) {$\mathcal{L}_\mathrm{ic}$};
 \node[b, fill=red!18, below=9mm of lpde] (tot) {$\mathcal{L}$};
 \draw[->] (in)--(net); \draw[->] (net)--(uvw); \draw[->] (uvw)--(ad);
 \draw[->] (ad)--(res); \draw[->] (res)--(lpde);
 \draw[->] (uvw.south) |- (lic.west);
 \draw[->] (lpde)--(tot);
 \draw[->] (lic) -| (tot);
-\draw[->, dashed, red!65] (tot.south) |- ($(net.south)+(0,-6mm)$)
-  node[glab, midway, below] {backprop $\nabla_\theta\mathcal{L}$} -- (net.south);
+\draw[->, dashed, red!65] (tot.south) -- ++(0,-9mm) coordinate (bl) -| (net.south);
+\node[glab, below] at (bl -| lic) {backprop $\nabla_\theta\mathcal{L}$};
 \end{tikzpicture}}
-\caption{\new{Strong-form PINN: outputs are differentiated to form the SWE residual, and the residual, initial-condition, and optional data terms make the loss.}}
+\caption{\new{Strong-form PINN: the network outputs are differentiated to form the SWE residual, which with the initial-condition term makes the loss.}}
 \label{fig:strongform}
 \end{figure}
 
