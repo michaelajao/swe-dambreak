@@ -1016,23 +1016,37 @@ where $\mathcal{L}_{\mathrm{pde}}$ is the mean squared PDE residual, $\mathcal{L
 \resizebox{0.98\textwidth}{!}{%
 \begin{tikzpicture}[font=\small, >=Latex, node distance=6mm and 9mm,
   b/.style={draw, rounded corners, align=center, inner sep=4pt, minimum height=8.5mm},
-  net/.style={b, fill=blue!8}, outv/.style={b, fill=teal!16},
-  ad/.style={b, fill=violet!12}, res/.style={b, fill=orange!14}, loss/.style={b, fill=red!9},
-  glab/.style={font=\footnotesize\bfseries, text=black!60}]
-\node[b] (in) {$(x,y,t)$};
-\node[net, right=of in] (net) {network\\$\mathcal{N}_\theta$};
-\node[outv, right=of net] (uvw) {$(h,u,v)$\ or\\$(h,hu,hv)$};
+  outv/.style={b, fill=teal!16}, ad/.style={b, fill=violet!12},
+  res/.style={b, fill=orange!14}, loss/.style={b, fill=red!9},
+  glab/.style={font=\footnotesize\bfseries, text=black!60},
+  neuron/.style={circle, draw, minimum size=5mm, inner sep=0, line width=0.3pt},
+  nin/.style={neuron, fill=blue!14}, nhid/.style={neuron, fill=blue!6},
+  nout/.style={neuron, fill=teal!18}, edge/.style={draw=black!22, line width=0.12pt},
+  grp/.style={draw, dashed, rounded corners, inner sep=5pt}]
+% ---- drawn network: (x,y,t) -> hidden xL -> outputs ----
+\foreach \i/\yy/\lab in {1/0.75/$x$,2/0/$y$,3/-0.75/$t$} \node[nin] (i\i) at (0,\yy) {\lab};
+\foreach \i/\yy in {1/1.5,2/0.75,3/0,4/-0.75,5/-1.5} \node[nhid] (p\i) at (1.0,\yy) {};
+\foreach \i/\yy in {1/1.5,2/0.75,3/0,4/-0.75,5/-1.5} \node[nhid] (q\i) at (2.0,\yy) {};
+\foreach \i/\yy in {1/0.75,2/0,3/-0.75} \node[nout] (o\i) at (3.0,\yy) {};
+\foreach \a in {1,2,3}\foreach \b in {1,...,5} \draw[edge] (i\a)--(p\b);
+\foreach \a in {1,...,5}\foreach \b in {1,...,5} \draw[edge] (p\a)--(q\b);
+\foreach \a in {1,...,5}\foreach \b in {1,2,3} \draw[edge] (q\a)--(o\b);
+\node[grp, fit=(i1)(i3)(p1)(p5)(o1)(o3), label={[glab]above:network $\mathcal{N}_\theta$}] (netg) {};
+\node[font=\footnotesize, text=black!65] at (1.5,-2.2) {hidden $\times L$, $\tanh$};
+% ---- forward chain ----
+\node[outv, right=9mm of netg] (uvw) {$(h,u,v)$\ or\\$(h,hu,hv)$};
 \node[ad, right=of uvw] (ad) {automatic\\differentiation\\$\partial_t,\ \partial_x,\ \partial_y$};
 \node[res, right=of ad] (res) {strong-form residual\\$r=\partial_t U+\partial_x F+\partial_y G-S$};
 \node[loss, right=of res] (lpde) {$\mathcal{L}_\mathrm{pde}=\overline{\lVert r\rVert^2}$};
 \node[loss, below=9mm of ad] (lic) {$\mathcal{L}_\mathrm{ic}$};
 \node[b, fill=red!18, below=9mm of lpde] (tot) {$\mathcal{L}$};
-\draw[->] (in)--(net); \draw[->] (net)--(uvw); \draw[->] (uvw)--(ad);
-\draw[->] (ad)--(res); \draw[->] (res)--(lpde);
+% ---- arrows ----
+\draw[->] (netg.east) -- (uvw.west);
+\draw[->] (uvw)--(ad); \draw[->] (ad)--(res); \draw[->] (res)--(lpde);
 \draw[->] (uvw.south) |- (lic.west);
 \draw[->] (lpde)--(tot);
 \draw[->] (lic) -| (tot);
-\draw[->, dashed, red!65] (tot.south) -- ++(0,-9mm) coordinate (bl) -| (net.south);
+\draw[->, dashed, red!65] (tot.south) -- ++(0,-9mm) coordinate (bl) -| (netg.south west);
 \node[glab, below] at (bl -| lic) {backprop $\nabla_\theta\mathcal{L}$};
 \end{tikzpicture}}
 \caption{\new{Strong-form PINN: the network outputs are differentiated to form the SWE residual, which with the initial-condition term makes the loss.}}
