@@ -1109,11 +1109,11 @@ Figure~\ref{fig:fvmpinn} shows the complete training loop: the shared network pr
 \node[loss, below=3mm of lfvm] (ldata) {$\mathcal{L}_\mathrm{data}$ (optional)};
 \node[box, fill=red!18, right=8mm of lfvm] (tot) {$\mathcal{L}$};
 % ===== arrows =====
-\draw[->] (o2.east) -- (rep.west);
+\draw[->] (netg.east) -- ++(3mm,0) |- (rep.west);
 \draw[->] (rep) -- (state);
 \draw[->] (state.south) -- (solvg.north) node[ann, pos=0.5, right] {$U_\theta(t_k)$};
 \draw[->] (rec)--(hyd); \draw[->] (hyd)--(hllc); \draw[->] (hllc)--(rk);
-\draw[->] (rk.east) -| (lfvm.south);
+\draw[->] (rk.east) -| ([xshift=-20mm]lfvm.south);
 \draw[->] (state.east) -- (lfvm.west) node[ann, midway, above] {$U_\theta(t_{k+1})$};
 \draw[->] (lic.east) -| (tot.north);
 \draw[->] (lfvm.east) -- (tot.west);
