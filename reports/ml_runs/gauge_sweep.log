@@ -21,4 +21,4 @@ device=cuda
     [fvm] dt_cfl=0.06988, dt_interval=0.05, n_sub=1
   fvm_data_g1024/ca_circular_dry/seed2: L1_h=3.498e+03 drift=8.13e-02 train=616.4s
 
-wrote reports/sciml_comparison.md
+wrote reports/pinn_comparison.md

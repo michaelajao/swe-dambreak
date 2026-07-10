@@ -1,7 +1,7 @@
 [project]
 name = "swe-dambreak"
 version = "0.1.0"
-description = "Differentiable 2D shallow-water solvers (PyTorch) + SciML comparison for dam-break problems"
+description = "Differentiable 2D shallow-water solvers (PyTorch) + physics-informed neural network comparison for dam-break problems"
 requires-python = ">=3.11"
 dependencies = [
     "torch>=2.6,<3",

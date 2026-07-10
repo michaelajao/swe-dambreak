@@ -1,0 +1,17 @@
+device: auto
+seeds: [0, 1, 2]
+entries:
+  - {name: fvm_data_g64,   kind: fvm, data: true, n_gauge: 64}
+  - {name: fvm_data_g256,  kind: fvm, data: true, n_gauge: 256}
+  - {name: fvm_data_g1024, kind: fvm, data: true, n_gauge: 1024}
+benchmarks:
+  - {id: ca_circular_dry, reference_n: 512, grid_n: 128}
+train:
+  iters: 12000
+  lr: 1.0e-3
+  n_collocation: 20000
+  n_ic: 4000
+  fvm_times: 41
+  fvm_nsub_max: 24
+  fvm_stochastic: true
+  n_gauge: 64

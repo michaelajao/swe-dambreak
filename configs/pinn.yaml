@@ -1,4 +1,4 @@
-# Publication SciML comparison: 3 entries x benchmarks x 3 seeds.
+# Publication PINN comparison: 3 entries x benchmarks x 3 seeds.
 # Expensive (many long trainings) — launch deliberately.
 device: auto
 seeds: [0, 1, 2]
@@ -9,7 +9,7 @@ entries:
   # sparse-data ablation, only where it matters (dry-bed momentum collapse)
   - {name: fvm_pinn_data, kind: fvm, data: true, only_benchmarks: [ca_circular_dry]}
 benchmarks:
-  # Coauthor-convention cases so the SciML section overlaps the classical
+  # Coauthor-convention cases so the PINN section overlaps the classical
   # section (Circular = paper Variant 3, Step = paper Variant 1), plus a dry
   # circular to exercise the FVM-PINN low-momentum collapse + data guidance.
   - {id: ca_circular_wet, reference_n: 512, grid_n: 128}

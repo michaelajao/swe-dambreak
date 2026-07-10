@@ -32,7 +32,7 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from benchmarks.cases import build
 from data.reference import SRC_EXTENT, load_run, regrid
-from experiments.plot_sciml import (
+from experiments.plot_pinn import (
     DEV,
     _fvm_depth,
     _load_fvm,

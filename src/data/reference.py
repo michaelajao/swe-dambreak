@@ -20,7 +20,7 @@ free surface eta = h + Z (plotting field); the actual SWE output is the water
 depth h, supplied separately in ``data/CSV_FILE_h/`` (same layout, filenames
 ``h_t*.csv``). Verified: the HLL and MUSCL-RS depth files equal ``raw - Z`` to
 ~1e-15, so those runs are unchanged; only the LW files were genuinely
-re-computed (see reports/data_audit.md addendum). Our SciML comparison is
+re-computed (see reports/data_audit.md addendum). Our PINN comparison is
 unaffected (analytic depth ICs + our own HLLC reference), and the reconciliation
 error is invariant to the eta/h choice.
 

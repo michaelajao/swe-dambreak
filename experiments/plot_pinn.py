@@ -1,6 +1,6 @@
-"""Generate all SciML result figures for the paper (written into paper/).
+"""Generate all PINN result figures for the paper (written into paper/).
 
-Summary charts (from the 3-seed means tabulated in reports/sciml_comparison.md):
+Summary charts (from the 3-seed means tabulated in reports/pinn_comparison.md):
   - across-IC L1(h) over the six variants
   - data-guidance recovery on the dry circular case (L1 and mass drift vs gauges)
   - shock-strength contrast (g=2 vs g=9.81) on the dry circular case
@@ -10,7 +10,7 @@ at the final time on the evaluation grid beside the fine-grid HLLC reference —
 a panel row of 2D depth fields and a centreline profile. Shows the FVM-PINN
 low-momentum collapse and its recovery under data guidance.
 
-Run: python experiments/plot_sciml.py
+Run: python experiments/plot_pinn.py
 """
 
 from __future__ import annotations
@@ -88,7 +88,7 @@ def fig_across_ic() -> None:
     ax.legend(ncol=2, fontsize=8.5, framealpha=0.9)
     ax.grid(axis="x", alpha=0)
     fig.tight_layout()
-    fig.savefig(OUT / "fig_sciml_across_ic.png")
+    fig.savefig(OUT / "fig_pinn_across_ic.png")
     plt.close(fig)
 
 
@@ -121,7 +121,7 @@ def fig_recovery() -> None:
     ax1.legend(lines, [ln.get_label() for ln in lines], fontsize=9,
                loc="upper right")
     fig.tight_layout()
-    fig.savefig(OUT / "fig_sciml_recovery.png")
+    fig.savefig(OUT / "fig_pinn_recovery.png")
     plt.close(fig)
 
 
@@ -146,7 +146,7 @@ def fig_shock() -> None:
     ax.grid(axis="x", alpha=0)
     ax.legend(fontsize=9, framealpha=0.9)
     fig.tight_layout()
-    fig.savefig(OUT / "fig_sciml_shock.png")
+    fig.savefig(OUT / "fig_pinn_shock.png")
     plt.close(fig)
 
 
@@ -242,7 +242,7 @@ def fig_fields_and_centerline(bid: str = "ca_circular_dry",
         ax.grid(False)
     axes[0].set_ylabel("y [m]")
     fig.colorbar(im, ax=axes, fraction=0.024, pad=0.02, label="depth $h$ [m]")
-    fig.savefig(OUT / f"fig_sciml_fields_{bid}.png")
+    fig.savefig(OUT / f"fig_pinn_fields_{bid}.png")
     plt.close(fig)
 
     # centreline profile at y = mid
@@ -262,7 +262,7 @@ def fig_fields_and_centerline(bid: str = "ca_circular_dry",
     ax.set_ylabel("depth $h$ [m] at $y=50$, $t=2$ s")
     ax.legend(fontsize=8.5)
     fig.tight_layout()
-    fig.savefig(OUT / f"fig_sciml_centerline_{bid}.png")
+    fig.savefig(OUT / f"fig_pinn_centerline_{bid}.png")
     plt.close(fig)
     print("wrote fields + centerline for", bid)
 
@@ -271,8 +271,8 @@ def main() -> None:
     fig_across_ic()
     fig_recovery()
     fig_shock()
-    print("wrote fig_sciml_across_ic.png, fig_sciml_recovery.png, "
-          "fig_sciml_shock.png to", OUT)
+    print("wrote fig_pinn_across_ic.png, fig_pinn_recovery.png, "
+          "fig_pinn_shock.png to", OUT)
     fig_fields_and_centerline("ca_circular_dry")
     fig_fields_and_centerline("ca_circular_wet")
 

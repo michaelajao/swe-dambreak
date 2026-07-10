@@ -1,5 +1,5 @@
-# Fast end-to-end validation of the SciML pipeline (NOT publication settings).
-# Full runs: raise iters to ~20000 and seeds to [0,1,2]; see configs/sciml.yaml.
+# Fast end-to-end validation of the PINN pipeline (NOT publication settings).
+# Full runs: raise iters to ~20000 and seeds to [0,1,2]; see configs/pinn.yaml.
 device: auto
 seeds: [0]
 entries:

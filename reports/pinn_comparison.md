@@ -1,4 +1,4 @@
-# SciML comparison — PINNs and FVM-informed PINN vs classical schemes
+# PINN comparison — PINNs and FVM-informed PINN vs classical schemes
 
 Curated from the training runs on the Coventry **brosnan** HPC (NVIDIA Quadro
 RTX 8000). Per-method numbers are mean ± std over 3 seeds. Errors are discrete

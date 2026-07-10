@@ -148,7 +148,7 @@ files (Z the fixed Gaussian hump):
   growing in time. The LW runs were genuinely re-computed (consistent with the
   LW mass-loss/artificial-viscosity issues noted above), not merely converted.
 
-**Impact on our contribution: none.** The SciML section never consumes these
+**Impact on our contribution: none.** The PINN section never consumes these
 CSVs — it trains on analytic depth ICs (`initial_depth`, already h) and
 evaluates against our own differentiable HLLC solver (the HLL/MUSCL-RS tier,
 which is unchanged). The Phase-1 reconciliation compared our free surface

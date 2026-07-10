@@ -1,0 +1,15 @@
+device: auto
+seeds: [0]
+entries:
+  - {name: pinn_primitive, kind: pinn, variables: primitive}
+  - {name: fvm_pinn, kind: fvm}
+benchmarks:
+  - {id: b1_circular_dry, reference_n: 384, grid_n: 96}
+train:
+  iters: 6000
+  lr: 1.0e-3
+  n_collocation: 8000
+  n_ic: 2000
+  fvm_times: 21
+  fvm_nsub_max: 16
+  grad_clip: 1.0

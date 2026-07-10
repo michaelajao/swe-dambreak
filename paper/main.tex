@@ -82,18 +82,18 @@
 \newtheorem{theorem}{Theorem}
 \newtheorem{remark}{Remark}[theorem]
 
-% ---- Draft markup: new content added for the SciML extension is shown in red.
+% ---- Draft markup: new content added for the PINN extension is shown in red.
 % Remove \new{} wrappers / newtext environments once coauthors approve the text.
 \usepackage{comment}   % provides \begin{comment}...\end{comment} to disable blocks
 \newcommand{\new}[1]{{\color{red}#1}}
 \newenvironment{newtext}{\par\color{red}}{\par}
 
 % ---- TikZ libraries for the FVM-PINN schematic (Fig.~\ref{fig:fvmpinn}).
-% Data plots are matplotlib PNGs (experiments/plot_sciml_figures.py). ----
+% Data plots are matplotlib PNGs (experiments/plot_pinn.py). ----
 \usetikzlibrary{positioning, arrows.meta, fit, backgrounds, calc}
 
 % ---- Original title (kept for reference; superseded by the version below that
-% signals the added SciML content). Restore this if the coauthors prefer it.
+% signals the added PINN content). Restore this if the coauthors prefer it.
 % \title{\textcolor{black}{\textbf{Comparative Analysis of Numerical Schemes for Two-Dimensional Dam-Break Problems with Source Terms under Different Initial Dam Breaking Conditions
 % }}}
 \title{\textcolor{black}{\textbf{Comparative Analysis of Numerical Schemes \new{and Physics-Informed Neural Networks} for Two-Dimensional Dam-Break Problems with Source Terms under Different Initial Dam Breaking Conditions
@@ -130,7 +130,7 @@ Several recent studies have compared neural solvers against classical schemes fo
 % ---- Contributions list and paper outline: COMMENTED OUT ----
 % Removed from the compiled draft for two reasons: (1) the contributions read as
 % generic placeholders and the coauthors will prefer to phrase these themselves;
-% (2) the outline references a Related Work section and SciML results that are
+% (2) the outline references a Related Work section and PINN results that are
 % commented out below until the training runs complete. Uncomment/rewrite later.
 \begin{comment}
 The contributions of this work are:
@@ -1202,12 +1202,12 @@ The propagating waves that come from the triangular vertices interact with each 
 \begin{newtext}
 \subsection{Physics-Informed Neural Network Comparison Across Initial Dam-Breaking Conditions}
 
-This section extends the comparison of Sects.~3.1--3.6 with the neural formulations, evaluated over all six initial-condition variants under the same domain, bed topography, and boundary conventions. For the six benchmark variants the reference is the MUSCL--Rusanov depth solution of Sects.~3.1--3.6, which is the most accurate of the classical schemes considered here, bilinearly resampled from its $501\times501$ grid onto the $128\times128$ evaluation grid; errors are the depth $L^1(h)$ at the final time $t=2$~s, averaged over three seeds. The classical baseline row of Table~\ref{tab:sciml_main} is the HLL scheme against the same reference (MUSCL--Rusanov itself defines the reference and is therefore omitted), so it reports the accuracy floor spanned by the classical schemes and every neural model is measured against the identical reference. To confirm that the neural training pipeline is consistent with this reference, the differentiable HLLC solver used to build the collocation losses and the ablation references below was reconciled against the classical circular solution in matched configuration and agrees to within $0.17\%$ relative $L^1$. Table~\ref{tab:sciml_main} reports accuracy across the six variants and Table~\ref{tab:sciml_drift} the corresponding relative mass drift, the latter computed from each method's own predicted volume and hence independent of the reference.
+This section extends the comparison of Sects.~3.1--3.6 with the neural formulations, evaluated over all six initial-condition variants under the same domain, bed topography, and boundary conventions. For the six benchmark variants the reference is the MUSCL--Rusanov depth solution of Sects.~3.1--3.6, which is the most accurate of the classical schemes considered here, bilinearly resampled from its $501\times501$ grid onto the $128\times128$ evaluation grid; errors are the depth $L^1(h)$ at the final time $t=2$~s, averaged over three seeds. The classical baseline row of Table~\ref{tab:pinn_main} is the HLL scheme against the same reference (MUSCL--Rusanov itself defines the reference and is therefore omitted), so it reports the accuracy floor spanned by the classical schemes and every neural model is measured against the identical reference. To confirm that the neural training pipeline is consistent with this reference, the differentiable HLLC solver used to build the collocation losses and the ablation references below was reconciled against the classical circular solution in matched configuration and agrees to within $0.17\%$ relative $L^1$. Table~\ref{tab:pinn_main} reports accuracy across the six variants and Table~\ref{tab:pinn_drift} the corresponding relative mass drift, the latter computed from each method's own predicted volume and hence independent of the reference.
 
 \begin{table}[h!]
 \centering
 \caption{Depth error $L^1(h)$ at $t=2$~s (integrated over cell areas) for each method across the six initial-condition variants, measured against the MUSCL--Rusanov reference resampled to the $128\times128$ evaluation grid. Neural entries are the mean over three seeds; the classical column is the HLL scheme at the same resolution, giving the classical accuracy floor.}
-\label{tab:sciml_main}
+\label{tab:pinn_main}
 \begin{tabular}{lcccc}
 \hline
 \textbf{Variant} & Classical (HLL) & PINN (prim.) & PINN (cons.) & FVM--PINN \\
@@ -1225,7 +1225,7 @@ This section extends the comparison of Sects.~3.1--3.6 with the neural formulati
 \begin{table}[h!]
 \centering
 \caption{Relative mass drift $\max_t|V(t)/V(0)-1|$ for each method across the six variants. The finite-volume schemes conserve mass to round-off; the neural models do not enforce conservation exactly.}
-\label{tab:sciml_drift}
+\label{tab:pinn_drift}
 \begin{tabular}{lcccc}
 \hline
 \textbf{Variant} & Classical & PINN (prim.) & PINN (cons.) & FVM--PINN \\
@@ -1242,37 +1242,37 @@ This section extends the comparison of Sects.~3.1--3.6 with the neural formulati
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width=\textwidth]{fig_sciml_across_ic.png}
+\includegraphics[width=\textwidth]{fig_pinn_across_ic.png}
 \caption{\new{Depth error $L^1(h)$ at $t=2$~s across the six initial-condition variants (log scale).}}
-\label{fig:sciml_bars}
+\label{fig:pinn_bars}
 \end{figure}
 
-Three observations hold across the initial-condition matrix, visualised in Figure~\ref{fig:sciml_bars}. First, the error tracks the smoothness of the initial data: the smooth Gaussian mound (Variant~4) is by far the easiest case for every method, with the classical HLL floor at $L^1(h)=49$ and the primitive PINN at $332$, well below the other variants. The discontinuous step, the circular column, and the thin curved parabolic band are the most demanding, and which of them tops the table depends on the method: the circular case is hardest for the classical and finite-volume-informed models and the step for the strong-form PINNs, while the rectangular and triangular columns fall in between. Second, among the strong-form networks the primitive formulation is more accurate than the conservative one on every variant except the rectangular column, where the two are comparable; writing the residual directly on the conserved variables did not help in this setting. Third, the physics-only FVM--PINN is the least accurate neural model on every variant and drifts the most (up to $0.54$), the low-momentum collapse documented by Liu~\cite{liu2026fvmpinn}: the network settles into a slowly varying, nearly static state that is self-consistent under the discrete solver step and matches the initial condition, yet fails to reproduce the true wave propagation, and this collapse is most severe precisely where the flow is most dynamic. The dry-bed case and the shock-strength contrast below examine the collapse in detail and identify the conditions under which it is removed.
+Three observations hold across the initial-condition matrix, visualised in Figure~\ref{fig:pinn_bars}. First, the error tracks the smoothness of the initial data: the smooth Gaussian mound (Variant~4) is by far the easiest case for every method, with the classical HLL floor at $L^1(h)=49$ and the primitive PINN at $332$, well below the other variants. The discontinuous step, the circular column, and the thin curved parabolic band are the most demanding, and which of them tops the table depends on the method: the circular case is hardest for the classical and finite-volume-informed models and the step for the strong-form PINNs, while the rectangular and triangular columns fall in between. Second, among the strong-form networks the primitive formulation is more accurate than the conservative one on every variant except the rectangular column, where the two are comparable; writing the residual directly on the conserved variables did not help in this setting. Third, the physics-only FVM--PINN is the least accurate neural model on every variant and drifts the most (up to $0.54$), the low-momentum collapse documented by Liu~\cite{liu2026fvmpinn}: the network settles into a slowly varying, nearly static state that is self-consistent under the discrete solver step and matches the initial condition, yet fails to reproduce the true wave propagation, and this collapse is most severe precisely where the flow is most dynamic. The dry-bed case and the shock-strength contrast below examine the collapse in detail and identify the conditions under which it is removed.
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width=\textwidth]{fig_sciml_fields_ca_circular_dry.png}
+\includegraphics[width=\textwidth]{fig_pinn_fields_ca_circular_dry.png}
 \caption{\new{Depth field at $t=2$~s on the dry-bed circular case: fine-grid HLLC reference and the three neural predictions on the evaluation grid.}}
-\label{fig:sciml_fields}
+\label{fig:pinn_fields}
 \end{figure}
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width=0.72\textwidth]{fig_sciml_centerline_ca_circular_dry.png}
+\includegraphics[width=0.72\textwidth]{fig_pinn_centerline_ca_circular_dry.png}
 \caption{\new{Centreline depth profile ($y=50$~m, $t=2$~s) on the dry-bed circular case.}}
-\label{fig:sciml_centerline}
+\label{fig:pinn_centerline}
 \end{figure}
 
-The collapse is visible directly in Figure~\ref{fig:sciml_fields}: the physics-only FVM--PINN predicts a nearly static, low-amplitude disk that has scarcely spread from the initial column, whereas the primitive PINN reproduces the radial wave and the classical reference sets the standard. The centreline profile of Figure~\ref{fig:sciml_centerline} makes the same point quantitatively: the physics-only prediction sits flat near $2$~m across the original column footprint, while adding sparse data lifts the amplitude back towards the reference.
+The collapse is visible directly in Figure~\ref{fig:pinn_fields}: the physics-only FVM--PINN predicts a nearly static, low-amplitude disk that has scarcely spread from the initial column, whereas the primitive PINN reproduces the radial wave and the classical reference sets the standard. The centreline profile of Figure~\ref{fig:pinn_centerline} makes the same point quantitatively: the physics-only prediction sits flat near $2$~m across the original column footprint, while adding sparse data lifts the amplitude back towards the reference.
 
 \subsubsection{Effect of sparse-data guidance}
 
-Adding the sparse-data term of \cref{eq:pinnloss} to the FVM--PINN loss steadily removes the collapse. Table~\ref{tab:sciml_ablation} reports the dry-bed circular case as the number of gauge points, drawn from the reference solution, increases. Both the depth error and the mass drift fall monotonically (Figure~\ref{fig:sciml_recovery}), from the physics-only values towards the strong-form range; with $1024$ gauges (about $6\%$ of the grid cells at a single snapshot) the error is roughly a third of the physics-only value and the drift falls to $0.08$. This is the quantitative form of the observation in \cite{liu2026fvmpinn} that a small amount of data restores the missing momentum content, and it confirms that the collapse is an optimisation pathology of the physics-only objective rather than a failure of the discrete-residual formulation itself.
+Adding the sparse-data term of \cref{eq:pinnloss} to the FVM--PINN loss steadily removes the collapse. Table~\ref{tab:pinn_ablation} reports the dry-bed circular case as the number of gauge points, drawn from the reference solution, increases. Both the depth error and the mass drift fall monotonically (Figure~\ref{fig:pinn_recovery}), from the physics-only values towards the strong-form range; with $1024$ gauges (about $6\%$ of the grid cells at a single snapshot) the error is roughly a third of the physics-only value and the drift falls to $0.08$. This is the quantitative form of the observation in \cite{liu2026fvmpinn} that a small amount of data restores the missing momentum content, and it confirms that the collapse is an optimisation pathology of the physics-only objective rather than a failure of the discrete-residual formulation itself.
 
 \begin{table}[h!]
 \centering
 \caption{Sparse-data guidance on the dry-bed circular case: depth error and mass drift versus the number of reference gauge points, mean over three seeds.}
-\label{tab:sciml_ablation}
+\label{tab:pinn_ablation}
 \begin{tabular}{lcc}
 \hline
 \textbf{Gauge points} & $L^1(h)$ & \textbf{mass drift} \\
@@ -1287,19 +1287,19 @@ Adding the sparse-data term of \cref{eq:pinnloss} to the FVM--PINN loss steadily
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width=0.75\textwidth]{fig_sciml_recovery.png}
+\includegraphics[width=0.75\textwidth]{fig_pinn_recovery.png}
 \caption{\new{Recovery under sparse-data guidance on the dry-bed circular case: depth error and mass drift versus the number of sparse gauge points.}}
-\label{fig:sciml_recovery}
+\label{fig:pinn_recovery}
 \end{figure}
 
 \subsubsection{Effect of shock strength}
 
-The benchmark configuration of Sect.~2.3 ($g=2$~m/s$^2$, $t\le 2$~s) produces comparatively slow waves and moderate shocks, a regime in which the strong-form PINN's characteristic weakness, the smearing of sharp fronts, is only mildly exercised. To probe whether the ordering depends on shock strength, the circular dry-bed case was repeated in a deliberately stronger-shock configuration ($g=9.81$~m/s$^2$, a tighter column of radius $R=11$~m on a flat bed, evaluated at $t=1.2$~s). This departs from the benchmark conventions of Sect.~2.3 precisely to isolate the effect of shock strength; because both regimes are ablations of the dry-bed circular case with no classical reference in the benchmark set, the reference here is a fine-grid HLLC self-convergence solution rather than the MUSCL--Rusanov data used in Table~\ref{tab:sciml_main}. Table~\ref{tab:sciml_shock} contrasts the two regimes.
+The benchmark configuration of Sect.~2.3 ($g=2$~m/s$^2$, $t\le 2$~s) produces comparatively slow waves and moderate shocks, a regime in which the strong-form PINN's characteristic weakness, the smearing of sharp fronts, is only mildly exercised. To probe whether the ordering depends on shock strength, the circular dry-bed case was repeated in a deliberately stronger-shock configuration ($g=9.81$~m/s$^2$, a tighter column of radius $R=11$~m on a flat bed, evaluated at $t=1.2$~s). This departs from the benchmark conventions of Sect.~2.3 precisely to isolate the effect of shock strength; because both regimes are ablations of the dry-bed circular case with no classical reference in the benchmark set, the reference here is a fine-grid HLLC self-convergence solution rather than the MUSCL--Rusanov data used in Table~\ref{tab:pinn_main}. Table~\ref{tab:pinn_shock} contrasts the two regimes.
 
 \begin{table}[h!]
 \centering
 \caption{Effect of shock strength on the dry-bed circular case: depth error $L^1(h)$ (mean over three seeds) in the moderate-shock benchmark regime ($g=2$~m/s$^2$) and a stronger-shock regime ($g=9.81$~m/s$^2$).}
-\label{tab:sciml_shock}
+\label{tab:pinn_shock}
 \begin{tabular}{lcc}
 \hline
 \textbf{Method} & $L^1(h)$, $g=2$ & $L^1(h)$, $g=9.81$ \\
@@ -1313,13 +1313,13 @@ FVM--PINN + data ($256$) & 5670 & 1950 \\
 \end{tabular}
 \end{table}
 
-The effect is pronounced (Figure~\ref{fig:sciml_shock_fig}): as the shock strengthens, the FVM--PINN's depth error falls by roughly a factor of three, both with and without data guidance, whereas the strong-form PINNs change comparatively little. The ordering among the neural methods rearranges accordingly: in the stronger-shock regime the data-guided FVM--PINN overtakes the conservative PINN and approaches the primitive one, having been less accurate than both strong-form PINNs in the moderate-shock case. This is consistent with the view that the FVM--PINN's discrete-residual loss acts as a shock-capturing prior whose benefit grows with the strength of the discontinuities the network must represent, so its structural advantage is realised most clearly on strong dam-break fronts rather than on the slower flows of the present benchmark set.
+The effect is pronounced (Figure~\ref{fig:pinn_shock_fig}): as the shock strengthens, the FVM--PINN's depth error falls by roughly a factor of three, both with and without data guidance, whereas the strong-form PINNs change comparatively little. The ordering among the neural methods rearranges accordingly: in the stronger-shock regime the data-guided FVM--PINN overtakes the conservative PINN and approaches the primitive one, having been less accurate than both strong-form PINNs in the moderate-shock case. This is consistent with the view that the FVM--PINN's discrete-residual loss acts as a shock-capturing prior whose benefit grows with the strength of the discontinuities the network must represent, so its structural advantage is realised most clearly on strong dam-break fronts rather than on the slower flows of the present benchmark set.
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width=0.8\textwidth]{fig_sciml_shock.png}
+\includegraphics[width=0.8\textwidth]{fig_pinn_shock.png}
 \caption{\new{Shock-strength contrast on the dry-bed circular case: depth error at $g=2$ and $g=9.81$~m/s$^2$ (log scale).}}
-\label{fig:sciml_shock_fig}
+\label{fig:pinn_shock_fig}
 \end{figure}
 \end{newtext}
 

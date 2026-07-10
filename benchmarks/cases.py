@@ -188,7 +188,7 @@ def build_b4(
 
 # --------------------------------------------------------------------------
 # Coauthor-convention cases (CA*): reproduce the paper's own dam-break variants
-# under their exact setup so the SciML section overlaps the classical section.
+# under their exact setup so the PINN section overlaps the classical section.
 # Domain [0,100]^2, g=2, Gaussian-hump bed, reflective walls, t_end=2 s,
 # snapshots every 0.5 s (see reports/data_audit.md / paper Sect. 2.3).
 # --------------------------------------------------------------------------

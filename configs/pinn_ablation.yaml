@@ -1,0 +1,16 @@
+device: auto
+seeds: [0, 1, 2]
+entries:
+  - {name: fvm_pinn, kind: fvm}
+  - {name: fvm_pinn_data, kind: fvm, data: true}
+benchmarks:
+  - {id: ca_circular_dry, reference_n: 512, grid_n: 128}
+train:
+  iters: 12000
+  lr: 1.0e-3
+  n_collocation: 20000
+  n_ic: 4000
+  fvm_times: 41
+  fvm_nsub_max: 24
+  fvm_stochastic: true
+  n_gauge: 64
