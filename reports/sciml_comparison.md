@@ -52,7 +52,7 @@ The dry-bed case additionally isolates the data-guidance ablation:
 
 | method (ca_circular_dry) | L1(h) | drift |
 |---|---|---|
-| FVM-PINN (physics only) | 9020 | 0.41 |
+| FVM-PINN (physics only) | 9210 | 0.41 |
 | FVM-PINN + data (256 gauges) | 5670 | 0.14 |
 
 ## 2. Data-guidance recovery curve (ca_circular_dry, sparse gauges)
@@ -82,7 +82,7 @@ shock benchmark regime (g=2, ca_circular_dry):
 | classical HLLC | 380 | ~0 | 79 | ~0 |
 | PINN (primitive) | 1680 | 0.015 | 1120 | 0.026 |
 | PINN (conservative) | 2040 | 0.030 | 2410 | 0.185 |
-| FVM-PINN (physics only) | 9020 | 0.41 | 3080 | 0.152 |
+| FVM-PINN (physics only) | 9210 | 0.41 | 3080 | 0.152 |
 | FVM-PINN + data (256) | 5670 | 0.14 | 1950 | 0.112 |
 
 **Finding:** the FVM-PINN's error drops ~3× at the stronger shock (both with and

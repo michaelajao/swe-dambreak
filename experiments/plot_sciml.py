@@ -128,7 +128,7 @@ def fig_recovery() -> None:
 def fig_shock() -> None:
     """Paired log-scale bars: L1(h) at g=2 vs g=9.81 per neural method."""
     methods = ["PINN\nprim.", "PINN\ncons.", "FVM-PINN\n(physics)", "FVM-PINN\n+ data"]
-    g2 = [1680, 2040, 9020, 5670]
+    g2 = [1680, 2040, 9210, 5670]
     g981 = [1120, 2410, 3080, 1950]
     x = np.arange(len(methods))
     w = 0.36

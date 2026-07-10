@@ -1,6 +1,6 @@
-PWD c:\Users\ajaoo\Desktop\swe-dambreak\paper
+PWD C:\Users\ajaoo\Desktop\swe-dambreak\paper
 INPUT C:\Users\ajaoo\AppData\Local\MiKTeX\miktex\data\le\pdftex\pdflatex.fmt
-INPUT c:\Users\ajaoo\Desktop\swe-dambreak\paper\main.tex
+INPUT main.tex
 OUTPUT main.log
 INPUT C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex\latex\base\article.cls
 INPUT C:\Users\ajaoo\AppData\Local\Programs\MiKTeX\tex\latex\base\article.cls
