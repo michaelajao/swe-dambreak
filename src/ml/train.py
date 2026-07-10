@@ -9,11 +9,15 @@ from __future__ import annotations
 
 import csv
 import json
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable
 
+import matplotlib
 import torch
+
+matplotlib.use("Agg")  # headless backend: training runs on machines without a display
+import matplotlib.pyplot as plt
 
 
 @dataclass
@@ -113,11 +117,6 @@ def _write_history(out: Path, history: list[dict]) -> None:
 def _plot_curves(out: Path, history: list[dict]) -> None:
     if not history:
         return
-    import matplotlib
-
-    matplotlib.use("Agg")
-    import matplotlib.pyplot as plt
-
     its = [r["iter"] for r in history]
     comp_keys = [k for k in history[0]
                  if k not in ("iter",) and isinstance(history[0][k], float)]
@@ -125,8 +124,10 @@ def _plot_curves(out: Path, history: list[dict]) -> None:
     for k in comp_keys:
         ys = [r.get(k, float("nan")) for r in history]
         ax.semilogy(its, ys, label=k, lw=1.1)
-    ax.set_xlabel("iteration"); ax.set_ylabel("loss (log)")
-    ax.legend(fontsize=8); ax.grid(alpha=0.3)
+    ax.set_xlabel("iteration")
+    ax.set_ylabel("loss (log)")
+    ax.legend(fontsize=8)
+    ax.grid(alpha=0.3)
     fig.tight_layout()
     fig.savefig(out / "loss_curves.png", dpi=130)
     plt.close(fig)

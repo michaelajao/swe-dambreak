@@ -29,8 +29,8 @@ from data.reference import (
     initial_depth,
     load_run,
     node_coords,
+    run_qc,
 )
-from data.qc import run_qc
 
 ROOT = Path(__file__).resolve().parents[1]
 RAW = ROOT / "data" / "raw"

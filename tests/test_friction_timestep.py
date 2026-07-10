@@ -4,11 +4,9 @@ import math
 
 import torch
 
-from swe.constants import G
-from swe.friction import apply_friction
 from swe.grid import Grid
-from swe.state import conserved
-from swe.timestep import compute_dt, max_wave_speeds
+from swe.physics import apply_friction, compute_dt, max_wave_speeds
+from swe.state import G, conserved
 
 
 def test_friction_matches_pointwise_implicit_relation():

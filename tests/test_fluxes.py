@@ -4,9 +4,8 @@ differentiability."""
 import pytest
 import torch
 
-from swe.constants import G
-from swe.fluxes import FLUXES
-from swe.fluxes.common import physical_flux
+from swe.fluxes import FLUXES, physical_flux
+from swe.state import G
 
 ALL = list(FLUXES.items())
 

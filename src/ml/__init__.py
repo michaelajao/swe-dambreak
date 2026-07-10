@@ -1,7 +1,6 @@
 """Scientific-ML entries: strong-form PINNs and the FVM-informed PINN."""
 
-from .fvm_pinn import FVMPINN, FVMPINNConfig, FVMResidualSpec
-from .pinn import PINN, PINNConfig
+from .models import FVMPINN, FVMPINNConfig, FVMResidualSpec, PINN, PINNConfig
 from .train import TrainConfig, train
 
 __all__ = [

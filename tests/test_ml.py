@@ -2,15 +2,16 @@
 
 import torch
 
-from ml.fvm_pinn import (
+from ml.losses import Physics, pde_residual
+from ml.models import (
     FVMPINN,
     FVMPINNConfig,
     FVMResidualSpec,
+    PINN,
+    PINNConfig,
     fvm_residual_loss,
     ic_anchor_loss,
 )
-from ml.losses import Physics, pde_residual
-from ml.pinn import PINN, PINNConfig
 from ml.train import TrainConfig, train
 from swe.grid import TRANSMISSIVE, Grid
 from swe.solver import Config
@@ -113,7 +114,7 @@ def test_data_anchor_uses_same_reconstruction_as_predict_grid():
     """The gauge misfit must be measured on the network's actual (h,hu,hv),
     i.e. the same softplus depth and h*vel reparametrization as predict_grid.
     Feeding the model's own grid prediction as the target => ~zero loss."""
-    from ml.fvm_pinn import data_anchor_loss
+    from ml.models import data_anchor_loss
 
     grid, model, _, _ = _fvm_setup(n=16)
     model.cfg.vel_scale = 8.0  # exercise the bounded-velocity path

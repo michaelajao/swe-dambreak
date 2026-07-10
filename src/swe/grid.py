@@ -19,7 +19,7 @@ from typing import Literal
 
 import torch
 
-from .constants import DTYPE
+from .state import DTYPE
 
 BCType = Literal["transmissive", "reflective", "periodic"]
 

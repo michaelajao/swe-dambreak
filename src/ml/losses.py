@@ -13,7 +13,7 @@ from typing import Callable
 
 import torch
 
-from .pinn import PINN
+from .models import PINN
 
 
 @dataclass

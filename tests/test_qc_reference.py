@@ -1,4 +1,4 @@
-"""Tests for data.qc and data.reference on synthetic inputs."""
+"""Tests for the data.reference loaders and QC diagnostics on synthetic inputs."""
 
 from pathlib import Path
 
@@ -13,8 +13,9 @@ from data.reference import (
     node_coords,
     read_field,
     regrid,
+    run_qc,
+    symmetry_errors,
 )
-from data.qc import run_qc, symmetry_errors
 
 RAW = Path(__file__).resolve().parents[1] / "data" / "raw"
 

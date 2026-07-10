@@ -29,16 +29,15 @@ from benchmarks.cases import build                         # noqa: E402
 from experiments.metrics import (                          # noqa: E402
     Timer, field_errors, radial_front_position, relative_mass_drift, resample_to,
 )
-from ml.fvm_pinn import (                                   # noqa: E402
-    FVMPINN, FVMPINNConfig, FVMResidualSpec,
-    fvm_residual_loss, ic_anchor_loss, data_anchor_loss,
-)
 from ml.losses import Physics, ic_loss, mse, pde_residual  # noqa: E402
-from ml.pinn import PINN, PINNConfig                        # noqa: E402
+from ml.models import (                                     # noqa: E402
+    FVMPINN, FVMPINNConfig, FVMResidualSpec, PINN, PINNConfig,
+    data_anchor_loss, fvm_residual_loss, ic_anchor_loss,
+)
 from ml.train import TrainConfig, train                     # noqa: E402
+from swe.physics import compute_dt                          # noqa: E402
 from swe.solver import Config, run                          # noqa: E402
 from swe.state import primitives                            # noqa: E402
-from swe.timestep import compute_dt                         # noqa: E402
 
 REPORTS = ROOT / "reports"
 

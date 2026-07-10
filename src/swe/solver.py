@@ -19,15 +19,18 @@ from typing import Callable
 
 import torch
 
-from .constants import CFL_DEFAULT, G, H_EPS, THIN_FACTOR
-from .friction import apply_friction
 from .fluxes import FLUXES
 from .grid import NG, BoundaryConditions, Grid, apply_bc, pad_scalar
+from .physics import (
+    apply_friction,
+    centered_source,
+    compute_dt,
+    enforce_positivity,
+    hydrostatic_depths,
+    pressure_corrections,
+)
 from .reconstruction import LIMITERS, reconstruct_line
-from .state import primitives
-from .timestep import compute_dt
-from .wellbalance import centered_source, hydrostatic_depths, pressure_corrections
-from .wetdry import enforce_positivity
+from .state import CFL_DEFAULT, G, H_EPS, THIN_FACTOR, primitives
 
 
 @dataclass(frozen=True)

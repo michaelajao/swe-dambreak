@@ -4,8 +4,8 @@ symmetry, batching, differentiability."""
 import pytest
 import torch
 
-from swe.analytic import lake_at_rest
-from swe.constants import G
+from swe import analytic
+from swe.state import G
 from swe.grid import REFLECTIVE, TRANSMISSIVE, BoundaryConditions, Grid
 from swe.solver import Config, run, step, rhs
 from swe.state import conserved
@@ -24,8 +24,8 @@ def test_lake_at_rest_is_machine_still(scheme, order):
     validation script): velocities stay at machine precision over the bump."""
     cfg = make_1d_case(nx=200, scheme=scheme, order=order)
     x = cfg.grid.xc.unsqueeze(0)
-    z = lake_at_rest.bed(x)
-    h0 = lake_at_rest.initial_depth(x)
+    z = analytic.lake_bed(x)
+    h0 = analytic.lake_initial_depth(x)
     U = conserved(h0, torch.zeros_like(h0), torch.zeros_like(h0))
     out = run(cfg, U, z, t_end=2.0)
     Uf = out["U"][-1]

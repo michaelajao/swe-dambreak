@@ -24,9 +24,9 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import torch
 
-from swe.analytic import lake_at_rest, ritter, stoker
-from swe.constants import G
+from swe import analytic
 from swe.grid import REFLECTIVE, TRANSMISSIVE, Grid
+from swe.state import G
 from swe.solver import Config, run
 from swe.state import conserved
 
@@ -54,9 +54,9 @@ def dam_break_1d(N: int, wet: bool, scheme: str, order: int, limiter: str = "van
 def l1_errors(grid: Grid, U, wet: bool):
     x = grid.xc
     if wet:
-        h_ex, u_ex = stoker.solution(x, T_END, HL, HR, X0)
+        h_ex, u_ex = analytic.stoker_solution(x, T_END, HL, HR, X0)
     else:
-        h_ex, u_ex = ritter.solution(x, T_END, H0, X0)
+        h_ex, u_ex = analytic.ritter_solution(x, T_END, H0, X0)
     dx = grid.dx
     e_h = ((U[0, 0] - h_ex).abs().sum() * dx).item()
     e_hu = ((U[1, 0] - h_ex * u_ex).abs().sum() * dx).item()
@@ -65,7 +65,7 @@ def l1_errors(grid: Grid, U, wet: bool):
 
 def shock_position(grid: Grid, U) -> float:
     """Front of the Stoker shock: last downward crossing of (h_m + h_r)/2."""
-    h_m, _, _ = stoker.middle_state(HL, HR)
+    h_m, _, _ = analytic.stoker_middle_state(HL, HR)
     thresh = 0.5 * (h_m + HR)
     h = U[0, 0]
     above = (h > thresh).nonzero()
@@ -87,7 +87,7 @@ def refinement_table(wet: bool, scheme="hllc", configs=((1, "minmod"), (2, "van_
             e_h, e_hu = l1_errors(grid, Uf, wet)
             extra = {}
             if wet:
-                _, _, s = stoker.middle_state(HL, HR)
+                _, _, s = analytic.stoker_middle_state(HL, HR)
                 extra["shock_err"] = abs(shock_position(grid, Uf) - (X0 + s * T_END))
                 extra["dx"] = grid.dx
             errs.append({"N": N, "e_h": e_h, "e_hu": e_hu, **extra,
@@ -120,11 +120,11 @@ def fmt_table(rows, wet: bool) -> list[str]:
 
 def lake_at_rest_100s():
     N = 200
-    grid = Grid.from_extent(nx=N, ny=1, extent=(lake_at_rest.X_MIN, lake_at_rest.X_MAX, 0, 1))
+    grid = Grid.from_extent(nx=N, ny=1, extent=(analytic.LAKE_X_MIN, analytic.LAKE_X_MAX, 0, 1))
     cfg = Config(grid=grid, bc=REFLECTIVE, scheme="hllc", order=2)
     x = grid.xc.unsqueeze(0)
-    z = lake_at_rest.bed(x)
-    h0 = lake_at_rest.initial_depth(x)
+    z = analytic.lake_bed(x)
+    h0 = analytic.lake_initial_depth(x)
     U0 = conserved(h0, torch.zeros_like(h0), torch.zeros_like(h0))
     times = [float(t) for t in range(10, 101, 10)]
     out = run(cfg, U0, z, t_end=100.0, output_times=times)
@@ -174,7 +174,7 @@ def runtime_512(device: str, n_steps: int = 20) -> float:
     z_pad = None
     from swe.grid import pad_scalar
     from swe.solver import step
-    from swe.timestep import compute_dt
+    from swe.physics import compute_dt
 
     z_pad = pad_scalar(torch.zeros_like(h0), cfg.bc)
     dt = float(compute_dt(U, grid, cfg.g, cfg.cfl, cfg.h_eps))
@@ -196,10 +196,10 @@ def profile_figure():
         grid, Uf, _ = dam_break_1d(400, wet, "hllc", 2)
         x = grid.xc
         if wet:
-            h_ex, u_ex = stoker.solution(x, T_END, HL, HR, X0)
+            h_ex, u_ex = analytic.stoker_solution(x, T_END, HL, HR, X0)
             title = "Stoker (wet bed)"
         else:
-            h_ex, u_ex = ritter.solution(x, T_END, H0, X0)
+            h_ex, u_ex = analytic.ritter_solution(x, T_END, H0, X0)
             title = "Ritter (dry bed)"
         axes[0, col].plot(x, h_ex, "k-", lw=1, label="exact")
         axes[0, col].plot(x, Uf[0, 0], "C0.", ms=2.5, label="HLLC MUSCL N=400")
@@ -249,7 +249,7 @@ def main() -> None:
         for order, lim in [(1, "minmod"), (2, "minmod"), (2, "van_leer"), (2, "superbee")]:
             grid, Uf, _ = dam_break_1d(400, wet=True, scheme=scheme, order=order, limiter=lim)
             e_h, _ = l1_errors(grid, Uf, wet=True)
-            _, _, s = stoker.middle_state(HL, HR)
+            _, _, s = analytic.stoker_middle_state(HL, HR)
             serr = abs(shock_position(grid, Uf) - (X0 + s * T_END))
             cross[(scheme, order, lim)] = (e_h, serr / grid.dx)
 
