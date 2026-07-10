@@ -19,33 +19,41 @@ These reproduce the paper's Variant 3 (Circular) and Variant 1 (Step) exactly,
 so the neural comparison overlaps the classical section. `ca_circular_dry` sets
 the downstream depth to zero to expose the dry-bed FVM-PINN collapse.
 
-**ca_circular_wet (paper Variant 3)**
+Depth error L1(h) at t=2 s, mean over 3 seeds, across all six variants:
 
-| method | L1(h) | drift | notes |
+| Variant | classical | PINN prim. | PINN cons. | FVM-PINN |
+|---|---|---|---|---|
+| 1 Step | 248 | 1090 | 2190 | 8660 |
+| 2 Rectangular | 372 | 900 | 880 | 4980 |
+| 3 Circular | 391 | 1650 | 2490 | 12900 |
+| 4 Gaussian | 6.4 | 448 | 857 | 5140 |
+| 5 Parabolic | 707 | 2590 | 3150 | 13450 |
+| 6 Triangular | 369 | 1390 | 1850 | 8720 |
+
+Mass drift (max_t |V(t)/V(0)-1|):
+
+| Variant | PINN prim. | PINN cons. | FVM-PINN |
 |---|---|---|---|
-| classical HLLC–van Leer | 3.91e+02 | 0.0 | same-grid reference tier |
-| PINN (primitive) | 1.65e+03 ± 3.1e+01 | 7.5e-03 | best neural |
-| PINN (conservative) | 2.49e+03 ± 1.5e+02 | 3.8e-02 | |
-| FVM-PINN (physics only) | 1.29e+04 ± 6.7e+02 | 3.9e-01 | low-momentum collapse |
+| 1 Step | 0.002 | 0.019 | 0.046 |
+| 2 Rectangular | 0.013 | 0.026 | 0.276 |
+| 3 Circular | 0.008 | 0.038 | 0.390 |
+| 4 Gaussian | 0.003 | 0.030 | 0.540 |
+| 5 Parabolic | 0.008 | 0.063 | 0.460 |
+| 6 Triangular | 0.009 | 0.029 | 0.280 |
 
-**ca_step (paper Variant 1)**
+Across-IC reading: error tracks IC smoothness — the smooth Gaussian (V4) is far
+the easiest for every method (classical 6.4, primitive PINN 448), the curved
+parabolic band (V5) the hardest; primitive PINN beats conservative on every
+variant except the rectangular tie; the physics-only FVM-PINN is the least
+accurate neural model on every variant and drifts most (up to 0.54) — the
+low-momentum collapse, worst where the flow is most dynamic.
 
-| method | L1(h) | drift |
+The dry-bed case additionally isolates the data-guidance ablation:
+
+| method (ca_circular_dry) | L1(h) | drift |
 |---|---|---|
-| classical HLLC–van Leer | 2.48e+02 | 0.0 |
-| PINN (primitive) | 1.09e+03 ± 5.1e+01 | 1.7e-03 |
-| PINN (conservative) | 2.19e+03 ± 7.7e+02 | 1.9e-02 |
-| FVM-PINN (physics only) | 8.66e+03 ± 1.1e+03 | 4.6e-02 |
-
-**ca_circular_dry (dry downstream)**
-
-| method | L1(h) | drift |
-|---|---|---|
-| classical HLLC–van Leer | 3.80e+02 | ~1e-16 |
-| PINN (primitive) | 1.68e+03 ± 1.5e+02 | 1.5e-02 |
-| PINN (conservative) | 2.04e+03 ± 3.3e+02 | 3.0e-02 |
-| FVM-PINN (physics only) | 9.02e+03 ± 1.6e+02 | 4.1e-01 |
-| FVM-PINN + data (256 gauges) | 5.67e+03 ± 2.0e+02 | 1.4e-01 |
+| FVM-PINN (physics only) | 9020 | 0.41 |
+| FVM-PINN + data (256 gauges) | 5670 | 0.14 |
 
 ## 2. Data-guidance recovery curve (ca_circular_dry, sparse gauges)
 

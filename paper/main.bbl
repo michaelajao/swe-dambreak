@@ -161,74 +161,11 @@ Jingxiao Wu, Qiuhua Liang, Huili Chen, and Haoran Duan.
 \newblock SSRN preprint, abstract no. 5433524, 2025.
 \newblock Preprint posted September 2025.
 
-\bibitem{toro2009riemann}
-Eleuterio~F. Toro.
-\newblock {\em Riemann Solvers and Numerical Methods for Fluid Dynamics: A
-  Practical Introduction}.
-\newblock Springer, Berlin, Heidelberg, 3rd edition, 2009.
-
-\bibitem{rusanov1961calculation}
-Viktor~V. Rusanov.
-\newblock The calculation of the interaction of non-stationary shock waves and
-  obstacles.
-\newblock {\em Zhurnal Vychislitel'noi Matematiki i Matematicheskoi Fiziki},
-  1(2):267--279, 1961.
-\newblock English translation: USSR Computational Mathematics and Mathematical
-  Physics, 1(2):304--320, 1962.
-
-\bibitem{borges2008improved}
-Rafael Borges, Monique Carmona, Bruno Costa, and Wai~Sun Don.
-\newblock An improved weighted essentially non-oscillatory scheme for
-  hyperbolic conservation laws.
-\newblock {\em Journal of Computational Physics}, 227(6):3191--3211, 2008.
-
-\bibitem{xing2010positivity}
-Yulong Xing, Xiangxiong Zhang, and Chi-Wang Shu.
-\newblock Positivity-preserving high order well-balanced discontinuous
-  {Galerkin} methods for the shallow water equations.
-\newblock {\em Advances in Water Resources}, 33(12):1476--1493, 2010.
-
-\bibitem{stoker1957water}
-James~J. Stoker.
-\newblock {\em Water Waves: The Mathematical Theory with Applications}.
-\newblock Interscience Publishers, New York, 1957.
-
-\bibitem{delestre2013swashes}
-Olivier Delestre, Carine Lucas, Pierre-Antoine Ksinant, Fr{\'e}d{\'e}ric
-  Darboux, Christian Laguerre, Thi-Ngoc-Tuoi Vo, Fran{\c{c}}ois James, and
-  St{\'e}phane Cordier.
-\newblock {SWASHES}: A compilation of shallow water analytic solutions for
-  hydraulic and environmental studies.
-\newblock {\em International Journal for Numerical Methods in Fluids},
-  72(3):269--300, 2013.
-
-\bibitem{fennema1990explicit}
-Robert~J. Fennema and M.~Hanif Chaudhry.
-\newblock Explicit methods for 2-{D} transient free-surface flows.
-\newblock {\em Journal of Hydraulic Engineering}, 116(8):1013--1034, 1990.
-
-\bibitem{kawahara1986finite}
-Mutsuto Kawahara and Tomoyoshi Umetsu.
-\newblock Finite element method for moving boundary problems in river flow.
-\newblock {\em International Journal for Numerical Methods in Fluids},
-  6(6):365--386, 1986.
-
-\bibitem{soaresfrazao2007experimental}
-Sandra Soares-Fraz{\~a}o and Yves Zech.
-\newblock Experimental study of dam-break flow against an isolated obstacle.
-\newblock {\em Journal of Hydraulic Research}, 45(sup1):27--36, 2007.
-
 \bibitem{lu2021deeponet}
 Lu~Lu, Pengzhan Jin, Guofei Pang, Zhongqiang Zhang, and George~Em Karniadakis.
 \newblock Learning nonlinear operators via {DeepONet} based on the universal
   approximation theorem of operators.
 \newblock {\em Nature Machine Intelligence}, 3(3):218--229, 2021.
-
-\bibitem{wang2021pideeponet}
-Sifan Wang, Hanwen Wang, and Paris Perdikaris.
-\newblock Learning the solution operator of parametric partial differential
-  equations with physics-informed {DeepONets}.
-\newblock {\em Science Advances}, 7(40):eabi8605, 2021.
 
 \bibitem{li2021fourier}
 Zongyi Li, Nikola Kovachki, Kamyar Azizzadenesheli, Burigede Liu, Kaushik
@@ -239,13 +176,6 @@ Zongyi Li, Nikola Kovachki, Kamyar Azizzadenesheli, Burigede Liu, Kaushik
   2021.
 \newblock arXiv:2010.08895.
 
-\bibitem{kovachki2023neuraloperator}
-Nikola Kovachki, Zongyi Li, Burigede Liu, Kamyar Azizzadenesheli, Kaushik
-  Bhattacharya, Andrew Stuart, and Anima Anandkumar.
-\newblock Neural operator: Learning maps between function spaces with
-  applications to {PDEs}.
-\newblock {\em Journal of Machine Learning Research}, 24(89):1--97, 2023.
-
 \bibitem{li2024pino}
 Zongyi Li, Hongkai Zheng, Nikola Kovachki, David Jin, Haoxuan Chen, Burigede
   Liu, Kamyar Azizzadenesheli, and Anima Anandkumar.
@@ -253,44 +183,10 @@ Zongyi Li, Hongkai Zheng, Nikola Kovachki, David Jin, Haoxuan Chen, Burigede
   equations.
 \newblock {\em ACM/IMS Journal of Data Science}, 1(3):1--27, 2024.
 
-\bibitem{liu2026hydraulics}
-Xiaofeng Liu and Yong~G. Lai.
-\newblock Physics-informed deep operator learning for computational hydraulics
-  modeling, 2026.
-\newblock arXiv:2601.08086.
-
-\bibitem{keppler2025pinoswe}
-Robert Keppler, Julian Koch, and Rasmus Fensholt.
-\newblock Learning {2D} shallow water equations with physics-informed neural
-  operator networks.
-\newblock ESS Open Archive preprint, 2025.
-\newblock Preprint, posted 24 October 2025.
-
-\bibitem{secchi2026debrisflow}
-Mauricio Secchi, Antonio Pasculli, and Nicola Sciarra.
-\newblock Artificial intelligence for learning {2D} debris-flow dynamics:
-  Application of {Fourier} neural operators and synthetic data to a case study
-  in central italy.
-\newblock {\em Land}, 15(5):759, 2026.
-
 \bibitem{wang2026lgno}
 Hao Wang, Chi-Wang Shu, and Qi~Tang.
 \newblock {LGNO}: A local-global neural operator for hyperbolic conservation
   laws, 2026.
 \newblock arXiv:2606.18221.
-
-\bibitem{lu2026dcmawno}
-Yu~Lu, Ling Hong, and Jun Jiang.
-\newblock Capturing steep transitions in high-{Reynolds} fluid flows and rogue
-  wave systems via a dual-channel wavelet neural operator.
-\newblock {\em International Journal of Numerical Methods for Heat \& Fluid
-  Flow}, 36(5):2027--2062, 2026.
-
-\bibitem{kontolati2024latent}
-Katiana Kontolati, Somdatta Goswami, George~Em Karniadakis, and Michael~D.
-  Shields.
-\newblock Learning nonlinear operators in latent spaces for real-time
-  predictions of complex dynamics in physical systems.
-\newblock {\em Nature Communications}, 15:5101, 2024.
 
 \end{thebibliography}

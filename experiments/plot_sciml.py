@@ -65,12 +65,14 @@ COLORS = {
 
 def fig_across_ic() -> None:
     """Grouped log-scale bars: L1(h) at t=2 s across the six IC variants."""
+    # errors vs the coauthor MUSCL-Rusanov depth reference (128^2 eval grid);
+    # classical row is their HLL scheme (the classical accuracy floor).
     variants = ["Step", "Rect.", "Circular", "Gaussian", "Parabolic", "Triang."]
     data = {
-        "Classical HLLC": ([248, 372, 391, 6.4, 707, 369], COLORS["classical"]),
-        "PINN (primitive)": ([1090, 900, 1650, 448, 2590, 1390], COLORS["prim"]),
-        "PINN (conservative)": ([2190, 880, 2490, 857, 3150, 1850], COLORS["cons"]),
-        "FVM-PINN (physics)": ([8660, 4980, 12900, 5140, 13450, 8720], COLORS["fvm"]),
+        "Classical (HLL)": ([273, 147, 831, 49, 681, 500], COLORS["classical"]),
+        "PINN (primitive)": ([3000, 790, 1550, 332, 2670, 1150], COLORS["prim"]),
+        "PINN (conservative)": ([3230, 836, 2770, 601, 3130, 2140], COLORS["cons"]),
+        "FVM-PINN (physics)": ([11000, 4990, 13500, 5170, 13500, 8940], COLORS["fvm"]),
     }
     x = np.arange(len(variants))
     w = 0.2
@@ -82,7 +84,7 @@ def fig_across_ic() -> None:
     ax.set_ylabel(r"$L^1(h)$ at $t=2\,$s")
     ax.set_xticks(x)
     ax.set_xticklabels(variants)
-    ax.set_ylim(3, 4e4)
+    ax.set_ylim(30, 4e4)
     ax.legend(ncol=2, fontsize=8.5, framealpha=0.9)
     ax.grid(axis="x", alpha=0)
     fig.tight_layout()

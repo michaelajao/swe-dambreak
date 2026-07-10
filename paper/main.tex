@@ -99,8 +99,8 @@
 \title{\textcolor{black}{\textbf{Comparative Analysis of Numerical Schemes \new{and Physics-Informed Neural Networks} for Two-Dimensional Dam-Break Problems with Source Terms under Different Initial Dam Breaking Conditions
 }}}
 \author[1]{Zahra}
-\author[1]{M. Asif Farooq}
 \author[2]{\textcolor{red}{Michael Ajao-Olarinoye}}
+\author[1]{M. Asif Farooq}
 \author[1]{Firdos Khan}
 \affil[1]{Department of Mathematics, School of Natural Sciences (SNS), National University of Sciences and Technology (NUST), Islamabad, Pakistan\newline
 zahrasamad1998@gmail.com (zahra), asiffarooq.2007@gmail.com (M. Asif Farooq),
@@ -146,7 +146,7 @@ The contributions of this work are:
   \item A quantitative comparison of all methods with respect to accuracy against the reference solutions, conservation, shock-front position error, and computational cost.
 \end{enumerate}
 
-The remainder of the paper is organized as follows. Section 2 reviews related work. Section 3 presents the governing equations, the classical numerical schemes, the benchmark initial conditions, and the neural network formulations. Section 4 reports results for the classical schemes and the SciML comparison. Section 5 discusses implications and limitations, and Section 6 concludes.
+The remainder of the paper is organized as follows. Section 2 presents the governing equations, the classical numerical schemes, the benchmark initial conditions, and the neural network formulations. Section 3 reports results for the classical schemes across the six dam-break variants, compares them with the neural formulations, and discusses the implications and limitations. Section 4 concludes.
 \end{comment}
 
 % ---- Standalone Related Work section: COMMENTED OUT ----
@@ -1005,6 +1005,7 @@ where $\mathcal{L}_{\mathrm{pde}}$ is the mean squared PDE residual, $\mathcal{L
   \fill[black!40] (0,0,3.4) circle (0.9pt); \node[right, font=\footnotesize] at (0.2,0,3.4) {collocation ($\mathcal{L}_\mathrm{pde}$)};
   \fill[blue!70] (0,0,2.5) circle (1.0pt); \node[right, font=\footnotesize] at (0.2,0,2.5) {$t{=}0$ ($\mathcal{L}_\mathrm{ic}$)};
   \node[star, star points=5, star point ratio=2.3, fill=red!85, inner sep=1.1pt] at (0,0,1.6) {}; \node[right, font=\footnotesize] at (0.2,0,1.6) {gauges ($\mathcal{L}_\mathrm{data}$)};
+  \draw[green!45!black, thick] (0,0,0.7) circle (0.09); \node[right, font=\footnotesize] at (0.2,0,0.7) {initial dam front};
 \end{scope}
 \end{tikzpicture}
 \caption{\new{Space-time sampling of the training points over the domain and time horizon.}}
@@ -1045,7 +1046,7 @@ where $\mathcal{L}_{\mathrm{pde}}$ is the mean squared PDE residual, $\mathcal{L
 \draw[->] (uvw)--(ad); \draw[->] (ad)--(res); \draw[->] (res)--(lpde);
 \draw[->] (uvw.south) |- (lic.west);
 \draw[->] (lpde)--(tot);
-\draw[->] (lic) -| (tot);
+\draw[->] (lic.east) -- (lic.east -| tot.west);
 \draw[->, dashed, red!65] (tot.south) -- ++(0,-9mm) coordinate (bl) -| (netg.south west);
 \node[glab, below] at (bl -| lic) {backprop $\nabla_\theta\mathcal{L}$};
 \end{tikzpicture}}
@@ -1118,22 +1119,27 @@ Figure~\ref{fig:fvmpinn} shows the complete training loop: the shared network pr
 \node[solv, right=3mm of hllc] (rk) {SSP--\\RK2};
 \node[grp, fit=(rec)(rk), label={[glab]below:differentiable step $\mathcal{S}_{\Delta t}$}] (solvg) {};
 % ===== losses =====
-\node[loss, right=22mm of state] (lfvm) {$\mathcal{L}_\mathrm{fvm}=\big\lVert U_\theta(t_{k+1})-\mathcal{S}_{\Delta t}(U_\theta(t_k))\big\rVert^2$};
+\node[loss, right=42mm of state] (lfvm) {$\mathcal{L}_\mathrm{fvm}=\big\lVert U_\theta(t_{k+1})-\mathcal{S}_{\Delta t}(U_\theta(t_k))\big\rVert^2$};
 \node[loss, above=3mm of lfvm] (lic) {$\mathcal{L}_\mathrm{ic}$};
-\node[loss, below=3mm of lfvm] (ldata) {$\mathcal{L}_\mathrm{data}$ (optional)};
+\node[loss, above=3mm of lic] (ldata) {$\mathcal{L}_\mathrm{data}$ (optional)};
 \node[box, fill=red!18, right=8mm of lfvm] (tot) {$\mathcal{L}$};
 % ===== arrows =====
 \draw[->] (netg.east) -- ++(3mm,0) |- (rep.west);
 \draw[->] (rep) -- (state);
 \draw[->] (state.south) -- (solvg.north) node[ann, pos=0.5, right] {$U_\theta(t_k)$};
 \draw[->] (rec)--(hyd); \draw[->] (hyd)--(hllc); \draw[->] (hllc)--(rk);
-\draw[->] (rk.east) -| ([xshift=-20mm]lfvm.south);
-\draw[->] (state.east) -- (lfvm.west) node[ann, midway, above] {$U_\theta(t_{k+1})$};
+% solver output enters L_fvm from below; nothing sits under L_fvm so no crossings
+\draw[->] (rk.east) -| ([xshift=-8mm]lfvm.south);
+\draw[->] (state.east) -- (lfvm.west) node[ann, pos=0.3, above] {$U_\theta(t_{k+1})$};
+% shared upward bus feeds the two extra loss terms, clear of the box and the line
+\coordinate (br) at ($(state.east)!0.42!(lfvm.west)$);
+\draw[->] (br) |- (lic.west) node[ann, pos=0.68, above] {$U_\theta(0)$};
+\draw[->] (br) |- (ldata.west) node[ann, pos=0.62, above] {$U_\theta(\mathbf{x}_g,t_g)$};
 \draw[->] (lic.east) -| (tot.north);
 \draw[->] (lfvm.east) -- (tot.west);
-\draw[->] (ldata.east) -| (tot.south);
-\draw[->, dashed, red!65] (tot.north) |- ($(netg.north)+(0,10mm)$)
-  node[glab, midway, above] {backprop $\nabla_\theta\mathcal{L}$ through the differentiable solver} -| (netg.north);
+\draw[->] (ldata.east) -| (tot.north);
+\draw[->, dashed, red!65] (tot.east) -- ++(5mm,0) |- ($(netg.north)+(0,10mm)$)
+  node[glab, midway, above] {backprop $\nabla_\theta\mathcal{L}$ through the differentiable solver} -| ([xshift=-22mm]netg.north);
 \end{tikzpicture}}
 \caption{\new{FVM-informed PINN architecture and training loop.}}
 \label{fig:fvmpinn}
@@ -1145,10 +1151,8 @@ Both families use $\tanh$ networks. The strong-form PINNs have six hidden layers
 
 The neural models are evaluated across the initial-condition variants of Sect.~2.3, under the same domain, bed topography, and boundary conventions as the classical schemes, so that the neural results extend the classical comparison matrix along its initial-condition axis. A dry-bed circular case, in which the downstream depth is set to zero, is added to probe the low-momentum collapse of the physics-only finite-volume loss and the effect of sparse-data guidance. For each case a fine-grid solution computed with the differentiable HLLC solver of Sect.~2.2 serves as the reference; it is resampled onto the evaluation grid and compared with the network prediction at the output times $t\in\{0.5, 1.0, 1.5, 2.0\}$~s using:
 \begin{itemize}
-  \item discrete $L^1$ and $L^2$ errors of the water depth $h$ and of the velocity magnitude, integrated over cell areas;
-  \item relative mass drift $\max_t\,\lvert V(t)/V(0)-1\rvert$, where $V(t)$ is the total water volume, quantifying conservation;
-  \item shock-front position error: the mean radius of the outermost depth-threshold crossing for radially spreading fronts, and the rightmost threshold crossing for planar fronts;
-  \item wall-clock time for training and inference, compared with the runtime of the classical schemes.
+  \item the discrete $L^1$ error of the water depth $h$, integrated over cell areas and reported as the mean over the three seeds;
+  \item relative mass drift $\max_t\,\lvert V(t)/V(0)-1\rvert$, where $V(t)$ is the total water volume, quantifying conservation.
 \end{itemize}
 \end{newtext}
 
@@ -1234,22 +1238,22 @@ The propagating waves that come from the triangular vertices interact with each 
 % are being finalised; their rows are marked pending below.
 \subsection{SciML Comparison Across Initial Dam-Breaking Conditions}
 
-This section extends the comparison of Sects.~4.1--4.6 with the neural formulations, evaluated over all six initial-condition variants under the same domain, bed topography, and boundary conventions. For each case the reference is a fine-grid solution of the differentiable HLLC solver, resampled onto the $128\times128$ evaluation grid; errors are the depth $L^1(h)$ at the final time $t=2$~s, averaged over three seeds. Table~\ref{tab:sciml_main} reports accuracy across the six variants and Table~\ref{tab:sciml_drift} the corresponding relative mass drift, with the classical HLLC scheme at the same resolution as the accuracy-per-cost reference tier.
+This section extends the comparison of Sects.~3.1--3.6 with the neural formulations, evaluated over all six initial-condition variants under the same domain, bed topography, and boundary conventions. For the six benchmark variants the reference is the MUSCL--Rusanov depth solution of Sects.~3.1--3.6 -- the most accurate of the classical schemes considered here -- bilinearly resampled from its $501\times501$ grid onto the $128\times128$ evaluation grid; errors are the depth $L^1(h)$ at the final time $t=2$~s, averaged over three seeds. The classical baseline row of Table~\ref{tab:sciml_main} is the HLL scheme against the same reference (MUSCL--Rusanov itself defines the reference and is therefore omitted), so it reports the accuracy floor spanned by the classical schemes and every neural model is measured against the identical reference. To confirm that the neural training pipeline is consistent with this reference, the differentiable HLLC solver used to build the collocation losses and the ablation references below was reconciled against the classical circular solution in matched configuration and agrees to within $0.17\%$ relative $L^1$. Table~\ref{tab:sciml_main} reports accuracy across the six variants and Table~\ref{tab:sciml_drift} the corresponding relative mass drift, the latter computed from each method's own predicted volume and hence independent of the reference.
 
 \begin{table}[h!]
 \centering
-\caption{Depth error $L^1(h)$ at $t=2$~s for each method across the six initial-condition variants. Neural entries are the mean over three seeds; the classical HLLC row is at the same $128\times128$ evaluation resolution.}
+\caption{Depth error $L^1(h)$ at $t=2$~s (integrated over cell areas) for each method across the six initial-condition variants, measured against the MUSCL--Rusanov reference resampled to the $128\times128$ evaluation grid. Neural entries are the mean over three seeds; the classical column is the HLL scheme at the same resolution, giving the classical accuracy floor.}
 \label{tab:sciml_main}
 \begin{tabular}{lcccc}
 \hline
-\textbf{Variant} & Classical & PINN (prim.) & PINN (cons.) & FVM--PINN \\
+\textbf{Variant} & Classical (HLL) & PINN (prim.) & PINN (cons.) & FVM--PINN \\
 \hline
-1 Step & 248 & 1090 & 2190 & 8660 \\
-2 Rectangular & 372 & 900 & 880 & 4980 \\
-3 Circular & 391 & 1650 & 2490 & 12900 \\
-4 Gaussian & 6.4 & 448 & 857 & 5140 \\
-5 Parabolic & 707 & 2590 & 3150 & 13450 \\
-6 Triangular & 369 & 1390 & 1850 & 8720 \\
+1 Step & 273 & 3000 & 3230 & 11000 \\
+2 Rectangular & 147 & 790 & 836 & 4990 \\
+3 Circular & 831 & 1550 & 2770 & 13500 \\
+4 Gaussian & 49 & 332 & 601 & 5170 \\
+5 Parabolic & 681 & 2670 & 3130 & 13500 \\
+6 Triangular & 500 & 1150 & 2140 & 8940 \\
 \hline
 \end{tabular}
 \end{table}
@@ -1279,7 +1283,7 @@ This section extends the comparison of Sects.~4.1--4.6 with the neural formulati
 \label{fig:sciml_bars}
 \end{figure}
 
-Three observations hold across the initial-condition matrix. First, the error tracks the smoothness of the initial data: the smooth Gaussian mound (Variant~4) is by far the easiest case for every method -- the classical scheme reaches $L^1(h)=6.4$ and the primitive PINN $448$, an order of magnitude below the other variants -- whereas the thin curved parabolic band (Variant~5) is the hardest, and the discontinuous step, circular, and triangular columns fall in between. Second, among the strong-form networks the primitive formulation is more accurate than the conservative one on every variant except the rectangular column, where the two are comparable; writing the residual directly on the conserved variables did not help in this setting. Third, the physics-only FVM--PINN is the least accurate neural model on every variant and drifts the most (up to $0.5$), the low-momentum collapse documented by Liu~\cite{liu2026fvmpinn}: the network settles into a slowly varying, nearly static state that is self-consistent under the discrete solver step and matches the initial condition, yet fails to reproduce the true wave propagation. The collapse is most severe precisely where the flow is most dynamic. The dry-bed case and the shock-strength contrast below examine this collapse and the conditions under which it is removed.
+Three observations hold across the initial-condition matrix. First, the error tracks the smoothness of the initial data: the smooth Gaussian mound (Variant~4) is by far the easiest case for every method -- the classical HLL floor is $L^1(h)=49$ and the primitive PINN reaches $332$, well below the other variants -- whereas the thin curved parabolic band (Variant~5) is the hardest, and the discontinuous step, circular, and triangular columns fall in between. Second, among the strong-form networks the primitive formulation is more accurate than the conservative one on every variant except the rectangular column, where the two are comparable; writing the residual directly on the conserved variables did not help in this setting. Third, the physics-only FVM--PINN is the least accurate neural model on every variant and drifts the most (up to $0.5$), the low-momentum collapse documented by Liu~\cite{liu2026fvmpinn}: the network settles into a slowly varying, nearly static state that is self-consistent under the discrete solver step and matches the initial condition, yet fails to reproduce the true wave propagation. The collapse is most severe precisely where the flow is most dynamic. The dry-bed case and the shock-strength contrast below examine this collapse and the conditions under which it is removed.
 
 \begin{figure}[h!]
 \centering
@@ -1326,7 +1330,7 @@ Adding the sparse-data term of \cref{eq:pinnloss} to the FVM--PINN loss steadily
 
 \subsubsection{Effect of shock strength}
 
-The benchmark configuration of Sect.~2.3 ($g=2$~m/s$^2$, $t\le 2$~s) produces comparatively slow waves and moderate shocks, a regime in which the strong-form PINN's characteristic weakness, the smearing of sharp fronts, is only mildly exercised. To probe whether the ordering depends on shock strength, the circular dry-bed case was repeated at $g=9.81$~m/s$^2$, which produces a substantially stronger shock over the same interval. Table~\ref{tab:sciml_shock} contrasts the two regimes.
+The benchmark configuration of Sect.~2.3 ($g=2$~m/s$^2$, $t\le 2$~s) produces comparatively slow waves and moderate shocks, a regime in which the strong-form PINN's characteristic weakness, the smearing of sharp fronts, is only mildly exercised. To probe whether the ordering depends on shock strength, the circular dry-bed case was repeated in a deliberately stronger-shock configuration ($g=9.81$~m/s$^2$, a tighter column of radius $R=11$~m on a flat bed, evaluated at $t=1.2$~s). This departs from the benchmark conventions of Sect.~2.3 precisely to isolate the effect of shock strength; because both regimes are ablations of the dry-bed circular case with no classical reference in the benchmark set, the reference here is a fine-grid HLLC self-convergence solution rather than the MUSCL--Rusanov data used in Table~\ref{tab:sciml_main}. Table~\ref{tab:sciml_shock} contrasts the two regimes.
 
 \begin{table}[h!]
 \centering
@@ -1356,15 +1360,15 @@ The effect is pronounced. As the shock strengthens, the FVM--PINN's depth error 
 \end{newtext}
 
 \begin{newtext}
-\section{Discussion}
+\subsection{Discussion}
 
 The comparison places three neural formulations against classical finite-volume schemes on identical dam-break problems, and the results temper the common expectation that embedding discrete structure into the loss automatically yields a better solver.
 
-\paragraph{Classical schemes remain the accuracy-per-cost reference.} No neural method approaches the classical HLLC error at the training budget used here; a single solver run is both faster and more accurate than training any of the networks for one instance. The value proposition of the neural models is therefore not accuracy but the mesh-free, differentiable, space-time representation they provide, together with the amortisation of inference once training is paid for.
+\paragraph{Classical schemes remain the accuracy-per-cost reference.} No neural method approaches the classical finite-volume error at the training budget used here; a single solver run is both faster and more accurate than training any of the networks for one instance. The value proposition of the neural models is therefore not accuracy but the mesh-free, differentiable, space-time representation they provide, together with the amortisation of inference once training is paid for.
 
 \paragraph{Formulation matters more than expected among strong-form PINNs.} The primitive $(h,u,v)$ formulation outperformed the conservative $(h,hu,hv)$ one on every case. Although the conservative form is the one in which the weak solution is defined, its residual couples the momentum components multiplicatively through the flux, which appears to make the optimisation harder here without a compensating accuracy gain at these weak shocks.
 
-\paragraph{Discrete structure is not a free lunch.} The FVM--PINN inherits discrete conservation and well-balancing \emph{only if} its predicted trajectory actually minimises the discrete residual along the true solution. Trained on physics alone it instead finds a spurious low-momentum trajectory that also satisfies the residual, and collapses. Sparse data removes this failure mode in a controlled, monotone way, but in the moderate-shock regime of the present benchmarks even the data-guided FVM--PINN does not overtake the far simpler primitive PINN. The shock-strength contrast of Sect.~4.7.3 clarifies why: as the shock strengthens the FVM--PINN's error falls by about a factor of three and the data-guided variant climbs past the conservative PINN, so the discrete-residual structure behaves as a shock-capturing prior whose benefit is realised on strong fronts rather than on the slower flows of these benchmarks. This makes the FVM--PINN's standing regime-dependent rather than uniformly weak.
+\paragraph{Discrete structure is not a free lunch.} The FVM--PINN inherits discrete conservation and well-balancing \emph{only if} its predicted trajectory actually minimises the discrete residual along the true solution. Trained on physics alone it instead finds a spurious low-momentum trajectory that also satisfies the residual, and collapses. Sparse data removes this failure mode in a controlled, monotone way, but in the moderate-shock regime of the present benchmarks even the data-guided FVM--PINN does not overtake the far simpler primitive PINN. The shock-strength contrast of Sect.~3.7.3 clarifies why: as the shock strengthens the FVM--PINN's error falls by about a factor of three and the data-guided variant climbs past the conservative PINN, so the discrete-residual structure behaves as a shock-capturing prior whose benefit is realised on strong fronts rather than on the slower flows of these benchmarks. This makes the FVM--PINN's standing regime-dependent rather than uniformly weak.
 
 \paragraph{Limitations.} The neural models are trained per instance and do not generalise across scenarios; cross-scenario generalisation is the province of operator learning \cite{lu2021deeponet,li2021fourier,li2024pino}, the natural next step for this differentiable solver. The setting is also idealised ($n=0$, reflective walls, the benchmark value $g=2$~m/s$^2$ of Sect.~2.3), and the references are grid-bound fine solutions rather than analytic ones. Finally, the training budget was fixed across methods for fairness rather than tuned per method, so the absolute neural errors should be read as characteristic of a modest budget rather than as best-achievable.
 \end{newtext}

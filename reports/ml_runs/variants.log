@@ -1,0 +1,63 @@
+device=cuda
+
+=== ca_rectangular: reference N=512, eval N=128 ===
+  classical HLLC-vanleer @N=128: L1_h=3.724e+02
+  pinn_primitive/ca_rectangular/seed0: L1_h=1.018e+03 drift=2.87e-02 train=564.7s
+  pinn_primitive/ca_rectangular/seed1: L1_h=7.916e+02 drift=7.31e-03 train=526.2s
+  pinn_primitive/ca_rectangular/seed2: L1_h=9.021e+02 drift=3.62e-03 train=521.1s
+  pinn_conservative/ca_rectangular/seed0: L1_h=9.493e+02 drift=3.13e-02 train=446.6s
+  pinn_conservative/ca_rectangular/seed1: L1_h=8.289e+02 drift=3.09e-02 train=451.6s
+  pinn_conservative/ca_rectangular/seed2: L1_h=8.626e+02 drift=1.60e-02 train=453.4s
+    [fvm] dt_cfl=0.09882, dt_interval=0.05, n_sub=1
+  fvm_pinn/ca_rectangular/seed0: L1_h=4.940e+03 drift=2.83e-01 train=634.1s
+    [fvm] dt_cfl=0.09882, dt_interval=0.05, n_sub=1
+  fvm_pinn/ca_rectangular/seed1: L1_h=4.958e+03 drift=2.51e-01 train=626.8s
+    [fvm] dt_cfl=0.09882, dt_interval=0.05, n_sub=1
+  fvm_pinn/ca_rectangular/seed2: L1_h=5.052e+03 drift=2.94e-01 train=633.4s
+
+=== ca_gaussian: reference N=512, eval N=128 ===
+  classical HLLC-vanleer @N=128: L1_h=6.357e+00
+  pinn_primitive/ca_gaussian/seed0: L1_h=4.397e+02 drift=3.14e-03 train=528.4s
+  pinn_primitive/ca_gaussian/seed1: L1_h=4.323e+02 drift=2.55e-03 train=524.5s
+  pinn_primitive/ca_gaussian/seed2: L1_h=4.717e+02 drift=3.74e-03 train=522.9s
+  pinn_conservative/ca_gaussian/seed0: L1_h=7.003e+02 drift=1.84e-02 train=448.5s
+  pinn_conservative/ca_gaussian/seed1: L1_h=1.262e+03 drift=5.88e-02 train=449.1s
+  pinn_conservative/ca_gaussian/seed2: L1_h=6.095e+02 drift=1.31e-02 train=449.9s
+    [fvm] dt_cfl=0.06993, dt_interval=0.05, n_sub=1
+  fvm_pinn/ca_gaussian/seed0: L1_h=5.213e+03 drift=5.62e-01 train=626.1s
+    [fvm] dt_cfl=0.06993, dt_interval=0.05, n_sub=1
+  fvm_pinn/ca_gaussian/seed1: L1_h=5.022e+03 drift=5.07e-01 train=642.3s
+    [fvm] dt_cfl=0.06993, dt_interval=0.05, n_sub=1
+  fvm_pinn/ca_gaussian/seed2: L1_h=5.170e+03 drift=5.62e-01 train=609.4s
+
+=== ca_parabolic: reference N=512, eval N=128 ===
+  classical HLLC-vanleer @N=128: L1_h=7.066e+02
+  pinn_primitive/ca_parabolic/seed0: L1_h=2.566e+03 drift=5.24e-03 train=527.3s
+  pinn_primitive/ca_parabolic/seed1: L1_h=2.536e+03 drift=8.19e-03 train=521.1s
+  pinn_primitive/ca_parabolic/seed2: L1_h=2.672e+03 drift=1.03e-02 train=520.8s
+  pinn_conservative/ca_parabolic/seed0: L1_h=3.174e+03 drift=5.36e-02 train=446.8s
+  pinn_conservative/ca_parabolic/seed1: L1_h=3.061e+03 drift=6.36e-02 train=447.4s
+  pinn_conservative/ca_parabolic/seed2: L1_h=3.217e+03 drift=7.23e-02 train=446.1s
+    [fvm] dt_cfl=0.06988, dt_interval=0.05, n_sub=1
+  fvm_pinn/ca_parabolic/seed0: L1_h=1.356e+04 drift=4.43e-01 train=603.1s
+    [fvm] dt_cfl=0.06988, dt_interval=0.05, n_sub=1
+  fvm_pinn/ca_parabolic/seed1: L1_h=1.339e+04 drift=5.26e-01 train=614.8s
+    [fvm] dt_cfl=0.06988, dt_interval=0.05, n_sub=1
+  fvm_pinn/ca_parabolic/seed2: L1_h=1.340e+04 drift=4.20e-01 train=607.0s
+
+=== ca_triangular: reference N=512, eval N=128 ===
+  classical HLLC-vanleer @N=128: L1_h=3.691e+02
+  pinn_primitive/ca_triangular/seed0: L1_h=1.366e+03 drift=5.67e-03 train=527.7s
+  pinn_primitive/ca_triangular/seed1: L1_h=1.526e+03 drift=9.50e-03 train=522.7s
+  pinn_primitive/ca_triangular/seed2: L1_h=1.281e+03 drift=1.11e-02 train=519.4s
+  pinn_conservative/ca_triangular/seed0: L1_h=2.125e+03 drift=2.85e-02 train=443.4s
+  pinn_conservative/ca_triangular/seed1: L1_h=1.752e+03 drift=3.88e-02 train=445.6s
+  pinn_conservative/ca_triangular/seed2: L1_h=1.679e+03 drift=2.14e-02 train=443.6s
+    [fvm] dt_cfl=0.06988, dt_interval=0.05, n_sub=1
+  fvm_pinn/ca_triangular/seed0: L1_h=8.279e+03 drift=2.77e-01 train=584.2s
+    [fvm] dt_cfl=0.06988, dt_interval=0.05, n_sub=1
+  fvm_pinn/ca_triangular/seed1: L1_h=8.912e+03 drift=2.17e-01 train=575.6s
+    [fvm] dt_cfl=0.06988, dt_interval=0.05, n_sub=1
+  fvm_pinn/ca_triangular/seed2: L1_h=8.982e+03 drift=3.51e-01 train=579.0s
+
+wrote reports/sciml_comparison.md
