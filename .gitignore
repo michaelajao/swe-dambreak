@@ -7,10 +7,10 @@ __pycache__/
 build/
 dist/
 
-# Data — raw reference outputs are large and external; keep out of git
-data/raw/
-data/cache/
-data/CSV_FILE_h/
+# Data — raw reference outputs are large and external; keep out of git.
+# The whole tree, not just the known subfolders: a fresh drop landing loose in
+# data/ is ~6 MB per snapshot and must not be committable by accident.
+data/
 
 # Experiment outputs
 runs/
@@ -27,3 +27,6 @@ paper/*.aux
 paper/*.log
 paper/*.out
 paper/*.synctex.gz
+
+# Transient run logs — curated copies live in reports/ml_runs/
+logs/
