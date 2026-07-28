@@ -3,7 +3,7 @@
 Setup: [0,100]^2 m, g = 2.0, Gaussian hump bed, reflective walls, T = 2 s. Their run: 501x501 nodes; ours: 500x500 cell centers (their nodes bilinearly sampled onto our centers). Comparison field: free surface eta.
 
 
-## HLL first-order (matched) — 137 steps, 1.1 s wall (cuda)
+## HLL first-order (matched) — 137 steps, 2.1 s wall (cuda)
 
 | t [s] | L1 | L2 | Linf | rel. L1 |
 |---|---|---|---|---|
@@ -12,7 +12,7 @@ Setup: [0,100]^2 m, g = 2.0, Gaussian hump bed, reflective walls, T = 2 s. Their
 | 1.5 | 3.1813e-03 | 9.7638e-03 | 1.5388e-01 | 0.16% |
 | 2 | 3.1348e-03 | 8.9001e-03 | 1.3942e-01 | 0.17% |
 
-## HLLC MUSCL-van Leer (ours, better) — 139 steps, 1.8 s wall (cuda)
+## HLLC MUSCL-van Leer (ours, better) — 139 steps, 2.3 s wall (cuda)
 
 | t [s] | L1 | L2 | Linf | rel. L1 |
 |---|---|---|---|---|

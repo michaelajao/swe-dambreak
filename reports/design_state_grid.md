@@ -131,7 +131,7 @@ conversion of whatever it is given.
   (adaptive stepping is inherently data-dependent); for the FVM-PINN loss dt is a
   *fixed input*, so the differentiable path never touches the reduction.
 
-## 6. Phase 0 note — reference data (already in `data/raw/`)
+## 6. Phase 0 note — reference data (already in `data/`)
 
 Inventory so far: 6 IC variants (step, rectangular, circular, Gaussian, parabolic,
 triangular) × 3 schemes (HLL, Lax–Wendroff, MUSCL-"RS") × 5 snapshots

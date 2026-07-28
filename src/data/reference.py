@@ -1,8 +1,7 @@
-"""Loaders, case definitions, and QC diagnostics for the reference solver
-outputs in ``data/raw/``.
+"""Loaders, case definitions, and QC diagnostics for the reference solver outputs.
 
-Observed layout (2026-07-03 drop):
-    data/raw/Variant <k> <Name> Dam-Break/solution_outputs_<ic>_numerical_<SCHEME>/<stem>_t<time>.csv
+Layout:
+    data/Variant <k> <Name> Dam-Break/solution_outputs_<ic>_numerical_<SCHEME>/h_t<time>.csv
 
 Conventions (from the paper draft, paper/main.tex, cross-checked
 numerically against the t=0 snapshots — see reports/data_audit.md):
@@ -10,19 +9,20 @@ numerically against the t=0 snapshots — see reports/data_audit.md):
     - g = 2 m/s^2 (sic), Manning n = 0
     - bed: Gaussian hump Z = 2 exp(-((x-50)^2 + (y-50)^2)/200)
     - reflective boundaries on all four sides (closed domain)
-    - the stored field is the FREE SURFACE eta = h + Z, one snapshot per file
+    - the stored field is the WATER DEPTH h, one snapshot per file
     - snapshot times 0.0, 0.5, 1.0, 1.5, 2.0 s parsed from filenames
     - schemes: LW (+artificial viscosity), HLL, MUSCL(minmod)+Rusanov+SSP-RK3
 No momentum fields are present in the drop.
 
-2026-07-08 correction from the solver authors: the ``data/raw`` files are the
-free surface eta = h + Z (plotting field); the actual SWE output is the water
-depth h, supplied separately in ``data/CSV_FILE_h/`` (same layout, filenames
-``h_t*.csv``). Verified: the HLL and MUSCL-RS depth files equal ``raw - Z`` to
-~1e-15, so those runs are unchanged; only the LW files were genuinely
-re-computed (see reports/data_audit.md addendum). Our PINN comparison is
-unaffected (analytic depth ICs + our own HLLC reference), and the reconciliation
-error is invariant to the eta/h choice.
+On the stored field. The original 2026-07-03 drop stored the free surface
+eta = h + Z; on 2026-07-08 the solver authors clarified that eta is only their
+plotting field and that the SWE output proper is the depth h, which they then
+supplied. The depth drop is now the single source of truth here and the surface
+drop has been retired: eta is recovered analytically via :meth:`ReferenceRun.eta`
+(the two agree to ~1e-15, which is how the drops were cross-checked). Nothing
+downstream changed as a result -- the PINN comparison always used analytic depth
+ICs and our own HLLC reference, and the reconciliation error is invariant to the
+eta/h choice, since the two differ by a time-independent field.
 
 Everything is returned as float64 torch tensors per the project convention.
 """
@@ -42,6 +42,11 @@ G_REF: float = 2.0
 N_NODES: int = 501
 DX: float = 0.2
 SNAPSHOT_TIMES = (0.0, 0.5, 1.0, 1.5, 2.0)
+
+# The one place the reference drop's location is defined. Consumers import this
+# rather than each rebuilding `ROOT / "data" / ...`, which is how the eta and
+# depth drops came to be addressed by two different hard-coded paths.
+DATA_ROOT: Path = Path(__file__).resolve().parents[2] / "data"
 
 _TIME_RE = re.compile(r"_t(\d+(?:\.\d+)?)\.csv$")
 _SCHEME_RE = re.compile(r"numerical_([A-Za-z]+)$")
@@ -110,13 +115,13 @@ def initial_depth(variant: int, X: torch.Tensor, Y: torch.Tensor) -> torch.Tenso
 
 @dataclass
 class ReferenceRun:
-    """One (variant, scheme) run: snapshots of the stored free-surface field."""
+    """One (variant, scheme) run: snapshots of the stored water depth."""
 
     variant: int                  # 1..6
     variant_name: str             # "Step", "Rectangular", ...
     scheme: str                   # "HLL", "LW", "MUSCLRS"
     times: torch.Tensor           # (T,) float64, seconds (from filenames)
-    eta: torch.Tensor             # (T, ny, nx) float64 — free surface h + Z
+    h: torch.Tensor               # (T, ny, nx) float64 — water depth
     files: list[Path] = field(default_factory=list)
 
     @property
@@ -125,12 +130,22 @@ class ReferenceRun:
 
     @property
     def shape(self) -> tuple[int, int]:
-        return self.eta.shape[-2], self.eta.shape[-1]
+        return self.h.shape[-2], self.h.shape[-1]
 
     def depth(self) -> torch.Tensor:
-        """Water depth h = eta - Z on the node grid (analytic Z)."""
+        """Water depth h on the node grid (the stored field)."""
+        return self.h
+
+    def eta(self) -> torch.Tensor:
+        """Free surface eta = h + Z on the node grid (analytic Z).
+
+        Derived, not stored: the free surface is the plotting field, and the
+        earlier drop that stored it directly was withdrawn by the solver authors
+        on 2026-07-08 in favour of the depth. Reconstructing it here is exact to
+        ~1e-15, which is how the two drops were cross-checked.
+        """
         X, Y = node_coords(self.shape[-1])
-        return self.eta - bed_elevation(X, Y)
+        return self.h + bed_elevation(X, Y)
 
 
 def _parse_variant_dir(vdir: Path) -> tuple[int, str]:
@@ -169,15 +184,15 @@ def load_run(scheme_dir: Path | str) -> ReferenceRun:
         variant_name=vname,
         scheme=scheme,
         times=torch.tensor([t for t, _ in stamped], dtype=torch.float64),
-        eta=torch.from_numpy(np.stack(fields)),
+        h=torch.from_numpy(np.stack(fields)),
         files=[f for _, f in stamped],
     )
 
 
-def discover_runs(raw_root: Path | str) -> list[Path]:
-    """All scheme directories under ``data/raw``, sorted for reproducibility."""
-    raw_root = Path(raw_root)
-    dirs = [d for d in sorted(raw_root.glob("Variant*/*")) if d.is_dir()]
+def discover_runs(root: Path | str = DATA_ROOT) -> list[Path]:
+    """All scheme directories under the data root, sorted for reproducibility."""
+    root = Path(root)
+    dirs = [d for d in sorted(root.glob("Variant*/*")) if d.is_dir()]
     return [d for d in dirs if _SCHEME_RE.search(d.name)]
 
 

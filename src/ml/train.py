@@ -43,9 +43,18 @@ def train(
     model: torch.nn.Module,
     loss_fn: Callable[[], tuple[torch.Tensor, dict]],
     cfg: TrainConfig,
+    provenance: dict | None = None,
 ) -> dict:
     """Optimize ``model`` on ``loss_fn``; returns a history dict and writes
-    out_dir/{history.csv, best.pt, loss_curves.png, meta.json}."""
+    out_dir/{history.csv, best.pt, loss_curves.png, meta.json}.
+
+    ``provenance`` is merged into meta.json and should carry whatever identifies
+    the run beyond the optimizer settings -- the entry name, benchmark, and any
+    entry-specific knob such as the gauge count. Without it a run directory is
+    only identifiable by its path, so two entries that share a configuration
+    (say a named data ablation and its gauge-sweep twin) are indistinguishable
+    from their contents alone.
+    """
     set_seed(cfg.seed)
     out = Path(cfg.out_dir)
     out.mkdir(parents=True, exist_ok=True)
@@ -97,9 +106,11 @@ def train(
 
     _write_history(out, history)
     _plot_curves(out, history)
-    (out / "meta.json").write_text(json.dumps({
-        "best_loss": best, "iters": cfg.iters, "lr": cfg.lr, "seed": cfg.seed,
-    }, indent=2))
+    meta = {"best_loss": best, "iters": cfg.iters, "lr": cfg.lr, "seed": cfg.seed,
+            "grad_clip": cfg.grad_clip, "lbfgs_iters": cfg.lbfgs_iters,
+            "device": cfg.device}
+    meta.update(provenance or {})
+    (out / "meta.json").write_text(json.dumps(meta, indent=2, sort_keys=True))
     return {"history": history, "best_loss": best}
 
 

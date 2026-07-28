@@ -1,9 +1,6 @@
-"""Re-evaluate the trained neural models against the reference depth data.
+"""Score the trained neural models against the reference solution.
 
-Following the solver authors' 2026-07-08 instruction, the PINN results should
-be compared against their water-depth files in ``data/CSV_FILE_h/`` (the
-actual SWE output; the earlier ``data/raw`` files were the plotting field
-eta = h + Z). This script loads every trained checkpoint for the six
+Post-training and inference-only: loads every trained checkpoint for the six
 reference-convention variants, predicts the depth field at t = 2 s on the
 evaluation grid, regrids the 501x501 reference node data onto the same grid,
 and reports the discrete L1(h) error per (method, variant, seed) plus the
@@ -11,11 +8,14 @@ and reports the discrete L1(h) error per (method, variant, seed) plus the
 classical tier (its error against the reference data is the inter-solver
 difference quantified in reports/reconciliation.md).
 
+Errors are on the water depth h, which is the reference solver's actual output
+and the field the drop under ``data/`` stores; see ``src/data/reference.py``.
+
 The dry-bed circular ablation and the g = 9.81 shock contrast have no matching
 counterpart and keep the fine-grid HLLC self-convergence reference.
 
-Run: python experiments/eval_against_depth_reference.py [--scheme MUSCLRS] [--eval-n 128]
-Writes: reports/ml_runs/eval_against_depth_reference.md
+Run: python experiments/run_evaluation.py [--scheme MUSCLRS] [--eval-n 128]
+Writes: reports/ml_runs/model_evaluation.md
 """
 
 from __future__ import annotations
@@ -31,7 +31,7 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "src"))
 
 from benchmarks.cases import build
-from data.reference import SRC_EXTENT, load_run, regrid
+from data.reference import DATA_ROOT, SRC_EXTENT, load_run, regrid
 from experiments.plot_pinn import (
     DEV,
     _fvm_depth,
@@ -41,19 +41,35 @@ from experiments.plot_pinn import (
 )
 from swe.solver import Config, run
 
-CSV_H = ROOT / "data" / "CSV_FILE_h"
-RUNS = ROOT / "runs" / "ml"
-OUT = ROOT / "reports" / "ml_runs" / "eval_against_depth_reference.md"
 
-#: benchmark id -> reference variant directory
-VARIANT_DIRS = {
-    "ca_step": "Variant 1 Step (Simple) Dam-Break",
-    "ca_rectangular": "Variant 2 Rectangular Dam-Break",
-    "ca_circular_wet": "Variant 3 Circular Dam-Break",
-    "ca_gaussian": "Variant 4 Gaussian Dam-Break",
-    "ca_parabolic": "Variant 5 Parabolic Dam-Break",
-    "ca_triangular": "Variant 6 Triangular (Equilateral) Dam-Break",
+RUNS = ROOT / "runs" / "ml"
+OUT = ROOT / "reports" / "ml_runs" / "model_evaluation.md"
+
+#: benchmark id -> paper IC variant number. Resolved to a directory by number
+#: rather than by name: the drop has spelled the same variant several ways
+#: ("Variant 1 Step Dam-Break", "Variant 1 Step (Simple) Dam-Break"), and a
+#: hard-coded name silently stops matching when it changes.
+VARIANT_NUMBERS = {
+    "ca_step": 1,
+    "ca_rectangular": 2,
+    "ca_circular_wet": 3,
+    "ca_gaussian": 4,
+    "ca_parabolic": 5,
+    "ca_triangular": 6,
 }
+
+
+def variant_dir(bid: str) -> Path:
+    """Reference directory for a benchmark id, matched on the variant number."""
+    n = VARIANT_NUMBERS[bid]
+    hits = [d for d in sorted(DATA_ROOT.glob(f"Variant {n} *")) if d.is_dir()]
+    if len(hits) != 1:
+        raise FileNotFoundError(
+            f"expected exactly one 'Variant {n} *' directory under {DATA_ROOT}, "
+            f"found {[d.name for d in hits]}")
+    return hits[0]
+
+
 VARIANT_LABELS = {
     "ca_step": "1 Step", "ca_rectangular": "2 Rectangular",
     "ca_circular_wet": "3 Circular", "ca_gaussian": "4 Gaussian",
@@ -70,11 +86,10 @@ T_FINAL = 2.0
 
 def reference_depth(bid: str, scheme: str, eval_bi) -> torch.Tensor:
     """Reference depth field at t = 2 s regridded onto our eval cell centers."""
-    vdir = CSV_H / VARIANT_DIRS[bid]
-    scheme_dir = next(vdir.glob(f"*numerical_{scheme}"))
-    ref = load_run(scheme_dir)  # stored field in CSV_FILE_h is the depth h
+    scheme_dir = next(variant_dir(bid).glob(f"*numerical_{scheme}"))
+    ref = load_run(scheme_dir)
     i_t = int((ref.times - T_FINAL).abs().argmin())
-    h_nodes = ref.eta[i_t : i_t + 1]  # (1, 501, 501)
+    h_nodes = ref.h[i_t : i_t + 1]  # (1, 501, 501)
     g = eval_bi.grid
     X, Y = g.centers()
     xc = X[0, :].cpu().double()
@@ -103,7 +118,7 @@ def main() -> None:
     args = ap.parse_args()
 
     lines = [
-        "# Neural models vs reference depth data (CSV_FILE_h)",
+        "# Neural models vs the reference depth solution",
         "",
         f"Reference: {args.scheme} depth files (501x501 nodes) at "
         f"t = {T_FINAL} s, bilinearly regridded onto the {args.eval_n}^2 "

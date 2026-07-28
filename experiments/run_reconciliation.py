@@ -24,6 +24,7 @@ import matplotlib.pyplot as plt
 import torch
 
 from data.reference import (
+    DATA_ROOT,
     G_REF,
     SRC_EXTENT,
     bed_elevation,
@@ -38,7 +39,6 @@ from swe.state import conserved
 ROOT = Path(__file__).resolve().parents[1]
 REPORTS = ROOT / "reports"
 FIGS = REPORTS / "figures"
-RAW = ROOT / "data" / "raw"
 
 VARIANT = 3
 N = 500
@@ -65,12 +65,12 @@ def our_run(scheme: str, order: int, limiter: str = "minmod"):
 
 def main() -> None:
     FIGS.mkdir(parents=True, exist_ok=True)
-    d = RAW / "Variant 3 Circular Dam-Break" / "solution_outputs_circular_numerical_HLL"
+    d = DATA_ROOT / "Variant 3 Circular Dam-Break" / "solution_outputs_circular_numerical_HLL"
     theirs = load_run(d)
 
     grid = Grid.from_extent(nx=N, ny=N, extent=SRC_EXTENT)
     # their eta sampled at our cell centers, one field per snapshot time
-    theirs_cc = regrid(theirs.eta, SRC_EXTENT, grid.xc, grid.yc, node_centered=True)
+    theirs_cc = regrid(theirs.eta(), SRC_EXTENT, grid.xc, grid.yc, node_centered=True)
     t_index = {round(float(t), 6): i for i, t in enumerate(theirs.times)}
 
     results = {}

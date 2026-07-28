@@ -1,4 +1,4 @@
-# Neural models vs reference depth data (CSV_FILE_h)
+# Neural models vs the reference depth solution
 
 Reference: MUSCLRS depth files (501x501 nodes) at t = 2.0 s, bilinearly regridded onto the 128^2 evaluation grid. Error: discrete L1(h) integrated over cell areas. Classical row: our HLLC MUSCL-van Leer at the same evaluation resolution (inter-solver difference; cf. reports/reconciliation.md).
 

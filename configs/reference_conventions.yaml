@@ -1,5 +1,5 @@
-source: data/raw (6 IC variants x {HLL, LW, MUSCLRS}); values from paper/main.tex Sect. 2.3, verified
-  against t=0 snapshots
+source: data/ (6 IC variants x {HLL, LW, MUSCLRS}); values from paper/main.tex Sect. 2.3, verified against
+  t=0 snapshots
 grid:
   shape:
   - 501
@@ -12,7 +12,7 @@ grid:
   dx_m: 0.2
   sample_location: nodes (501 = 500 intervals + 1)
 fields:
-  stored: 'free surface eta = h + Z [m] (verified: eta(t=0) == h_IC + Z)'
+  stored: 'water depth h [m] (verified: h(t=0) == h_IC)'
   momentum: ABSENT from the drop
 time:
   snapshot_times_s:
@@ -39,5 +39,5 @@ open_questions:
 - momentum/velocity snapshots available?
 - fixed dt or CFL-adaptive (which CFL)?
 - LW artificial viscosity form/coefficient?
-- confirm stored field is eta (verified numerically)
+- confirm stored field is the depth h (verified numerically)
 - confirm g = 2 m/s^2 is intentional

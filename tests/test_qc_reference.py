@@ -1,13 +1,11 @@
 """Tests for the data.reference loaders and QC diagnostics on synthetic inputs."""
 
-from pathlib import Path
-
 import numpy as np
 import pytest
 import torch
 
 from data.reference import (
-    bed_elevation,
+    DATA_ROOT,
     initial_depth,
     load_run,
     node_coords,
@@ -17,23 +15,21 @@ from data.reference import (
     symmetry_errors,
 )
 
-RAW = Path(__file__).resolve().parents[1] / "data" / "raw"
 
-
-@pytest.mark.skipif(not RAW.exists(), reason="reference data not present")
-def test_stored_field_is_eta_on_real_data():
-    """Lock the convention: stored t=0 snapshot equals h_IC + Z to rounding.
+@pytest.mark.skipif(not DATA_ROOT.exists(), reason="reference data not present")
+def test_stored_field_is_depth_on_real_data():
+    """Lock the convention: stored t=0 snapshot equals the analytic IC depth.
 
     Discontinuous ICs may disagree on nodes lying exactly on the discontinuity
     locus (float rounding in their inside/outside test — e.g. 2 of the 20
     nodes exactly on r=20 in variant 3), so the check tolerates a measure-zero
     mismatch set rather than demanding equality everywhere.
     """
-    d = RAW / "Variant 3 Circular Dam-Break" / "solution_outputs_circular_numerical_HLL"
+    d = DATA_ROOT / "Variant 3 Circular Dam-Break" / "solution_outputs_circular_numerical_HLL"
     run = load_run(d)
     X, Y = node_coords()
-    expected = initial_depth(3, X, Y) + bed_elevation(X, Y)
-    dev = (run.eta[0] - expected).abs()
+    expected = initial_depth(3, X, Y)
+    dev = (run.h[0] - expected).abs()
     mismatched = dev > 1e-9
     assert mismatched.float().mean().item() < 1e-4
     # all mismatches must sit exactly on the circle r = 20

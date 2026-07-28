@@ -1,4 +1,4 @@
-"""Reference data audit: inventory + QC of the reference runs in data/raw.
+"""Reference data audit: inventory + QC of the reference runs under data/.
 
 Writes:
     reports/data_audit.md
@@ -22,6 +22,7 @@ import torch
 import yaml
 
 from data.reference import (
+    DATA_ROOT,
     G_REF,
     SRC_EXTENT,
     bed_elevation,
@@ -33,7 +34,6 @@ from data.reference import (
 )
 
 ROOT = Path(__file__).resolve().parents[1]
-RAW = ROOT / "data" / "raw"
 REPORTS = ROOT / "reports"
 FIGS = REPORTS / "figures"
 
@@ -49,20 +49,20 @@ def fmt(x: float, prec: int = 3) -> str:
 
 def main() -> None:
     FIGS.mkdir(parents=True, exist_ok=True)
-    scheme_dirs = discover_runs(RAW)
+    scheme_dirs = discover_runs()
     if not scheme_dirs:
-        sys.exit(f"no runs found under {RAW}")
+        sys.exit(f"no runs found under {DATA_ROOT}")
 
     runs, reports, ic_dev = [], [], []
     X, Y = node_coords()
     Z = bed_elevation(X, Y)
     for d in scheme_dirs:
         run = load_run(d)
-        # QC on the physical depth h = eta - Z (mass/positivity live on h)
-        rep = run_qc(run.depth(), run.times, check_symmetry=True)
-        # convention check: stored t=0 field should equal h_IC + Z, up to a
-        # measure-zero set of nodes exactly on the IC discontinuity locus
-        dev = (run.eta[0] - (initial_depth(run.variant, X, Y) + Z)).abs()
+        # QC on the stored depth h (mass/positivity live on h)
+        rep = run_qc(run.h, run.times, check_symmetry=True)
+        # convention check: stored t=0 field should equal the analytic IC depth,
+        # up to a measure-zero set of nodes exactly on the discontinuity locus
+        dev = (run.h[0] - initial_depth(run.variant, X, Y)).abs()
         n_mis = int((dev > 1e-9).sum())
         dev_smooth = dev[dev <= 1e-9].max().item() if n_mis < dev.numel() else float("nan")
         runs.append(run)
@@ -74,7 +74,7 @@ def main() -> None:
     # ---------------- inventory + QC markdown ----------------
     lines: list[str] = []
     lines.append("# Reference data audit — inventory and QC\n")
-    lines.append(f"Source: `data/raw/` — {len(runs)} runs, "
+    lines.append(f"Source: `data/` — {len(runs)} runs, "
                  f"{sum(len(r.files) for r in runs)} CSV snapshot files.\n")
 
     lines.append("## Conventions (from paper/main.tex, verified numerically)\n")
@@ -89,13 +89,14 @@ def main() -> None:
         "- Schemes: Lax–Wendroff **with artificial viscosity**; HLL with "
         "`SL = min(uL-cL, uR-cR)`, `SR = max(uL+cL, uR+cR)`; MUSCL-RS = MUSCL "
         "(minmod, conserved variables) + Rusanov flux + SSP-RK3.\n"
-        "- **The stored field is the free surface `eta = h + Z`**, not the depth. "
-        "Verified below: the t=0 snapshots equal `h_IC + Z` to rounding in every "
-        "run.\n"
+        "- **The stored field is the water depth `h`** -- the solver's actual output. "
+        "(An earlier drop stored the free surface `eta = h + Z`, which the authors "
+        "clarified on 2026-07-08 is only their plotting field.) Verified below: the "
+        "t=0 snapshots equal the analytic `h_IC` to rounding in every run.\n"
     )
 
     lines.append("### Stored-field verification\n")
-    lines.append("Nodes where `eta(t=0)` differs from `h_IC + Z` by more than 1e-9 "
+    lines.append("Nodes where `h(t=0)` differs from the analytic `h_IC` by more than 1e-9 "
                  "(out of 251,001), plus the max deviation over all remaining "
                  "nodes. Mismatched nodes sit exactly on IC discontinuity loci "
                  "(float rounding in the reference solver's inside/outside tests).\n")
@@ -107,13 +108,13 @@ def main() -> None:
 
     lines.append("## Inventory\n")
     lines.append("All files are headerless CSV arrays of a **single field "
-                 "(free surface eta) per snapshot**; momentum fields are absent. "
+                 "(water depth h) per snapshot**; momentum fields are absent. "
                  "Times are parsed from filenames.\n")
     lines.append("| run | variant IC | scheme | grid (ny×nx) | snapshots | t range [s] | "
-                 "eta min @t0 | eta max @t0 |")
+                 "h min @t0 | h max @t0 |")
     lines.append("|---|---|---|---|---|---|---|---|")
     for run in runs:
-        e0 = run.eta[0]
+        e0 = run.h[0]
         lines.append(
             f"| {run.name} | {run.variant_name} | {run.scheme} | "
             f"{run.shape[0]}×{run.shape[1]} | {len(run.times)} | "
@@ -123,8 +124,8 @@ def main() -> None:
     lines.append("")
 
     lines.append("## QC diagnostics\n")
-    lines.append("All diagnostics are computed on the physical depth "
-                 "`h = eta − Z` (analytic Z). Mass drift is "
+    lines.append("All diagnostics are computed on the stored physical depth "
+                 "`h`. Mass drift is "
                  "`sum(h)_t / sum(h)_0 − 1` (uniform grid, so cell area "
                  "cancels). The paper states reflective BCs on all sides, so "
                  "the domain is **closed** and any drift is a numerical "
@@ -161,9 +162,9 @@ def main() -> None:
     lines.append(
         "- **Data hygiene is good**: no NaNs, no missing snapshots in any of the "
         "18 runs; all grids are 501×501 with a uniform 0.5 s output cadence.\n"
-        "- **Stored field identified**: t=0 snapshots equal `h_IC + Z` to "
+        "- **Stored field identified**: t=0 snapshots equal the analytic `h_IC` to "
         "float-rounding in all 18 runs (table above), confirming the files store "
-        "the free surface eta on the 501×501 node grid.\n"
+        "the water depth h on the 501×501 node grid.\n"
         "- **All runs are wet-bed**: the Gaussian variant's background depth "
         "decays to ~1.4e-11 at the corners but never reaches zero; no run "
         "exercises a true dry front. Our planned dry-bed benchmarks therefore "
@@ -198,7 +199,7 @@ def main() -> None:
         "runtime comparisons, not accuracy.\n"
         "3. **LW artificial viscosity**: form and coefficient (needed to "
         "attribute the LW mass loss precisely).\n"
-        "4. **Confirm the stored field is eta = h + Z** (we verified this "
+        "4. **Confirm the stored field is the depth h** (we verified this "
         "numerically; a one-line confirmation closes it).\n"
         "5. **g = 2 m/s²**: confirm this is intentional (it is unusual; all "
         "cross-solver comparisons will use it for reconciliation, while our "
@@ -209,7 +210,7 @@ def main() -> None:
 
     # ---------------- conventions yaml ----------------
     conv = {
-        "source": "data/raw (6 IC variants x {HLL, LW, MUSCLRS}); "
+        "source": "data/ (6 IC variants x {HLL, LW, MUSCLRS}); "
                   "values from paper/main.tex Sect. 2.3, verified against t=0 snapshots",
         "grid": {
             "shape": [501, 501],
@@ -218,7 +219,7 @@ def main() -> None:
             "sample_location": "nodes (501 = 500 intervals + 1)",
         },
         "fields": {
-            "stored": "free surface eta = h + Z [m] (verified: eta(t=0) == h_IC + Z)",
+            "stored": "water depth h [m] (verified: h(t=0) == h_IC)",
             "momentum": "ABSENT from the drop",
         },
         "time": {"snapshot_times_s": [0.0, 0.5, 1.0, 1.5, 2.0], "cadence_s": 0.5,
@@ -243,7 +244,7 @@ def main() -> None:
             "momentum/velocity snapshots available?",
             "fixed dt or CFL-adaptive (which CFL)?",
             "LW artificial viscosity form/coefficient?",
-            "confirm stored field is eta (verified numerically)",
+            "confirm stored field is the depth h (verified numerically)",
             "confirm g = 2 m/s^2 is intentional",
         ],
     }
@@ -258,13 +259,13 @@ def main() -> None:
     for j, run in enumerate(hll_runs):
         for i, ti in enumerate([0, len(run.times) - 1]):
             ax = axes[i, j]
-            im = ax.imshow(run.eta[ti], origin="lower", cmap="viridis",
+            im = ax.imshow(run.h[ti], origin="lower", cmap="viridis",
                            extent=SRC_EXTENT)
             ax.set_title(f"V{run.variant} {run.variant_name}\nt={run.times[ti]:g}s"
                          if i == 0 else f"t={run.times[ti]:g}s", fontsize=9)
             ax.set_xticks([]); ax.set_yticks([])
             fig.colorbar(im, ax=ax, fraction=0.046)
-    fig.suptitle("Reference HLL runs — free surface eta, first/last snapshot")
+    fig.suptitle("Reference HLL runs — water depth h, first/last snapshot")
     fig.tight_layout()
     fig.savefig(FIGS / "data_audit_snapshots.png", dpi=140)
     plt.close(fig)
