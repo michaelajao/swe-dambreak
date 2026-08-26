@@ -30,3 +30,4 @@ paper/*.synctex.gz
 
 # Transient run logs — curated copies live in reports/ml_runs/
 logs/
+doc/
