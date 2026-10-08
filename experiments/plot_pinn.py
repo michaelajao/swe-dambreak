@@ -1,4 +1,4 @@
-"""Generate all PINN result figures for the paper (written into paper/).
+"""Generate all PINN result figures for the paper (written into docs/research_paper/figures/).
 
 Summary charts (from the 3-seed means tabulated in reports/pinn_comparison.md):
   - across-IC L1(h) over the six variants
@@ -36,7 +36,7 @@ from swe.solver import Config, run
 
 DEV = "cuda" if torch.cuda.is_available() else "cpu"
 RUNS = ROOT / "runs" / "ml"
-OUT = ROOT / "paper"
+OUT = ROOT / "docs" / "research_paper" / "figures"
 
 plt.rcParams.update({
     "font.size": 11,
