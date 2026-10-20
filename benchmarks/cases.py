@@ -201,6 +201,12 @@ def ca_bed(X: torch.Tensor, Y: torch.Tensor) -> torch.Tensor:
     return 2.0 * torch.exp(-((X - 50.0) ** 2 + (Y - 50.0) ** 2) / 200.0)
 
 
+def ca_bed_grad(x: torch.Tensor, y: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
+    """Analytic gradient (Z_x, Z_y) of :func:`ca_bed` at arbitrary points."""
+    z = ca_bed(x, y)
+    return -(x - 50.0) / 100.0 * z, -(y - 50.0) / 100.0 * z
+
+
 def build_ca_circular(n: int, device: Device = "cpu", *, wet: bool = True) -> BenchmarkInstance:
     """Paper Variant 3 (circular) at the paper's conventions. h_in=10 m in
     R=20 m; downstream h_out=1 m (wet, matches the classical section) or 0

@@ -1,0 +1,14 @@
+# Pipeline check for the bed-source rerun (tiny budget).
+device: auto
+run_root: revision_2026_10/strongform_bed_smoke
+seeds: [0]
+entries:
+  - {name: pinn_primitive, kind: pinn, variables: primitive, bed_source: true}
+  - {name: pinn_conservative, kind: pinn, variables: conservative, bed_source: true}
+benchmarks:
+  - {id: ca_gaussian, reference_n: 64, grid_n: 32}
+train:
+  iters: 20
+  lr: 1.0e-3
+  n_collocation: 500
+  n_ic: 500

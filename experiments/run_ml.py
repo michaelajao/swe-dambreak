@@ -26,7 +26,7 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from benchmarks.cases import build                         # noqa: E402
+from benchmarks.cases import build, ca_bed_grad            # noqa: E402
 from experiments.metrics import (                          # noqa: E402
     Timer, field_errors, radial_front_position, relative_mass_drift, resample_to,
 )
@@ -101,7 +101,14 @@ def setup_pinn(entry, eval_bi, device, tr):
                         torch.zeros(grid.ny * grid.nx, device=dev)], dim=1).to(device)
     h0 = eval_bi.U0[0].reshape(-1).to(torch.float32).to(device)
     zero = torch.zeros_like(h0)
-    phys = Physics(g=eval_bi.g, manning_n=eval_bi.manning_n)
+    # Historical runs omitted the bed-slope source (flat-bed residual). It is
+    # opt-in per entry so archived configurations keep their original behaviour.
+    bed_grad = None
+    if entry.get("bed_source", False):
+        if not eval_bi.name.startswith("ca_") or eval_bi.z is None:
+            raise ValueError("bed_source is implemented for the ca_* Gaussian-hump cases only")
+        bed_grad = ca_bed_grad
+    phys = Physics(g=eval_bi.g, manning_n=eval_bi.manning_n, bed_grad=bed_grad)
 
     def loss_fn():
         n = tr["n_collocation"]
@@ -226,7 +233,9 @@ def main() -> None:
                 continue
             for seed in cfg["seeds"]:
                 tag = f"{entry['name']}/{bid}/seed{seed}"
-                out_dir = ROOT / "runs" / "ml" / entry["name"] / bid / f"seed{seed}"
+                out_dir = ROOT / "runs" / cfg.get("run_root", "ml") / entry["name"] / bid / f"seed{seed}"
+                if "run_root" in cfg and (out_dir / "best.pt").exists():
+                    raise FileExistsError(f"refusing to overwrite {out_dir}")
                 if entry["kind"] == "pinn":
                     model, loss_fn, ev = setup_pinn(entry, eval_bi, device, tr)
                 else:
@@ -241,7 +250,8 @@ def main() -> None:
                         "kind": entry["kind"], "grid_n": eval_n,
                         "reference_n": ref_n,
                         "variables": entry.get("variables"),
-                        "data": bool(entry.get("data", False))}
+                        "data": bool(entry.get("data", False)),
+                        "bed_source": bool(entry.get("bed_source", False))}
                 if prov["data"]:
                     prov["n_gauge"] = entry.get("n_gauge", tr.get("n_gauge", 64))
                 with Timer(device) as tm:
