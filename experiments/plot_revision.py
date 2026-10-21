@@ -63,7 +63,9 @@ def fig_learning_curve() -> None:
         short = "gaussian" if case == "ca_gaussian" else "circular"
         curves: dict[str, list[tuple[np.ndarray, np.ndarray]]] = defaultdict(list)
         frozen = solver = None
-        for name in (f"long_{short}_001", f"longsoft_{short}_001"):
+        for name in (f"long_{short}_001", f"longsoft_{short}_001", f"long_{short}_seeds34_001"):
+            if not (RUNS / name / "results.json").exists():
+                continue
             d = _load(name)
             ref = next(r for r in d["references"] if r["case"] == case and r["bed"] == "hump")
             frozen = _final(ref["frozen_initial_state"])

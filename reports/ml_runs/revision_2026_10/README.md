@@ -12,6 +12,8 @@ only on brosnan). Checkpoints, histories and `predictions.npz` stay on brosnan.
 | long_{gaussian,circular}_001 | configs/remedy_long_*.json | hard_ic, hard_causal; hump; 16k updates; last update reported |
 | longsoft_{gaussian,circular}_001 | configs/remedy_longsoft_*.json | soft, causal; hump; 16k updates; last update |
 | sweep_{a,b,c}_001 | configs/remedy_sweep_*.json | circular, tanh front of width w = 0.5,1 / 2,4 / 8,16 m; hard_ic, hard_causal; 4k updates; last update |
+| long_{gaussian,circular}_flat_001, longsoft_{gaussian,circular}_flat_001 | the same configs with beds = [flat] (made by scripts/brosnan_followup.sh) | flat-bed control at 16k updates, all four arms, 3 seeds (2026-10-20/21) |
+| long_circular_seeds34_001 | remedy_long_circular.json with seeds = [3, 4] | two extra seeds for hard_ic and hard_causal on the circular hump case |
 
 Strong-form reruns WITH the bed-slope term (configs/pinn_bed_rerun_{a,b,c}.yaml)
 live in `runs/revision_2026_10/strongform_bed/` on brosnan; their L1-vs-HLLC
